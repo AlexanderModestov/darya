@@ -1097,10 +1097,35 @@ Diese E-Mails funktionieren durch ihre Direktheit — halte sie ehrlich und knap
 let _currentUserId = null;
 const userKey = (k) => _currentUserId ? 'los3_u_'+_currentUserId+'_'+k : 'los3_'+k;
 const save = () => {
+  if (AUTH_MODE === 'backend' && AUTH_API()) return;
   ['leads','pending','inbox','logs'].forEach(k => localStorage.setItem(userKey(k), JSON.stringify(eval(k))));
   localStorage.setItem('los3_cfg', JSON.stringify(cfg));
 };
-const load = () => {
+const load = async () => {
+  if (AUTH_MODE === 'backend' && AUTH_API()) {
+    try {
+      const [leadsRes, emailsRes, inboxRes, settingsRes, logsRes] = await Promise.all([
+        authFetch('/api/leads'),
+        authFetch('/api/emails'),
+        authFetch('/api/inbox'),
+        authFetch('/api/settings'),
+        authFetch('/api/logs?limit=200')
+      ]);
+      if (leadsRes.ok) leads = await leadsRes.json();
+      if (emailsRes.ok) pending = await emailsRes.json();
+      if (inboxRes.ok) inbox = await inboxRes.json();
+      if (settingsRes.ok) {
+        const s = await settingsRes.json();
+        if (s.cfg) cfg = { ...cfg, ...s.cfg };
+        if (s.product) try { localStorage.setItem('los3_product', JSON.stringify(s.product)); } catch(e){}
+      }
+      if (logsRes.ok) {
+        const serverLogs = await logsRes.json();
+        logs = serverLogs.map(l => ({ msg: l.action + (l.details?.name ? ': ' + l.details.name : ''), t: 'info', time: l.created_at }));
+      }
+    } catch (e) { console.error('Load failed:', e); }
+    return;
+  }
   ['leads','pending','inbox','logs'].forEach(k => { try { eval(k+'=JSON.parse(localStorage.getItem(userKey(k))||"[]")'); } catch(e){} });
   try { const c = localStorage.getItem('los3_cfg'); if(c) cfg = {...cfg, ...JSON.parse(c)}; } catch(e){}
 };
@@ -1604,18 +1629,35 @@ const runEmailGen = async () => {
 };
 
 // ─── SEND ─────────────────────────────────────────────────────────────────────
-const doSend = (entry, lead) => {
-  const to  = entry.leadEmail || '';
+const doSend = async (entry, lead) => {
+  if (AUTH_MODE === 'backend' && AUTH_API()) {
+    try {
+      const res = await authFetch('/api/emails/' + entry.id + '/approve', { method: 'POST' });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        addLog('Fehler beim Senden: ' + (data.error || 'HTTP ' + res.status), 'err');
+        return;
+      }
+      addLog('E-Mail gesendet via Resend: ' + (entry.leadName || entry.lead_name), 'ok');
+      const l = leads.find(x => x.id === (entry.leadId || entry.lead_id));
+      if (l) l.status = 'Kontaktiert';
+      ui(); renderApprove(); renderLeads();
+    } catch (e) {
+      addLog('Sendefehler: ' + e.message, 'err');
+    }
+    return;
+  }
+  const to = entry.leadEmail || '';
   const sub = encodeURIComponent(entry.subject);
   const bod = encodeURIComponent(entry.body);
-  if(to) {
-    window.open(`https://mail.google.com/mail/?view=cm&to=${to}&su=${sub}&body=${bod}`, '_blank');
+  if (to) {
+    window.open('https://mail.google.com/mail/?view=cm&to=' + to + '&su=' + sub + '&body=' + bod, '_blank');
   } else {
-    addLog('Hinweis: Keine E-Mail-Adresse für '+entry.leadName+' — Gmail ohne Empfänger geöffnet','warn');
-    window.open(`https://mail.google.com/mail/?view=cm&su=${sub}&body=${bod}`, '_blank');
+    addLog('Hinweis: Keine E-Mail-Adresse für ' + entry.leadName + ' — Gmail ohne Empfänger geöffnet', 'warn');
+    window.open('https://mail.google.com/mail/?view=cm&su=' + sub + '&body=' + bod, '_blank');
   }
-  const l = leads.find(x=>x.id===entry.leadId);
-  if(l) { l.status='Kontaktiert'; save(); }
+  const l = leads.find(x => x.id === entry.leadId);
+  if (l) { l.status = 'Kontaktiert'; save(); }
 };
 
 // ─── APPROVE ─────────────────────────────────────────────────────────────────
@@ -1951,15 +1993,36 @@ Nur den E-Mail-Text, kein Betreff:`;
 
 const approveReply = id => { const item=inbox.find(x=>x.id===id); if(item?.aiDraft) doSendReply(item,item.aiDraft); };
 const sendManualReply = id => { const item=inbox.find(x=>x.id===id); const t=V('rt-'+id); if(!t){alert('Text eingeben');return;} doSendReply(item,t); };
-const doSendReply = (item, text) => {
-  if(cfg.gFrom && item.fromEmail) {
-    window.open('https://mail.google.com/mail/?view=cm&to='+encodeURIComponent(item.fromEmail)+'&su='+encodeURIComponent('Re: '+item.subject)+'&body='+encodeURIComponent(text),'_blank');
+const doSendReply = async (item, text) => {
+  if (AUTH_MODE === 'backend' && AUTH_API()) {
+    try {
+      const res = await authFetch('/api/inbox/' + item.id + '/reply', {
+        method: 'POST',
+        body: JSON.stringify({ body: text })
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        addLog('Fehler beim Antworten: ' + (data.error || 'HTTP ' + res.status), 'err');
+        return;
+      }
+      item.replied = true; item.replyBody = text; item.aiDraft = null;
+      const lead = leads.find(l => l.id === (item.leadId || item.lead_id));
+      if (lead) lead.status = 'Warm';
+      ui(); renderInbox(); renderLeads();
+      addLog('Antwort gesendet via Resend: ' + (item.from || item.from_name), 'ok');
+    } catch (e) {
+      addLog('Antwortfehler: ' + e.message, 'err');
+    }
+    return;
   }
-  item.replied=true; item.replyBody=text; item.aiDraft=null;
-  const lead = leads.find(l=>l.id===item.leadId);
-  if(lead) lead.status='Warm';
+  if (cfg.gFrom && item.fromEmail) {
+    window.open('https://mail.google.com/mail/?view=cm&to=' + encodeURIComponent(item.fromEmail) + '&su=' + encodeURIComponent('Re: ' + item.subject) + '&body=' + encodeURIComponent(text), '_blank');
+  }
+  item.replied = true; item.replyBody = text; item.aiDraft = null;
+  const lead = leads.find(l => l.id === item.leadId);
+  if (lead) lead.status = 'Warm';
   save(); ui(); renderInbox(); renderLeads();
-  addLog('Antwort gesendet: '+item.from,'ok');
+  addLog('Antwort gesendet: ' + item.from, 'ok');
 };
 
 const simReply = () => {
@@ -2894,7 +2957,7 @@ const migrateLegacyLeads = () => {
 // ─── AUTH ─────────────────────────────────────────────────────────────────────
 // Mode: 'local' (localStorage) or 'backend' (API)
 // Switch to 'backend' once Node.js server is running
-const AUTH_MODE = 'local';
+const AUTH_MODE = 'backend';
 const AUTH_API  = () => (cfg.backendUrl || '').replace(/\/$/, '');
 
 // ── Token storage ──────────────────────────────────────────────────────────
@@ -3228,10 +3291,26 @@ const changeOwnPassword = async () => {
 (async () => {
   const loggedIn = await checkSession();
   if(!loggedIn) return;
-  load(); migrateLegacyLeads(); applyCfg(); ui();
+  await load(); migrateLegacyLeads(); applyCfg(); ui();
   renderLeads(); renderApprove(); renderInbox(); renderLog();
   renderCatGrid(); renderLeadPicker(); renderLinkedInEnrichList();
   setInterval(tick,1000); tick();
+
+  // Inbox polling (backend mode)
+  if (AUTH_MODE === 'backend' && AUTH_API()) {
+    setInterval(async () => {
+      try {
+        const res = await authFetch('/api/inbox');
+        if (res.ok) {
+          const newInbox = await res.json();
+          if (newInbox.length !== inbox.length) {
+            inbox = newInbox;
+            ui(); renderInbox();
+          }
+        }
+      } catch (e) {}
+    }, 30000);
+  }
 })();
 </script>
 </body>
