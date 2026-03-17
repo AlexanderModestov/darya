@@ -1,0 +1,3238 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeadOS — Autonomer Sales Agent</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0b0b;--s1:#111;--s2:#181818;--s3:#202020;--s4:#2a2a2a;
+  --green:#00d4a0;--green2:#00a87f;--red:#ff4545;--yellow:#f5c218;
+  --blue:#4b8fff;--purple:#a855f7;--orange:#f97316;
+  --t1:#f0f0f0;--t2:#888;--t3:#444;
+  --bd:1px solid #1e1e1e;
+}
+html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'SF Mono',ui-monospace,monospace;font-size:13px;overflow:hidden}
+.shell{display:grid;grid-template-rows:50px 1fr;grid-template-columns:240px 1fr;height:100vh}
+.top{grid-column:1/-1;background:var(--s1);border-bottom:var(--bd);display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+.brand{font-size:14px;font-weight:900;letter-spacing:.18em;color:var(--green)}
+.brand em{color:var(--t3);font-style:normal;font-weight:400}
+.top-right{display:flex;gap:10px;align-items:center}
+.side{background:var(--s1);border-right:var(--bd);display:flex;flex-direction:column;overflow-y:auto}
+.nav-sec{font-size:10px;letter-spacing:.14em;color:var(--t3);padding:14px 16px 5px;text-transform:uppercase}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:12px;color:var(--t2);cursor:pointer;border-left:2px solid transparent;transition:all .12s;user-select:none}
+.ni:hover{color:var(--t1);background:var(--s2)}
+.ni.on{color:var(--green);border-left-color:var(--green);background:var(--s2)}
+.ni-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center}
+.side-foot{margin-top:auto;padding:12px 16px;border-top:var(--bd);font-size:10px;color:var(--t3);line-height:1.7}
+.main{overflow-y:auto;padding:26px 24px}
+.pg{display:none}
+.pg.on{display:block;animation:fu .18s ease}
+@keyframes fu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px}
+.ph-t{font-size:20px;font-weight:800;letter-spacing:-.02em;color:var(--t1)}
+.ph-s{font-size:11px;color:var(--t3);margin-top:4px;letter-spacing:.04em}
+.pn{background:var(--s1);border:var(--bd);border-radius:3px;margin-bottom:14px}
+.pn-h{padding:11px 16px;border-bottom:var(--bd);display:flex;align-items:center;justify-content:space-between}
+.pn-ht{font-size:10px;letter-spacing:.12em;color:var(--t2);text-transform:uppercase}
+.pn-b{padding:16px}
+.btn{padding:7px 16px;font-size:11px;letter-spacing:.07em;border:var(--bd);border-radius:3px;cursor:pointer;background:transparent;color:var(--t1);text-transform:uppercase;font-family:inherit;transition:all .12s}
+.btn:hover{background:var(--s3)}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.btn-g{background:var(--green);border-color:var(--green);color:#000;font-weight:800}
+.btn-g:hover{background:var(--green2)}
+.btn-r{border-color:var(--red);color:var(--red)}
+.btn-r:hover{background:var(--red);color:#fff}
+.btn-ok{background:rgba(0,212,160,.12);border-color:var(--green);color:var(--green)}
+.btn-ok:hover{background:var(--green);color:#000}
+.btn-rej{background:rgba(255,69,69,.1);border-color:var(--red);color:var(--red)}
+.btn-rej:hover{background:var(--red);color:#fff}
+.btn-purple{background:var(--purple);border-color:var(--purple);color:#fff;font-weight:800}
+.btn-purple:hover{background:#9333ea}
+.btn-sm{padding:5px 12px;font-size:10px}
+.inp{width:100%;padding:8px 12px;font-size:12px;font-family:inherit;background:var(--bg);border:var(--bd);border-radius:3px;color:var(--t1);outline:none;transition:border-color .12s}
+.inp:focus{border-color:var(--green)}
+.inp::placeholder{color:var(--t3)}
+select.inp option{background:var(--s1)}
+textarea.inp{resize:vertical;line-height:1.6}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:10px;letter-spacing:.1em;color:var(--t3);text-transform:uppercase;margin-bottom:5px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:2px;font-size:10px;font-weight:700;letter-spacing:.06em}
+.pill-on{background:rgba(0,212,160,.12);color:var(--green)}
+.pill-off{background:rgba(255,69,69,.1);color:var(--red)}
+.pill-warn{background:rgba(245,194,24,.12);color:var(--yellow)}
+.pill-info{background:rgba(75,143,255,.12);color:var(--blue)}
+.pill-purple{background:rgba(168,85,247,.12);color:var(--purple)}
+.bdg{display:inline-block;padding:2px 7px;border-radius:2px;font-size:10px;font-weight:700;letter-spacing:.05em}
+.bdg-new{background:rgba(75,143,255,.15);color:#6fa3ff}
+.bdg-sent{background:rgba(0,212,160,.15);color:var(--green)}
+.bdg-warm{background:rgba(245,200,66,.15);color:var(--yellow)}
+.bdg-rep{background:rgba(0,212,160,.28);color:#00eeb0}
+.bdg-cold{background:rgba(120,120,120,.1);color:var(--t3)}
+.term{background:#000;border:var(--bd);border-radius:3px;padding:14px;font-size:11px;line-height:1.75;max-height:300px;overflow-y:auto;font-family:inherit}
+.term .ln{margin:0}
+.lg{color:var(--green)}.lr{color:var(--red)}.lb{color:var(--blue)}.ly{color:var(--yellow)}.ld{color:var(--t3)}.lw{color:var(--t1)}.lp{color:var(--purple)}
+.step{display:flex;gap:14px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--s3)}
+.step:last-child{border-bottom:none}
+.sn{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+.sn-pend{background:var(--s3);color:var(--t3)}
+.sn-act{background:var(--green);color:#000}
+.sn-done{background:var(--s4);color:var(--green);border:1px solid var(--green)}
+.acard{background:var(--s2);border:var(--bd);border-radius:3px;padding:16px;margin-bottom:12px;transition:border-color .15s}
+.acard.pend{border-color:rgba(245,194,24,.35)}
+.acard.appr{border-color:rgba(0,212,160,.25)}
+.acard.rej{border-color:rgba(255,69,69,.15);opacity:.55}
+.eml-prev{background:var(--bg);border:var(--bd);border-radius:3px;padding:12px;font-size:12px;line-height:1.65;color:var(--t2);white-space:pre-wrap;max-height:220px;overflow-y:auto;margin:8px 0}
+.icard{background:var(--s2);border:var(--bd);border-radius:3px;padding:14px;margin-bottom:10px}
+.icard.unread{border-left:3px solid var(--green)}
+.icard.replied{opacity:.6}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{text-align:left;padding:8px 12px;font-size:10px;letter-spacing:.1em;color:var(--t3);text-transform:uppercase;border-bottom:var(--bd)}
+.tbl td{padding:8px 12px;border-bottom:1px solid var(--s2);color:var(--t2);font-size:12px;vertical-align:middle}
+.tbl tr:hover td{background:var(--s2);color:var(--t1)}
+.sp{display:inline-block;width:12px;height:12px;border:2px solid var(--s3);border-top-color:var(--green);border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.alrt{padding:10px 14px;border-radius:3px;font-size:12px;margin-bottom:14px}
+.alrt-ok{background:rgba(0,212,160,.1);border:1px solid rgba(0,212,160,.3);color:var(--green)}
+.alrt-err{background:rgba(255,69,69,.1);border:1px solid rgba(255,69,69,.3);color:var(--red)}
+.alrt-warn{background:rgba(245,194,24,.08);border:1px solid rgba(245,194,24,.25);color:var(--yellow)}
+.sep{height:1px;background:var(--s3);margin:14px 0}
+.tbtn{background:transparent;border:none;cursor:pointer;padding:3px 6px;color:var(--t3);font-size:12px;border-radius:2px;font-family:inherit}
+.tbtn:hover{color:var(--t1);background:var(--s3)}
+.isel{background:transparent;border:none;font-size:11px;font-family:inherit;cursor:pointer;color:var(--t3);outline:none}
+.field-lbl{font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em}
+.miss-btn{background:transparent;border:1px solid rgba(245,194,24,.35);border-radius:2px;padding:3px 8px;font-size:10px;color:var(--yellow);cursor:pointer;font-family:inherit;transition:all .12s}
+.miss-btn:hover{background:rgba(245,194,24,.1)}
+
+/* ── EMAIL GENERATOR SPECIFIC ─────────────────────────────── */
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:6px}
+.cat-card{background:var(--s2);border:2px solid var(--s3);border-radius:4px;padding:14px 12px;cursor:pointer;transition:all .15s;text-align:left}
+.cat-card:hover{border-color:var(--s4);background:var(--s3)}
+.cat-card.sel{border-color:var(--green);background:rgba(0,212,160,.06)}
+.cat-card .cat-icon{font-size:20px;margin-bottom:6px;display:block}
+.cat-card .cat-name{font-size:12px;font-weight:700;color:var(--t1);margin-bottom:3px}
+.cat-card .cat-desc{font-size:10px;color:var(--t3);line-height:1.4}
+.prod-card{background:var(--s2);border:var(--bd);border-radius:3px;padding:14px;margin-bottom:10px}
+.prod-card.active-prod{border-color:var(--green)}
+.prod-tag{display:inline-block;padding:2px 8px;border-radius:2px;font-size:10px;font-weight:700;margin-right:4px;margin-bottom:4px}
+.gen-progress{height:4px;background:var(--s3);border-radius:2px;overflow:hidden;margin:8px 0}
+.gen-progress-fill{height:100%;background:var(--green);border-radius:2px;transition:width .4s ease;width:0%}
+.lead-checkbox{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:3px;cursor:pointer;transition:background .1s}
+.lead-checkbox:hover{background:var(--s2)}
+.lead-checkbox input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:var(--green)}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--s1)}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:2px}
+
+/* ── LOGIN ───────────────────────────────────────────────────────────────── */
+.login-wrap{position:fixed;inset:0;background:#0b0b0b;display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-box{background:#111;border:1px solid #1e1e1e;border-radius:6px;padding:40px;width:380px;max-width:90vw}
+.login-logo{font-size:28px;font-weight:900;letter-spacing:.14em;color:#00d4a0;margin-bottom:4px}
+.login-sub{font-size:11px;color:#444;margin-bottom:32px;letter-spacing:.06em}
+.login-lbl{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
+.login-inp{width:100%;padding:10px 14px;background:#0b0b0b;border:1px solid #1e1e1e;border-radius:3px;color:#f0f0f0;font-family:inherit;font-size:13px;outline:none;margin-bottom:14px;transition:border-color .15s}
+.login-inp:focus{border-color:#00d4a0}
+.login-btn{width:100%;padding:11px;background:#00d4a0;border:none;border-radius:3px;color:#000;font-weight:900;font-size:13px;letter-spacing:.06em;cursor:pointer;font-family:inherit;margin-top:4px;transition:background .15s}
+.login-btn:hover{background:#00a87f}
+.login-btn:disabled{opacity:.4;cursor:not-allowed}
+.login-err{background:rgba(255,69,69,.1);border:1px solid rgba(255,69,69,.3);color:#ff4545;font-size:12px;padding:8px 12px;border-radius:3px;margin-bottom:14px;display:none}
+.login-footer{font-size:10px;color:#333;text-align:center;margin-top:20px}
+.user-pill{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--t3)}
+.user-avatar{width:24px;height:24px;border-radius:50%;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green)}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN OVERLAY ──────────────────────────────────────────────────────── -->
+<div id="login-overlay" class="login-wrap">
+  <div class="login-box">
+    <div class="login-logo">LeadOS</div>
+    <div class="login-sub">SALES AGENT · SIGN IN</div>
+
+    <div id="login-view">
+      <div id="login-err" class="login-err"></div>
+      <div class="login-lbl">E-Mail</div>
+      <input class="login-inp" id="li-email" type="email" placeholder="daria@firma.de" autocomplete="username">
+      <div class="login-lbl">Passwort</div>
+      <input class="login-inp" id="li-pass" type="password" placeholder="••••••••" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter') doLogin()">
+      <button class="login-btn" id="li-btn" onclick="doLogin()">Einloggen</button>
+      <div class="login-footer">
+        <span style="cursor:pointer;color:#555" onclick="showRegView()">Neuen Account erstellen →</span>
+      </div>
+    </div>
+
+    <div id="register-view" style="display:none">
+      <div id="reg-err" class="login-err"></div>
+      <div class="login-lbl">Name</div>
+      <input class="login-inp" id="reg-name" type="text" placeholder="Max Müller">
+      <div class="login-lbl">E-Mail</div>
+      <input class="login-inp" id="reg-email" type="email" placeholder="max@firma.de">
+      <div class="login-lbl">Passwort (min. 8 Zeichen)</div>
+      <input class="login-inp" id="reg-pass" type="password" placeholder="••••••••"
+        onkeydown="if(event.key==='Enter') doRegister()">
+      <div class="login-lbl">Passwort wiederholen</div>
+      <input class="login-inp" id="reg-pass2" type="password" placeholder="••••••••"
+        onkeydown="if(event.key==='Enter') doRegister()">
+      <button class="login-btn" id="reg-btn" onclick="doRegister()">Account erstellen</button>
+      <div class="login-footer">
+        <span style="cursor:pointer;color:#555" onclick="showLoginView()">← Zurück zum Login</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="shell" id="main-shell" style="display:none">
+
+<!-- TOP -->
+<div class="top">
+  <div class="brand">LeadOS <em>AGENT</em></div>
+  <div style="font-size:11px;color:var(--t3)">Autonomer B2B Sales-Agent · Bankensektor Deutschland</div>
+  <div class="top-right">
+    <div class="user-pill"><div class="user-avatar" id="user-avatar">?</div><span id="user-name-lbl" style="font-size:11px;color:var(--t2)"></span><button class="tbtn" onclick="doLogout()" style="font-size:10px;color:var(--t3);margin-left:4px" title="Ausloggen">⏻</button></div>
+    <span id="pill-agent" class="pill pill-off">● AGENT OFFLINE</span>
+    <span id="pill-api" class="pill pill-off">● API</span>
+    <span id="clk" style="font-size:11px;color:var(--t3)"></span>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="side">
+  <div class="nav-sec">Agent</div>
+  <div class="ni on" onclick="nav('agent')"><span>⚡</span> Agent & Suche</div>
+  <div class="ni" onclick="nav('linkedin')">
+    <span>🔗</span> LinkedIn Prospecting
+    <span class="ni-badge" id="b-li" style="display:none">0</span>
+  </div>
+  <div class="nav-sec">E-Mails</div>
+  <div class="ni" onclick="nav('emailgen')"><span>✉</span> E-Mails generieren</div>
+  <div class="ni" onclick="nav('approve')">
+    <span>✓</span> Freigabe
+    <span class="ni-badge" id="b-app" style="display:none">0</span>
+  </div>
+  <div class="ni" onclick="nav('inbox')">
+    <span>📥</span> Inbox / Antworten
+    <span class="ni-badge" id="b-inbox" style="display:none">0</span>
+  </div>
+  <div class="nav-sec">Daten</div>
+  <div class="ni" onclick="nav('leads')"><span>◈</span> Lead-Datenbank</div>
+  <div class="ni" onclick="nav('log')"><span>≡</span> Aktivitätslog</div>
+  <div class="nav-sec">System</div>
+  <div class="ni" onclick="nav('config')"><span>⊕</span> Konfiguration</div>
+  <div class="ni" id="nav-team" onclick="nav('team')" style="display:none"><span>👥</span> Team & Benutzer</div>
+  <div class="side-foot">
+    <div id="sb-inf">0 Leads · 0 Produkte</div>
+    <div style="color:var(--t3);margin-top:2px">lokal · localStorage</div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="main">
+
+<!-- ═══ AGENT ═══ -->
+<div id="pg-agent" class="pg on">
+  <div class="ph">
+    <div>
+      <div class="ph-t">Agent & Firmensuche</div>
+      <div class="ph-s">Agent recherchiert Firmen und speichert sie als Leads — E-Mails werden separat generiert</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-sm btn-r" id="btn-stop" style="display:none" onclick="stopAgent()">⬛ Stopp</button>
+      <button class="btn btn-g" id="btn-run" onclick="runAgent()">▶ Agent starten</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;margin-bottom:14px">
+    <div class="pn">
+      <div class="pn-h"><span class="pn-ht">Suchauftrag / Prompt</span></div>
+      <div class="pn-b">
+        <div class="fg">
+          <label>Was soll der Agent suchen?</label>
+          <textarea class="inp" id="a-prompt" style="min-height:110px">Suche nach deutschen IT-Dienstleistern und Fintech-Unternehmen mit 50–200 Mitarbeitern, die aktiv Banken, Sparkassen oder Volksbanken als Kunden haben. Fokus auf: RegTech, Core-Banking, Compliance-Software, Zahlungsverkehr. Keine Großkonzerne.</textarea>
+        </div>
+        <div class="fr">
+          <div class="fg" style="margin-bottom:0">
+            <label>Anzahl neue Leads</label>
+            <select class="inp" id="a-count">
+              <option value="5">5 Leads</option>
+              <option value="8" selected>8 Leads</option>
+              <option value="10">10 Leads</option>
+              <option value="15">15 Leads</option>
+            </select>
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <label>Nach Suche</label>
+            <select class="inp" id="a-after">
+              <option value="nothing">Nur Leads speichern</option>
+              <option value="emailgen">Direkt zu E-Mails generieren</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="pn" style="margin-bottom:10px">
+        <div class="pn-h"><span class="pn-ht">Schritte</span></div>
+        <div class="pn-b" style="padding:10px 16px">
+          <div class="step"><div class="sn sn-pend" id="s1">1</div><div><div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:2px">Firmen recherchieren</div><div style="font-size:11px;color:var(--t3)" id="s1d">Wartet…</div></div></div>
+          <div class="step"><div class="sn sn-pend" id="s2">2</div><div><div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:2px">Leads speichern</div><div style="font-size:11px;color:var(--t3)" id="s2d">Wartet…</div></div></div>
+          <div class="step" style="border:none"><div class="sn sn-pend" id="s3">3</div><div><div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:2px">Fertig</div><div style="font-size:11px;color:var(--t3)" id="s3d">Wartet…</div></div></div>
+        </div>
+      </div>
+      <div class="pn">
+        <div class="pn-h"><span class="pn-ht">Statistik</span></div>
+        <div class="pn-b" style="padding:10px 16px">
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)">Leads gesamt</span><span id="st-tot" style="color:var(--t1);font-weight:700">0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)">Pending Freigaben</span><span id="st-pen" style="color:var(--yellow);font-weight:700">0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)">E-Mails genehmigt</span><span id="st-app" style="color:var(--green);font-weight:700">0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--t3)">Antworten</span><span id="st-rep" style="color:var(--blue);font-weight:700">0</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pn">
+    <div class="pn-h"><span class="pn-ht">Terminal</span><button class="btn btn-sm btn-r" onclick="clearTerm()">Leeren</button></div>
+    <div class="term" id="term"><div class="ln ld">// LeadOS Agent bereit. Starte die Firmensuche oben.</div></div>
+  </div>
+</div>
+
+<!-- ═══ E-MAILS GENERIEREN ═══ -->
+<div id="pg-emailgen" class="pg">
+  <div class="ph">
+    <div>
+      <div class="ph-t">E-Mails generieren</div>
+      <div class="ph-s">Dein Produkt-Prompt → Kategorie wählen → Leads auswählen → KI generiert personalisierte E-Mails</div>
+    </div>
+    <button class="btn btn-g" id="eg-run-btn" onclick="runEmailGen()">⚡ E-Mails generieren</button>
+  </div>
+  <div id="eg-alrt" style="display:none" class="alrt"></div>
+
+  <!-- SCHRITT 1: DEIN PRODUKT -->
+  <div class="pn">
+    <div class="pn-h">
+      <span class="pn-ht">① Profil deines Unternehmens</span>
+      <span style="font-size:10px;color:var(--t3)">Wird bei jeder E-Mail-Generierung verwendet — einmal ausfüllen, immer nutzen</span>
+    </div>
+    <div class="pn-b">
+
+      <!-- ROW 1: Name + Zielgruppe -->
+      <div class="fr" style="margin-bottom:12px">
+        <div class="fg" style="margin-bottom:0">
+          <label>Produktname / Angebotsbezeichnung</label>
+          <input class="inp" id="eg-prodname" placeholder="z.B. AI-Prozessautomatisierung für Banken">
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Zielgruppe / Ansprechpartner</label>
+          <input class="inp" id="eg-target" placeholder="z.B. CIO, IT-Leiter, Compliance-Chef">
+        </div>
+      </div>
+
+      <!-- ROW 2: Was wir machen + Probleme die wir lösen -->
+      <div class="fr" style="margin-bottom:12px">
+        <div class="fg" style="margin-bottom:0">
+          <label>Was wir machen (2-3 Sätze)</label>
+          <textarea class="inp" id="eg-what" style="min-height:72px;line-height:1.6" placeholder="Wir entwickeln KI-Agenten die Vertriebsprozesse automatisieren — von der Lead-Recherche bis zur E-Mail-Generierung. Unsere Lösung reduziert den manuellen Aufwand im B2B-Vertrieb um 60%."></textarea>
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Welche Probleme lösen wir?</label>
+          <textarea class="inp" id="eg-problems" style="min-height:72px;line-height:1.6" placeholder="Vertriebsteams verlieren zu viel Zeit mit manueller Recherche und copy-paste E-Mails. CRM-Daten sind unvollständig. Follow-ups werden vergessen."></textarea>
+        </div>
+      </div>
+
+      <!-- ROW 3: USP + ROI -->
+      <div class="fr" style="margin-bottom:12px">
+        <div class="fg" style="margin-bottom:0">
+          <label>USP — Was macht uns einzigartig?</label>
+          <input class="inp" id="eg-usp" placeholder="z.B. Setup in 2 Wochen, kein IT-Team nötig, nachweisbar 40% Zeitersparnis">
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>ROI / konkrete Kennzahlen</label>
+          <input class="inp" id="eg-roi" placeholder="z.B. ROI nach 8 Monaten, 15h/Woche gespart, +23% Conversion">
+        </div>
+      </div>
+
+      <!-- ROW 4: Preise + Referenzen -->
+      <div class="fr" style="margin-bottom:12px">
+        <div class="fg" style="margin-bottom:0">
+          <label>Preise / Pakete (optional)</label>
+          <input class="inp" id="eg-pricing" placeholder="z.B. ab 2.900 €/Monat, Setup einmalig 5.000 €, kostenlose Pilotphase">
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Referenzen / Kunden-Beispiele</label>
+          <input class="inp" id="eg-refs" placeholder="z.B. 3 Sparkassen in Bayern, FinTech-Startup Berlin, 200-MA IT-Dienstleister">
+        </div>
+      </div>
+
+      <!-- ROW 5: Freier Zusatz-Prompt -->
+      <div class="fg" style="margin-bottom:12px">
+        <label>Zusätzlicher Kontext (optional) — Besonderheiten, aktuelle Aktionen, Sprache</label>
+        <textarea class="inp" id="eg-prompt" style="min-height:60px;line-height:1.6" placeholder="z.B. Wir haben gerade eine Case Study mit Commerzbank veröffentlicht. Aktuell bieten wir bis Ende Q1 eine kostenlose Pilotphase an. Schreib immer auf Deutsch, Sie-Form."></textarea>
+      </div>
+
+      <!-- Preview & Save -->
+      <div style="background:var(--s2);border:var(--bd);border-radius:3px;padding:10px 14px;margin-bottom:12px;display:none" id="eg-preview-box">
+        <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Vorschau — was Claude sieht:</div>
+        <div id="eg-preview-text" style="font-size:11px;color:var(--t2);line-height:1.7;white-space:pre-wrap;max-height:140px;overflow-y:auto"></div>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-sm btn-g" onclick="saveProductPrompt()">💾 Profil speichern</button>
+        <button class="btn btn-sm" onclick="loadProductPrompt()">📂 Gespeichertes laden</button>
+        <button class="btn btn-sm" onclick="togglePromptPreview()">👁 Vorschau</button>
+        <span id="eg-saved-info" style="font-size:10px;color:var(--t3)"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCHRITT 2: KATEGORIE -->
+  <div class="pn">
+    <div class="pn-h">
+      <span class="pn-ht">② E-Mail-Kategorie wählen</span>
+      <span style="font-size:10px;color:var(--t3)">Bestimmt Stil, Ton und Ziel der E-Mail</span>
+    </div>
+    <div class="pn-b">
+      <div class="cat-grid" id="cat-grid">
+        <!-- rendered by JS -->
+      </div>
+      <!-- Custom settings for selected category -->
+      <div id="cat-custom" style="margin-top:12px;display:none">
+        <div class="sep"></div>
+        <div class="fr3">
+          <div class="fg" style="margin-bottom:0">
+            <label>Tonalität</label>
+            <select class="inp" id="eg-tone">
+              <option value="professionell">Professionell & direkt</option>
+              <option value="locker">Locker & persönlich</option>
+              <option value="formell">Formell (Sie-Form)</option>
+              <option value="neugierig">Neugierig & fragend</option>
+            </select>
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <label>E-Mail-Länge</label>
+            <select class="inp" id="eg-len">
+              <option value="kurz">Kurz (3–4 Sätze)</option>
+              <option value="mittel" selected>Mittel (5–6 Sätze)</option>
+              <option value="lang">Ausführlich (7–9 Sätze)</option>
+            </select>
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <label>Call-to-Action</label>
+            <select class="inp" id="eg-cta">
+              <option value="call">15-Min Discovery Call</option>
+              <option value="demo">Kurze Demo</option>
+              <option value="info">Infomaterial senden</option>
+              <option value="roi">ROI-Analyse anbieten</option>
+              <option value="pilot">Pilot-Projekt vorschlagen</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg" style="margin-top:12px;margin-bottom:0">
+          <label>Zusätzliche Anweisungen (optional)</label>
+          <input class="inp" id="eg-extra" placeholder="z.B. Erwähne DORA-Regulierung. Vermeide das Wort 'revolutionär'. Beziehe dich auf aktuelle BaFin-Anforderungen.">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCHRITT 3: LEADS AUSWÄHLEN -->
+  <div class="pn">
+    <div class="pn-h">
+      <span class="pn-ht">③ Leads auswählen</span>
+      <span id="eg-lead-count-lbl" style="font-size:10px;color:var(--t3)">0 ausgewählt</span>
+    </div>
+    <div class="pn-b">
+      <div class="fr" style="margin-bottom:12px">
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-sm" onclick="selectLeadsFilter('Neu')">Alle Neu</button>
+          <button class="btn btn-sm" onclick="selectLeadsFilter('Kalt')">Alle Kalt</button>
+          <button class="btn btn-sm" onclick="selectLeadsFilter('all')">Alle</button>
+          <button class="btn btn-sm btn-r" onclick="selectLeadsFilter('none')">Keine</button>
+        </div>
+        <input class="inp" id="eg-lead-search" placeholder="Leads filtern…" oninput="renderLeadPicker()">
+      </div>
+      <div id="lead-picker" style="max-height:220px;overflow-y:auto;border:var(--bd);border-radius:3px;padding:4px"></div>
+    </div>
+  </div>
+
+  <!-- SCHRITT 4: VORSCHAU & START -->
+  <div class="pn">
+    <div class="pn-h">
+      <span class="pn-ht">④ Freigabe-Modus</span>
+    </div>
+    <div class="pn-b">
+      <div class="fr">
+        <div class="fg" style="margin-bottom:0">
+          <label>Modus</label>
+          <select class="inp" id="eg-mode">
+            <option value="review">Ich prüfe jede E-Mail vor dem Senden</option>
+            <option value="auto">Auto-Approve — sofort senden (simuliert)</option>
+          </select>
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Test-E-Mail (optional)</label>
+          <div style="display:flex;gap:8px">
+            <input class="inp" id="eg-test-lead" placeholder="Lead-Name für Test…" style="flex:1">
+            <button class="btn btn-sm btn-purple" onclick="runTestEmail()"><span id="eg-test-sp" style="display:none" class="sp"></span>Test</button>
+          </div>
+        </div>
+      </div>
+      <div id="eg-test-result" style="display:none;margin-top:12px">
+        <div style="font-size:10px;color:var(--yellow);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">Test-E-Mail Vorschau</div>
+        <div style="font-size:11px;color:var(--yellow);margin-bottom:4px">Betreff: <span id="eg-test-subj" style="color:var(--t1)"></span></div>
+        <div class="eml-prev" id="eg-test-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORTSCHRITT -->
+  <div id="eg-progress-panel" class="pn" style="display:none">
+    <div class="pn-h">
+      <span class="pn-ht">Generierung läuft</span>
+      <span id="eg-prog-lbl" style="font-size:11px;color:var(--t3)">0 / 0</span>
+    </div>
+    <div class="pn-b">
+      <div class="gen-progress"><div class="gen-progress-fill" id="eg-prog-bar"></div></div>
+      <div id="eg-prog-log" style="font-size:11px;color:var(--t2);line-height:1.8;max-height:150px;overflow-y:auto;margin-top:6px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FREIGABE ═══ -->
+<div id="pg-approve" class="pg">
+  <div class="ph">
+    <div>
+      <div class="ph-t">Freigabe</div>
+      <div class="ph-s">Alle generierten E-Mails prüfen · bearbeiten · freigeben zum Versand</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span id="app-counter" style="font-size:11px;color:var(--t3)"></span>
+      <button class="btn btn-sm" onclick="setApproveFilter('all')" id="af-all">Alle</button>
+      <button class="btn btn-sm" onclick="setApproveFilter('pending')" id="af-pend">Ausstehend</button>
+      <button class="btn btn-sm" onclick="setApproveFilter('approved')" id="af-appr">Gesendet</button>
+      <button class="btn btn-sm" onclick="setApproveFilter('rejected')" id="af-rej">Abgelehnt</button>
+      <div style="width:1px;height:20px;background:var(--s4)"></div>
+      <button class="btn btn-sm" id="view-cards" onclick="setApproveView('cards')" title="Kartenansicht">☰ Karten</button>
+      <button class="btn btn-sm" id="view-table" onclick="setApproveView('table')" title="Tabellenansicht">⊞ Tabelle</button>
+      <div style="width:1px;height:20px;background:var(--s4)"></div>
+      <button class="btn btn-sm btn-ok" onclick="approveAll()">✓ Alle freigeben</button>
+      <button class="btn btn-sm btn-rej" onclick="rejectAll()">✕ Alle ablehnen</button>
+    </div>
+  </div>
+
+  <!-- STATS ROW -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
+    <div style="background:var(--s1);border:var(--bd);border-radius:3px;padding:12px 14px">
+      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Gesamt</div>
+      <div style="font-size:22px;font-weight:800;color:var(--t1)" id="as-total">0</div>
+    </div>
+    <div style="background:var(--s1);border:var(--bd);border-left:3px solid var(--yellow);border-radius:3px;padding:12px 14px">
+      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Ausstehend</div>
+      <div style="font-size:22px;font-weight:800;color:var(--yellow)" id="as-pend">0</div>
+    </div>
+    <div style="background:var(--s1);border:var(--bd);border-left:3px solid var(--green);border-radius:3px;padding:12px 14px">
+      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Freigegeben</div>
+      <div style="font-size:22px;font-weight:800;color:var(--green)" id="as-appr">0</div>
+    </div>
+    <div style="background:var(--s1);border:var(--bd);border-left:3px solid var(--red);border-radius:3px;padding:12px 14px">
+      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Abgelehnt</div>
+      <div style="font-size:22px;font-weight:800;color:var(--red)" id="as-rej">0</div>
+    </div>
+  </div>
+
+  <div id="app-empty" style="display:none;text-align:center;padding:60px;color:var(--t3);font-size:13px">
+    Noch keine E-Mails generiert.<br>
+    <span style="font-size:11px;color:var(--t3);margin-top:8px;display:block">Gehe zu "E-Mails generieren" um Kampagnen zu starten.</span>
+  </div>
+  <div id="app-list"></div>
+</div>
+
+<!-- ═══ INBOX ═══ -->
+<div id="pg-inbox" class="pg">
+  <div class="ph">
+    <div><div class="ph-t">Inbox / Antworten</div><div class="ph-s">Agent antwortet kontextbasiert — immer mit Produkt-Kontext</div></div>
+    <button class="btn btn-sm" onclick="simReply()">+ Antwort simulieren</button>
+  </div>
+  <div id="inbox-empty" style="display:none;text-align:center;padding:60px;color:var(--t3)">Keine Antworten.</div>
+  <div id="inbox-list"></div>
+</div>
+
+<!-- ═══ LEADS ═══ -->
+<div id="pg-leads" class="pg">
+  <div class="ph">
+    <div><div class="ph-t">Lead-Datenbank</div><div class="ph-s" id="ld-lbl">0 Einträge</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-sm" onclick="expCSV()">↓ CSV</button>
+      <button class="btn btn-sm" onclick="expJSON()">↓ JSON</button>
+      <button class="btn btn-sm" onclick="impJSON()">↑ Import</button>
+      <button class="btn btn-sm btn-r" onclick="clearLeads()">DB leeren</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;margin-bottom:14px">
+    <input class="inp" id="ld-q" placeholder="Suchen…" oninput="renderLeads()" style="flex:1">
+    <select class="inp" id="ld-fs" style="width:160px" onchange="renderLeads()">
+      <option value="">Alle Status</option>
+      <option>Neu</option><option>Kontaktiert</option><option>Warm</option><option>Geantwortet</option><option>Kalt</option>
+    </select>
+  </div>
+  <div class="pn"><div class="pn-b" style="padding:0">
+    <table class="tbl">
+      <thead><tr><th>Firma + E-Mail</th><th>Ansprechpartner</th><th>Telefon</th><th>E-Mail Kontakt</th><th>Beschreibung</th><th>Status</th><th></th></tr></thead>
+      <tbody id="ld-body"></tbody>
+    </table>
+  </div></div>
+</div>
+
+<!-- ═══ LOG ═══ -->
+<div id="pg-log" class="pg">
+  <div class="ph">
+    <div><div class="ph-t">Aktivitätslog</div></div>
+    <button class="btn btn-sm btn-r" onclick="clearLog()">Log leeren</button>
+  </div>
+  <div class="pn"><div class="pn-b" id="log-body" style="max-height:560px;overflow-y:auto;padding:0 16px"></div></div>
+</div>
+
+<!-- ═══ CONFIG ═══ -->
+<div id="pg-config" class="pg">
+  <div class="ph">
+    <div><div class="ph-t">Konfiguration</div><div class="ph-s">API-Keys, Absender-Profil, Webhook</div></div>
+    <button class="btn btn-g" onclick="saveConfig()">Speichern</button>
+  </div>
+  <div id="cfg-alrt" style="display:none" class="alrt"></div>
+  <div class="pn">
+    <div class="pn-h"><span class="pn-ht">KI-Anbieter</span><span id="p-claude" class="pill pill-off">● OFFLINE</span></div>
+    <div class="pn-b">
+      <div class="fr" style="margin-bottom:14px">
+        <div class="fg" style="margin-bottom:0">
+          <label>Anbieter wählen</label>
+          <select class="inp" id="c-provider" onchange="switchProvider(this.value)">
+            <option value="claude">Anthropic Claude</option>
+            <option value="openai">OpenAI (ChatGPT)</option>
+            <option value="gemini">Google Gemini</option>
+          </select>
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Modell</label>
+          <select class="inp" id="c-model" style="max-width:360px">
+            <option value="claude-sonnet-4-20250514">Claude Sonnet 4 (empfohlen)</option>
+            <option value="claude-opus-4-20250514">Claude Opus 4</option>
+            <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (schnell)</option>
+          </select>
+        </div>
+      </div>
+      <!-- Claude -->
+      <div id="key-claude" class="fg">
+        <label>Claude API Key</label>
+        <div style="display:flex;gap:10px">
+          <input class="inp" id="c-key" type="password" placeholder="sk-ant-api03-…">
+          <button class="btn btn-sm" onclick="testClaude()">Testen</button>
+        </div>
+        <div style="font-size:10px;color:var(--t3);margin-top:4px">console.anthropic.com → API Keys</div>
+      </div>
+      <!-- OpenAI -->
+      <div id="key-openai" class="fg" style="display:none">
+        <label>OpenAI API Key</label>
+        <div style="display:flex;gap:10px">
+          <input class="inp" id="c-openai-key" type="password" placeholder="sk-proj-…">
+          <button class="btn btn-sm" onclick="testOpenAI()">Testen</button>
+        </div>
+        <div style="font-size:10px;color:var(--t3);margin-top:4px">platform.openai.com → API Keys</div>
+      </div>
+      <!-- Gemini -->
+      <div id="key-gemini" class="fg" style="display:none;margin-bottom:0">
+        <label>Gemini API Key</label>
+        <div style="display:flex;gap:10px">
+          <input class="inp" id="c-gemini-key" type="password" placeholder="AIzaSy…">
+          <button class="btn btn-sm" onclick="testGemini()">Testen</button>
+        </div>
+        <div style="font-size:10px;color:var(--t3);margin-top:4px">aistudio.google.com → Get API Key · Kostenlos</div>
+      </div>
+    </div>
+  </div>
+  <div class="pn">
+    <div class="pn-h"><span class="pn-ht">Backend</span><span id="p-backend" class="pill pill-off">● OFFLINE</span></div>
+    <div class="pn-b">
+      <div class="fg" style="margin-bottom:0">
+        <label>Backend URL</label>
+        <div style="display:flex;gap:10px">
+          <input class="inp" id="c-backend" placeholder="http://localhost:3000 oder https://your-app.railway.app">
+          <button class="btn btn-sm" onclick="testBackend()">Testen</button>
+        </div>
+        <div style="font-size:10px;color:var(--t3);margin-top:5px">
+          Leer lassen = lokaler Modus (Daten im Browser). Mit Backend-URL = Server-Modus (Daten in PostgreSQL).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pn">
+    <div class="pn-h"><span class="pn-ht">Absender-Profil</span></div>
+    <div class="pn-b">
+      <div class="fr">
+        <div class="fg"><label>Name</label><input class="inp" id="c-name" placeholder="Daria"></div>
+        <div class="fg"><label>Rolle</label><input class="inp" id="c-role" placeholder="Lead AI Architect"></div>
+      </div>
+      <div class="fr" style="margin-bottom:0">
+        <div class="fg" style="margin-bottom:0"><label>Unternehmen</label><input class="inp" id="c-co" placeholder="Meine GmbH"></div>
+        <div class="fg" style="margin-bottom:0"><label>Signatur</label><input class="inp" id="c-sig" placeholder="Beste Grüße, Daria"></div>
+      </div>
+    </div>
+  </div>
+  <div class="pn">
+    <div class="pn-h"><span class="pn-ht">Gmail / E-Mail</span><span id="p-gmail" class="pill pill-off">● OFFLINE</span></div>
+    <div class="pn-b">
+      <div class="fr" style="margin-bottom:0">
+        <div class="fg" style="margin-bottom:0"><label>Absender-E-Mail</label><input class="inp" id="c-gfrom" placeholder="daria@firma.de" type="email"></div>
+        <div class="fg" style="margin-bottom:0"><label>Anzeigename</label><input class="inp" id="c-gname" placeholder="Daria, Lead AI Architect"></div>
+      </div>
+    </div>
+  </div>
+  <div class="pn">
+    <div class="pn-h"><span class="pn-ht">Webhook / CRM</span><span id="p-wh" class="pill pill-off">● OFFLINE</span></div>
+    <div class="pn-b">
+      <div class="fg" style="margin-bottom:0"><label>Webhook URL</label>
+        <div style="display:flex;gap:10px">
+          <input class="inp" id="c-wh" placeholder="https://hook.zapier.com/…">
+          <button class="btn btn-sm" onclick="testWH()">Testen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pn">
+    <div class="pn-h"><span class="pn-ht">Daten</span></div>
+    <div class="pn-b" style="display:flex;gap:8px">
+      <button class="btn btn-sm" onclick="expJSON()">JSON Export</button>
+      <button class="btn btn-sm" onclick="impJSON()">JSON Import</button>
+      <button class="btn btn-sm btn-r" onclick="nukeAll()">Meine Daten löschen</button>
+    </div>
+  </div>
+  <div class="pn">
+    <div class="pn-h">
+      <span class="pn-ht">Nutzer-Verwaltung</span>
+      <span id="p-admin" class="pill" style="display:none"></span>
+    </div>
+    <div class="pn-b">
+      <div id="users-list" style="margin-bottom:10px"></div>
+      <div style="font-size:10px;color:var(--t3)">Neue Nutzer registrieren sich selbst über den Login-Screen. Als Admin kannst du alle Accounts sehen und löschen.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ LINKEDIN PROSPECTING ═══ -->
+<div id="pg-linkedin" class="pg">
+  <div class="ph">
+    <div>
+      <div class="ph-t">LinkedIn Prospecting</div>
+      <div class="ph-s">Ansprechpartner recherchieren · Profile öffnen · Kontaktdaten via Apollo.io / Hunter.io anreichern</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-sm btn-purple" id="li-enrich-btn" onclick="enrichAllLeads()">⚡ Alle anreichern</button>
+      <button class="btn btn-g" id="li-search-btn" onclick="runLinkedInSearch()">🔍 Suche starten</button>
+    </div>
+  </div>
+  <div id="li-alrt" style="display:none" class="alrt"></div>
+
+  <!-- HOW IT WORKS BANNER -->
+  <div style="background:rgba(75,143,255,.08);border:1px solid rgba(75,143,255,.2);border-radius:3px;padding:12px 16px;margin-bottom:14px;font-size:11px;color:var(--blue);line-height:1.7">
+    <strong style="color:var(--t1)">Wie es funktioniert:</strong>
+    &nbsp;① Agent generiert optimierte LinkedIn-Suchanfragen für deine Leads
+    &nbsp;·&nbsp;② Suchanfragen öffnen sich direkt in LinkedIn Sales Navigator / LinkedIn Search
+    &nbsp;·&nbsp;③ Apollo.io API findet E-Mail + Telefon automatisch
+    &nbsp;·&nbsp;④ Gefundene Kontakte werden direkt in die Lead-DB gespeichert
+  </div>
+
+  <div style="display:grid;grid-template-columns:340px 1fr;gap:16px">
+    <!-- LEFT PANEL -->
+    <div>
+      <!-- SEARCH CONFIG -->
+      <div class="pn">
+        <div class="pn-h"><span class="pn-ht">① LinkedIn-Suche konfigurieren</span></div>
+        <div class="pn-b">
+          <div class="fg">
+            <label>Zielgruppe / Jobtitel</label>
+            <input class="inp" id="li-jobtitle" placeholder="z.B. CIO, IT-Leiter, Head of Compliance, CTO">
+          </div>
+          <div class="fg">
+            <label>Branche / Keywords</label>
+            <input class="inp" id="li-keywords" placeholder="z.B. Bankensektor, Sparkasse, Volksbank, RegTech">
+          </div>
+          <div class="fg">
+            <label>Region</label>
+            <select class="inp" id="li-region">
+              <option value="Deutschland">Deutschland</option>
+              <option value="DACH">DACH (DE/AT/CH)</option>
+              <option value="Bayern">Bayern</option>
+              <option value="NRW">Nordrhein-Westfalen</option>
+              <option value="Baden-Württemberg">Baden-Württemberg</option>
+              <option value="Hessen">Hessen (Frankfurt)</option>
+              <option value="Berlin">Berlin</option>
+              <option value="Hamburg">Hamburg</option>
+            </select>
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <label>Suchmodus</label>
+            <select class="inp" id="li-mode">
+              <option value="people">People Search (nach Person)</option>
+              <option value="company">Company Search (nach Firma)</option>
+              <option value="both">Beides</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- APIS -->
+      <div class="pn">
+        <div class="pn-h">
+          <span class="pn-ht">② Daten-Anreicherung</span>
+          <span id="li-api-status" class="pill pill-off">KEIN API</span>
+        </div>
+        <div class="pn-b">
+          <div class="fg">
+            <label>Apollo.io API Key (empfohlen)</label>
+            <div style="display:flex;gap:8px">
+              <input class="inp" id="li-apollo" type="password" placeholder="apollo_api_key_...">
+              <button class="btn btn-sm" onclick="testApollo()">Testen</button>
+            </div>
+            <div style="font-size:10px;color:var(--t3);margin-top:4px">apollo.io → Settings → API Keys · Free: 50 Anfragen/Tag</div>
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <label>Hunter.io API Key (Backup)</label>
+            <div style="display:flex;gap:8px">
+              <input class="inp" id="li-hunter" type="password" placeholder="hunter_api_key_...">
+              <button class="btn btn-sm" onclick="testHunter()">Testen</button>
+            </div>
+            <div style="font-size:10px;color:var(--t3);margin-top:4px">hunter.io → API → Kostenlos 25/Monat</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="pn">
+        <div class="pn-h"><span class="pn-ht">Statistik</span></div>
+        <div class="pn-b" style="padding:10px 16px">
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)">Profile gefunden</span><span id="li-st-found" style="color:var(--t1);font-weight:700">0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)">E-Mails angereichert</span><span id="li-st-email" style="color:var(--green);font-weight:700">0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)">Telefon gefunden</span><span id="li-st-phone" style="color:var(--green);font-weight:700">0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--t3)">Gespeichert in Leads</span><span id="li-st-saved" style="color:var(--blue);font-weight:700">0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: RESULTS + QUEUE -->
+    <div>
+      <!-- GENERATED SEARCH URLS -->
+      <div class="pn" id="li-url-panel" style="display:none">
+        <div class="pn-h">
+          <span class="pn-ht">③ Generierte LinkedIn-Suchen</span>
+          <button class="btn btn-sm" onclick="openAllLinkedIn()">Alle öffnen ↗</button>
+        </div>
+        <div class="pn-b" id="li-url-list" style="max-height:200px;overflow-y:auto"></div>
+      </div>
+
+      <!-- ENRICHMENT QUEUE -->
+      <div class="pn">
+        <div class="pn-h">
+          <span class="pn-ht">④ Leads anreichern via Apollo / Hunter</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sm" onclick="enrichSelected()" id="li-enrich-sel-btn">Auswahl anreichern</button>
+          </div>
+        </div>
+        <div class="pn-b" style="padding:0">
+          <div id="li-enrich-list" style="max-height:420px;overflow-y:auto"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MANUAL CAPTURE -->
+  <div class="pn">
+    <div class="pn-h">
+      <span class="pn-ht">⑤ Manueller LinkedIn-Import</span>
+      <span style="font-size:10px;color:var(--t3)">Profil-Daten von LinkedIn kopieren & einfügen</span>
+    </div>
+    <div class="pn-b">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="fg" style="margin-bottom:0"><label>Name + Rolle</label><input class="inp" id="mc-kontakt" placeholder="Max Müller, CIO"></div>
+        <div class="fg" style="margin-bottom:0"><label>Firma</label><input class="inp" id="mc-firma" placeholder="Sparkasse XY GmbH"></div>
+        <div class="fg" style="margin-bottom:0"><label>LinkedIn URL</label><input class="inp" id="mc-linkedin" placeholder="linkedin.com/in/..."></div>
+        <div class="fg" style="margin-bottom:0"><label>E-Mail (optional)</label><input class="inp" id="mc-email" placeholder="m.mueller@firma.de" type="email"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="fg" style="margin-bottom:0"><label>Telefon</label><input class="inp" id="mc-tel" placeholder="+49 30 ..."></div>
+        <div class="fg" style="margin-bottom:0"><label>Branche</label><input class="inp" id="mc-branche" placeholder="IT-Dienstleister"></div>
+        <div class="fg" style="margin-bottom:0"><label>Mitarbeiter</label><input class="inp" id="mc-ma" placeholder="~100"></div>
+        <div class="fg" style="margin-bottom:0"><label>Standort</label><input class="inp" id="mc-ort" placeholder="Berlin"></div>
+      </div>
+      <button class="btn btn-g btn-sm" onclick="saveManualCapture()">+ In Lead-DB speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TEAM & BENUTZER ═══ -->
+<div id="pg-team" class="pg">
+  <div class="ph">
+    <div>
+      <div class="ph-t">Team &amp; Benutzer</div>
+      <div class="ph-s">Zugänge verwalten · nur für Admins sichtbar</div>
+    </div>
+    <button class="btn btn-g btn-sm" onclick="showAddUser()">+ Benutzer einladen</button>
+  </div>
+  <div id="team-alrt" style="display:none" class="alrt"></div>
+
+  <!-- ADD USER FORM -->
+  <div id="add-user-panel" class="pn" style="display:none">
+    <div class="pn-h"><span class="pn-ht">Neuen Benutzer anlegen</span></div>
+    <div class="pn-b">
+      <div class="fr" style="margin-bottom:12px">
+        <div class="fg" style="margin-bottom:0">
+          <label>Name</label>
+          <input class="inp" id="nu-name" placeholder="Max Müller">
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>E-Mail</label>
+          <input class="inp" id="nu-email" type="email" placeholder="max@firma.de">
+        </div>
+      </div>
+      <div class="fr" style="margin-bottom:12px">
+        <div class="fg" style="margin-bottom:0">
+          <label>Passwort (min. 8 Zeichen)</label>
+          <input class="inp" id="nu-pass" type="password" placeholder="Temporäres Passwort">
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Rolle</label>
+          <select class="inp" id="nu-role">
+            <option value="user">Mitarbeiter — kann Leads sehen und E-Mails generieren</option>
+            <option value="admin">Admin — kann Benutzer verwalten und alles konfigurieren</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-g btn-sm" onclick="createUser()">Benutzer anlegen</button>
+        <button class="btn btn-sm" onclick="hideAddUser()">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- USER LIST -->
+  <div class="pn">
+    <div class="pn-h">
+      <span class="pn-ht">Alle Benutzer</span>
+      <span id="team-count" style="font-size:11px;color:var(--t3)"></span>
+    </div>
+    <div class="pn-b" style="padding:0">
+      <table class="tbl" style="width:100%">
+        <thead>
+          <tr>
+            <th>Benutzer</th>
+            <th>E-Mail</th>
+            <th style="width:120px">Rolle</th>
+            <th style="width:160px">Registriert</th>
+            <th style="width:160px">Letzter Login</th>
+            <th style="width:100px">Aktionen</th>
+          </tr>
+        </thead>
+        <tbody id="team-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CHANGE PASSWORD (own account) -->
+  <div class="pn">
+    <div class="pn-h"><span class="pn-ht">Eigenes Passwort ändern</span></div>
+    <div class="pn-b">
+      <div class="fr" style="margin-bottom:12px">
+        <div class="fg" style="margin-bottom:0">
+          <label>Aktuelles Passwort</label>
+          <input class="inp" id="cp-old" type="password" placeholder="••••••••">
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Neues Passwort (min. 8 Zeichen)</label>
+          <input class="inp" id="cp-new" type="password" placeholder="••••••••">
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Wiederholen</label>
+          <input class="inp" id="cp-new2" type="password" placeholder="••••••••">
+        </div>
+      </div>
+      <button class="btn btn-sm btn-ok" onclick="changeOwnPassword()">Passwort ändern</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let leads   = [];
+let pending = [];
+let inbox   = [];
+let logs    = [];
+let cfg = { provider:'claude', claudeKey:'', openaiKey:'', geminiKey:'', model:'claude-sonnet-4-20250514', name:'Daria', role:'Lead AI Architect', co:'', sig:'Beste Grüße', gFrom:'', gName:'', whUrl:'', apolloKey:'', hunterKey:'', backendUrl:'' };
+let agentOn = false, abort = false;
+
+// Email gen state
+let selectedCat = null;
+let selectedLeadIds = new Set();
+
+// ─── KATEGORIE-DEFINITIONEN ───────────────────────────────────────────────────
+const EMAIL_CATS = [
+  {
+    id: 'erstansprache',
+    icon: '👋',
+    name: 'Erstansprache',
+    desc: 'Erste Kontaktaufnahme — präzise, nicht aufdringlich',
+    tone: 'professionell',
+    len: 'mittel',
+    cta: 'call',
+    systemPrompt: `Schreibe eine Kaltakquise-Erstansprache. 
+Regeln: Erster Satz bezieht sich direkt auf die Firma (Fokus/Branche). 
+Kein "Ich hoffe diese E-Mail erreicht Sie gut". 
+Zeige in 1-2 Sätzen warum das Angebot für DIESE Firma relevant ist. 
+Konkrete Kennzahlen wenn vorhanden. Klarer CTA am Ende.`
+  },
+  {
+    id: 'followup',
+    icon: '🔁',
+    name: 'Follow-Up',
+    desc: 'Nachfassen nach keiner Antwort — freundlich, nicht nervig',
+    tone: 'locker',
+    len: 'kurz',
+    cta: 'call',
+    systemPrompt: `Schreibe ein Follow-Up nach einer unbeantworteten Erstansprache (3-5 Werktage her).
+Regeln: Sehr kurz (3-4 Sätze). Kein Vorwurf. Leicht anders formuliert als die Erstansprache. 
+Stelle eine konkrete Frage oder biete einen neuen Mehrwert. Locker aber professionell.`
+  },
+  {
+    id: 'reaktivierung',
+    icon: '🔥',
+    name: 'Reaktivierung',
+    desc: 'Kalt gewordene Leads wieder aktivieren',
+    tone: 'locker',
+    len: 'mittel',
+    cta: 'call',
+    systemPrompt: `Schreibe eine Reaktivierungs-E-Mail für einen Lead der sich länger nicht gemeldet hat.
+Regeln: Erwähne implizit dass es eine Weile her ist. Biete etwas Neues oder eine aktuelle Entwicklung an. 
+Mache es leicht für sie zu antworten. Kein Druck.`
+  },
+  {
+    id: 'demo',
+    icon: '🎯',
+    name: 'Demo-Anfrage',
+    desc: 'Einladung zu einer konkreten Produktdemo',
+    tone: 'professionell',
+    len: 'mittel',
+    cta: 'demo',
+    systemPrompt: `Schreibe eine E-Mail mit dem Ziel eine konkrete Demo zu vereinbaren.
+Regeln: Erkläre kurz was in der Demo gezeigt wird (spezifisch für ihre Branche). 
+Kommuniziere den konkreten Wert den sie in 20-30 Minuten sehen werden. 
+Schlage 2-3 konkrete Zeitfenster vor oder verweise auf Buchungslink.`
+  },
+  {
+    id: 'roi',
+    icon: '📊',
+    name: 'ROI & Zahlen',
+    desc: 'Konkrete Zahlen und Business Case im Vordergrund',
+    tone: 'professionell',
+    len: 'mittel',
+    cta: 'roi',
+    systemPrompt: `Schreibe eine E-Mail die den Business Case und ROI in den Vordergrund stellt.
+Regeln: Starte mit einer konkreten Zahl oder Statistik. 
+Rechne den potentiellen Nutzen speziell für ihre Firmengröße/Branche hoch. 
+Biete eine kostenlose ROI-Analyse an. Fakten statt Buzzwords.`
+  },
+  {
+    id: 'event',
+    icon: '📅',
+    name: 'Event / Webinar',
+    desc: 'Einladung zu einem Event, Webinar oder Roundtable',
+    tone: 'locker',
+    len: 'kurz',
+    cta: 'info',
+    systemPrompt: `Schreibe eine Event-Einladungs-E-Mail.
+Regeln: Kurz und prägnant. Was ist das Event, wann, warum relevant für sie. 
+Maximal 3-4 Sätze. Direkter Link / CTA zur Anmeldung. Informell aber professionell.`
+  },
+  {
+    id: 'referenz',
+    icon: '🏆',
+    name: 'Referenz & Case Study',
+    desc: 'Konkrete Erfolgsgeschichte aus der Branche teilen',
+    tone: 'professionell',
+    len: 'mittel',
+    cta: 'call',
+    systemPrompt: `Schreibe eine E-Mail die eine Referenz oder Case Study aus dem Banking-Umfeld teilt.
+Regeln: Starte mit dem Ergebnis (nicht dem Prozess). 
+Erkläre in 1-2 Sätzen die Parallele zu ihrer Situation. 
+Biete an die vollständige Case Study zu teilen oder darüber zu sprechen.`
+  },
+  {
+    id: 'breakup',
+    icon: '👋',
+    name: 'Break-Up E-Mail',
+    desc: 'Letzte E-Mail — schafft oft überraschend viel Response',
+    tone: 'locker',
+    len: 'kurz',
+    cta: 'call',
+    systemPrompt: `Schreibe eine "Break-Up" E-Mail — die letzte E-Mail in einer Serie ohne Antwort.
+Regeln: Sehr kurz (2-3 Sätze). Sage implizit dass du nicht mehr schreiben wirst. 
+Keine Frustration zeigen. Offen für zukünftigen Kontakt. 
+Diese E-Mails funktionieren durch ihre Direktheit — halte sie ehrlich und knapp.`
+  },
+  {
+    id: 'custom',
+    icon: '✏️',
+    name: 'Eigener Prompt',
+    desc: 'Schreibe deine eigenen E-Mail-Anweisungen',
+    tone: 'professionell',
+    len: 'mittel',
+    cta: 'call',
+    systemPrompt: ''
+  }
+];
+
+// ─── STORAGE ─────────────────────────────────────────────────────────────────
+let _currentUserId = null;
+const userKey = (k) => _currentUserId ? 'los3_u_'+_currentUserId+'_'+k : 'los3_'+k;
+const save = () => {
+  ['leads','pending','inbox','logs'].forEach(k => localStorage.setItem(userKey(k), JSON.stringify(eval(k))));
+  localStorage.setItem('los3_cfg', JSON.stringify(cfg));
+};
+const load = () => {
+  ['leads','pending','inbox','logs'].forEach(k => { try { eval(k+'=JSON.parse(localStorage.getItem(userKey(k))||"[]")'); } catch(e){} });
+  try { const c = localStorage.getItem('los3_cfg'); if(c) cfg = {...cfg, ...JSON.parse(c)}; } catch(e){}
+};
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+const $  = id => document.getElementById(id);
+const V  = id => $(id)?.value || '';
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const dl = (n,h) => { const a = document.createElement('a'); a.href=h; a.download=n; a.click(); };
+const ds = () => new Date().toISOString().slice(0,10);
+const uid = () => Date.now() + Math.floor(Math.random()*99999);
+const slp = ms => new Promise(r => setTimeout(r, ms));
+const showAlert = (id, msg, t) => {
+  const e=$(id); e.className='alrt alrt-'+(t||'ok'); e.textContent=msg; e.style.display='';
+  setTimeout(() => e.style.display='none', 6000);
+};
+
+// ─── LOG ─────────────────────────────────────────────────────────────────────
+const addLog = (msg, t='info') => {
+  logs.unshift({msg, t, time: new Date().toISOString()});
+  if(logs.length > 2000) logs = logs.slice(0,2000);
+  save(); renderLog();
+};
+const renderLog = () => {
+  const clr = {info:'var(--t2)',ok:'var(--green)',err:'var(--red)',warn:'var(--yellow)',agent:'var(--purple)'};
+  $('log-body').innerHTML = logs.map(l => `
+    <div style="display:flex;gap:12px;padding:6px 0;border-bottom:1px solid var(--s2)">
+      <span style="font-size:10px;color:var(--t3);white-space:nowrap">${new Date(l.time).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</span>
+      <span style="font-size:11px;color:${clr[l.t]||clr.info}">${esc(l.msg)}</span>
+    </div>`).join('') || '<div style="font-size:12px;color:var(--t3);padding:12px 0">Leer</div>';
+};
+const clearLog = () => { if(confirm('Log leeren?')) { logs=[]; save(); renderLog(); } };
+
+const tlog = (msg, cls='ld') => {
+  const t=$('term'), d=document.createElement('div');
+  d.className='ln '+cls;
+  d.textContent='['+new Date().toLocaleTimeString('de-DE')+'] '+msg;
+  t.appendChild(d); t.scrollTop=t.scrollHeight;
+};
+const clearTerm = () => { $('term').innerHTML='<div class="ln ld">// Terminal geleert.</div>'; };
+
+// ─── NAV ─────────────────────────────────────────────────────────────────────
+const PAGES = ['agent','linkedin','emailgen','approve','inbox','leads','log','config','team'];
+const nav = id => {
+  PAGES.forEach(p => { $('pg-'+p).classList.toggle('on', p===id); });
+  document.querySelectorAll('.ni').forEach((el,i) => el.classList.toggle('on', PAGES[i]===id));
+  if(id==='leads') renderLeads();
+  if(id==='approve') { approveFilter='all'; renderApprove(); }
+  if(id==='inbox') renderInbox();
+  if(id==='log') renderLog();
+  if(id==='emailgen') { renderCatGrid(); renderLeadPicker(); }
+  if(id==='linkedin') { renderLinkedInEnrichList(); }
+  if(id==='team') renderTeam();
+  if(id==='config') { renderUsersList(); }
+};
+
+// ─── UI UPDATE ────────────────────────────────────────────────────────────────
+const ui = () => {
+  const pN = pending.filter(p=>p.status==='pending').length;
+  const iN = inbox.filter(i=>!i.replied).length;
+  $('b-app').textContent=pN; $('b-app').style.display=pN?'':'none';
+  $('b-inbox').textContent=iN; $('b-inbox').style.display=iN?'':'none';
+  $('sb-inf').textContent=leads.length+' Leads · '+pending.filter(p=>p.status==='pending').length+' Pending';
+  $('st-tot').textContent=leads.length;
+  $('st-pen').textContent=pN;
+  $('st-app').textContent=pending.filter(p=>p.status==='approved').length;
+  $('st-rep').textContent=inbox.length;
+  $('ld-lbl').textContent=leads.length+' Einträge';
+};
+
+const step = (n, s) => { const e=$('s'+n); e.className='sn sn-'+s; e.textContent=s==='done'?'✓':n; };
+const stepD = (n, t) => { $('s'+n+'d').textContent=t; };
+const resetSteps = () => { [1,2,3].forEach(n => { step(n,'pend'); stepD(n,'Wartet…'); }); };
+const setPill = (id, on) => { const e=$(id); if(!e) return; e.className='pill '+(on?'pill-on':'pill-off'); e.textContent=on?'● ONLINE':'● OFFLINE'; };
+
+// ─── CLAUDE API ───────────────────────────────────────────────────────────────
+// Universal LLM router — Claude / OpenAI / Gemini
+const claude = async (prompt, max=1200) => {
+  const prov = cfg.provider || 'claude';
+  if(prov === 'openai')  return await llmOpenAI(prompt, max);
+  if(prov === 'gemini')  return await llmGemini(prompt, max);
+  return await llmClaude(prompt, max);
+};
+
+const llmClaude = async (prompt, max) => {
+  if(!cfg.claudeKey) throw new Error('Kein Claude API-Key eingetragen (Konfiguration)');
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':cfg.claudeKey},
+    body: JSON.stringify({model:cfg.model||'claude-sonnet-4-20250514', max_tokens:max, messages:[{role:'user',content:prompt}]})
+  });
+  if(!r.ok) throw new Error('Claude HTTP '+r.status);
+  const d = await r.json();
+  return (d.content||[]).map(c=>c.text||'').join('');
+};
+
+const llmOpenAI = async (prompt, max) => {
+  if(!cfg.openaiKey) throw new Error('Kein OpenAI API-Key eingetragen (Konfiguration)');
+  const modelMap = {'gpt-4o':'gpt-4o','gpt-4o-mini':'gpt-4o-mini','gpt-4-turbo':'gpt-4-turbo'};
+  const model = modelMap[cfg.model] || 'gpt-4o';
+  const r = await fetch('https://api.openai.com/v1/chat/completions', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+cfg.openaiKey},
+    body: JSON.stringify({model, max_tokens:max, messages:[{role:'user',content:prompt}]})
+  });
+  if(!r.ok) throw new Error('OpenAI HTTP '+r.status);
+  const d = await r.json();
+  return d.choices?.[0]?.message?.content || '';
+};
+
+const llmGemini = async (prompt, max) => {
+  if(!cfg.geminiKey) throw new Error('Kein Gemini API-Key eingetragen (Konfiguration)');
+  const model = cfg.model || 'gemini-1.5-flash';
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${cfg.geminiKey}`;
+  const r = await fetch(url, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({contents:[{parts:[{text:prompt}]}], generationConfig:{maxOutputTokens:max}})
+  });
+  if(!r.ok) throw new Error('Gemini HTTP '+r.status);
+  const d = await r.json();
+  return d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+};
+
+// ─── AGENT (FIRMENSUCHE) ─────────────────────────────────────────────────────
+const runAgent = async () => {
+  if(agentOn) { tlog('Agent läuft bereits.','ly'); return; }
+  agentOn=true; abort=false;
+  $('btn-run').disabled=true; $('btn-stop').style.display='';
+  $('pill-agent').className='pill pill-on'; $('pill-agent').textContent='● AGENT AKTIV';
+  resetSteps();
+
+  const prompt = V('a-prompt');
+  const count  = parseInt(V('a-count'));
+  const after  = V('a-after');
+
+  if(!cfg.claudeKey) {
+    tlog('✗ Kein Claude API-Key! Bitte zuerst unter Konfiguration eintragen.','lr');
+    endAgent(); return;
+  }
+  tlog('Firmensuche gestartet…','lg');
+  addLog('Agent-Suche: '+prompt.substring(0,60)+'…','agent');
+
+  step(1,'act'); stepD(1,'Recherchiert via Claude…');
+  let newLeads = [];
+  try {
+    const excl = leads.map(l=>l.name).slice(0,30).join(', ');
+    const p = `Du bist ein B2B-Lead-Recherche-Agent für den deutschen Markt.
+
+Suchauftrag: "${prompt}"
+Bereits vorhanden (NICHT wiederholen): ${excl||'keine'}
+
+Aufgabe: Identifiziere exakt ${count} REALE deutsche Unternehmen die zum Suchauftrag passen.
+
+Für jedes Unternehmen recherchiere:
+1. Firmendaten (Name, Branche, Mitarbeiter, Ort, Website)
+2. Company Beschreibung: 2-3 präzise Sätze was die Firma macht, welche Kunden/Partner sie hat, welche Produkte/Services
+3. Konkreter Ansprechpartner: Vorname + Nachname + genaue Rolle (z.B. "CIO", "Geschäftsführer") — passend zur Zielgruppe im Prompt
+4. E-Mail Ansprechpartner: direkte E-Mail (Format: vorname.nachname@domain)
+5. Firmen-E-Mail: info@domain oder kontakt@domain
+6. Telefon: Direkte Durchwahl oder Zentrale (+49 Format)
+7. LinkedIn-Profil URL des Ansprechpartners
+
+Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array (kein Text davor/danach):
+[{"name":"Firmenname GmbH","branche":"IT-Dienstleister","fokus":"konkrete Banken-Referenz","ma":"~100","ort":"Berlin","web":"firma.de","email":"info@firma.de","vorname":"Max","nachname":"Müller","rolle":"CIO","kontaktEmail":"max.mueller@firma.de","firmenEmail":"info@firma.de","telefon":"+49 30 12345678","linkedin":"linkedin.com/in/maxmueller","beschreibung":"Was macht die Firma, welche Kunden, welche Produkte"}]`;
+    const raw = await claude(p, 2500);
+    if(abort) { endAgent(); return; }
+    // Strip markdown code fences if present
+    const cleaned = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+    const s=cleaned.indexOf('['), e=cleaned.lastIndexOf(']');
+    if(s<0||e<0) throw new Error('Claude hat kein JSON zurückgegeben. Antwort: '+cleaned.substring(0,120));
+    try {
+      newLeads = JSON.parse(cleaned.substring(s,e+1));
+    } catch(parseErr) {
+      throw new Error('JSON-Fehler: '+parseErr.message+' — Rohtext: '+cleaned.substring(s,s+200));
+    }
+    step(1,'done'); stepD(1, newLeads.length+' Firmen gefunden');
+    tlog(newLeads.length+' Firmen gefunden','lg');
+  } catch(e) {
+    tlog('✗ Fehler: '+e.message,'lr'); addLog('Agent-Fehler: '+e.message,'err'); tlog('→ Bitte API-Key in Konfiguration prüfen.','ly');
+    endAgent(); return;
+  }
+
+  step(2,'act'); stepD(2,'Speichere Leads…');
+  const existing = new Set(leads.map(l=>l.name));
+  const toAdd = newLeads.filter(l=>l.name&&!existing.has(l.name));
+  toAdd.forEach(l => {
+    l.id=uid(); l.status='Neu'; l.created=new Date().toLocaleDateString('de-DE');
+    leads.unshift(l);
+    tlog('  + '+l.name,'lw');
+    if(cfg.whUrl) sendWH(l);
+  });
+  save(); ui();
+  step(2,'done'); stepD(2, toAdd.length+' Leads gespeichert');
+  addLog(toAdd.length+' Leads gespeichert','ok');
+
+  step(3,'done'); stepD(3,'Fertig');
+  tlog('Suche abgeschlossen. '+toAdd.length+' neue Leads.','lg');
+  endAgent();
+
+  if(after==='emailgen') {
+    tlog('→ Weiter zu E-Mails generieren…','lp');
+    setTimeout(() => { nav('emailgen'); renderLeadPicker(); }, 600);
+  }
+};
+const stopAgent = () => { abort=true; tlog('Stopp…','ly'); };
+const endAgent = () => {
+  agentOn=false; $('btn-run').disabled=false; $('btn-stop').style.display='none';
+  $('pill-agent').className='pill pill-off'; $('pill-agent').textContent='● AGENT OFFLINE';
+  ui(); renderLeads();
+};
+
+// ─── E-MAIL KATEGORIE GRID ────────────────────────────────────────────────────
+const renderCatGrid = () => {
+  $('cat-grid').innerHTML = EMAIL_CATS.map(c => `
+    <div class="cat-card${selectedCat===c.id?' sel':''}" onclick="selectCat('${c.id}')">
+      <span class="cat-icon">${c.icon}</span>
+      <div class="cat-name">${esc(c.name)}</div>
+      <div class="cat-desc">${esc(c.desc)}</div>
+    </div>`).join('');
+};
+
+const selectCat = id => {
+  selectedCat = id;
+  renderCatGrid();
+  const cat = EMAIL_CATS.find(c=>c.id===id);
+  if(!cat) return;
+  // prefill tone/len/cta from category defaults
+  $('eg-tone').value = cat.tone || 'professionell';
+  $('eg-len').value  = cat.len  || 'mittel';
+  $('eg-cta').value  = cat.cta  || 'call';
+  $('cat-custom').style.display = '';
+
+  // for custom cat: show extra field
+  if(id==='custom') {
+    const extraEl = $('eg-extra');
+    if(!extraEl.placeholder.includes('Schreibe')) {
+      // add custom prompt area
+    }
+  }
+};
+
+// ─── PRODUCT PROMPT SAVE/LOAD ─────────────────────────────────────────────────
+const saveProductPrompt = () => {
+  const data = {
+    name:     V('eg-prodname'),
+    target:   V('eg-target'),
+    what:     V('eg-what'),
+    problems: V('eg-problems'),
+    usp:      V('eg-usp'),
+    roi:      V('eg-roi'),
+    pricing:  V('eg-pricing'),
+    refs:     V('eg-refs'),
+    prompt:   V('eg-prompt'),
+    saved:    new Date().toLocaleString('de-DE')
+  };
+  if(!data.name && !data.what && !data.prompt) {
+    showAlert('eg-alrt','Bitte mindestens Produktname oder Beschreibung ausfüllen.','err'); return;
+  }
+  localStorage.setItem('los3_product', JSON.stringify(data));
+  $('eg-saved-info').textContent = '✓ Gespeichert: ' + data.saved;
+  showAlert('eg-alrt','Unternehmensprofil gespeichert.','ok');
+  addLog('Produkt-Profil gespeichert: ' + (data.name||data.what||'').substring(0,40), 'ok');
+};
+
+const loadProductPrompt = () => {
+  const raw = localStorage.getItem('los3_product');
+  if(!raw) { showAlert('eg-alrt','Kein gespeichertes Profil gefunden.','warn'); return; }
+  try {
+    const d = JSON.parse(raw);
+    const fill = (id, val) => { const el=$(id); if(el) el.value = val||''; };
+    fill('eg-prodname', d.name);
+    fill('eg-target',   d.target);
+    fill('eg-what',     d.what);
+    fill('eg-problems', d.problems);
+    fill('eg-usp',      d.usp);
+    fill('eg-roi',      d.roi);
+    fill('eg-pricing',  d.pricing);
+    fill('eg-refs',     d.refs);
+    fill('eg-prompt',   d.prompt);
+    $('eg-saved-info').textContent = '✓ Geladen: ' + (d.saved||'');
+    showAlert('eg-alrt','Unternehmensprofil geladen.','ok');
+  } catch(e) { showAlert('eg-alrt','Fehler beim Laden: '+e.message,'err'); }
+};
+
+const togglePromptPreview = () => {
+  const box = $('eg-preview-box');
+  if(!box) return;
+  const visible = box.style.display !== 'none';
+  if(visible) { box.style.display='none'; return; }
+  const prev = $('eg-preview-text');
+  if(prev) prev.textContent = buildProductContext();
+  box.style.display = '';
+};
+
+const buildProductContext = () => {
+  const parts = [];
+  const v = id => ($(id)?.value||'').trim();
+  if(v('eg-prodname'))  parts.push('Produkt: ' + v('eg-prodname'));
+  if(v('eg-target'))    parts.push('Zielgruppe: ' + v('eg-target'));
+  if(v('eg-what'))      parts.push('Was wir machen:\n' + v('eg-what'));
+  if(v('eg-problems'))  parts.push('Probleme die wir lösen:\n' + v('eg-problems'));
+  if(v('eg-usp'))       parts.push('USP: ' + v('eg-usp'));
+  if(v('eg-roi'))       parts.push('ROI / Kennzahlen: ' + v('eg-roi'));
+  if(v('eg-pricing'))   parts.push('Preise: ' + v('eg-pricing'));
+  if(v('eg-refs'))      parts.push('Referenzen: ' + v('eg-refs'));
+  if(v('eg-prompt'))    parts.push('Zusätzlicher Kontext:\n' + v('eg-prompt'));
+  return parts.join('\n\n') || '(noch nichts ausgefüllt)';
+};
+
+// ─── LEAD PICKER ─────────────────────────────────────────────────────────────
+const renderLeadPicker = () => {
+  const q = V('eg-lead-search').toLowerCase();
+  const filtered = leads.filter(l => !q || l.name.toLowerCase().includes(q) || (l.fokus||'').toLowerCase().includes(q) || (l.kontakt||'').toLowerCase().includes(q));
+  $('eg-lead-count-lbl').textContent = selectedLeadIds.size + ' ausgewählt';
+  $('lead-picker').innerHTML = filtered.map(l => `
+    <label class="lead-checkbox">
+      <input type="checkbox" ${selectedLeadIds.has(l.id)?'checked':''} onchange="toggleLead(${l.id},this.checked)">
+      <div style="flex:1">
+        <span style="font-weight:700;color:var(--t1);font-size:12px">${esc(l.name)}</span>
+        <span style="font-size:10px;color:var(--t3);margin-left:8px">${esc(l.branche||'')} · ${esc(l.ort||'')} · ${esc(l.ma||'?')} MA</span>
+        <div style="display:flex;gap:12px;margin-top:2px">
+          ${(l.vorname||l.nachname)?`<span style="font-size:10px;color:var(--t1)">👤 ${esc(l.vorname||'')} ${esc(l.nachname||'')}${l.rolle?', '+esc(l.rolle):''}</span>`:'<span style="font-size:10px;color:var(--red)">⚠ kein Ansprechpartner</span>'}
+          ${l.telefon?`<span style="font-size:10px;color:var(--green)">📞 ${esc(l.telefon)}</span>`:'<span style="font-size:10px;color:var(--t3)">kein Telefon</span>'}
+          ${l.email?`<span style="font-size:10px;color:var(--blue)">✉ ${esc(l.email)}</span>`:''}
+        </div>
+      </div>
+      <span class="bdg bdg-${l.status==='Neu'?'new':l.status==='Kontaktiert'?'sent':l.status==='Warm'?'warm':l.status==='Geantwortet'?'rep':'cold'}">${l.status}</span>
+    </label>`).join('') || '<div style="font-size:12px;color:var(--t3);padding:12px">Keine Leads. Erst Agent starten oder Leads manuell hinzufügen.</div>';
+};
+
+const toggleLead = (id, checked) => {
+  if(checked) selectedLeadIds.add(id);
+  else selectedLeadIds.delete(id);
+  $('eg-lead-count-lbl').textContent = selectedLeadIds.size + ' ausgewählt';
+};
+
+const selectLeadsFilter = (filter) => {
+  selectedLeadIds.clear();
+  if(filter === 'all') leads.forEach(l => selectedLeadIds.add(l.id));
+  else if(filter !== 'none') leads.filter(l=>l.status===filter).forEach(l => selectedLeadIds.add(l.id));
+  renderLeadPicker();
+};
+
+// ─── BUILD EMAIL PROMPT ───────────────────────────────────────────────────────
+const buildEmailPrompt = (lead, catId) => {
+  const cat = EMAIL_CATS.find(c=>c.id===catId) || EMAIL_CATS[0];
+  const prodName   = V('eg-prodname');
+  const usp        = V('eg-usp');
+  const roi        = V('eg-roi');
+  const prodPrompt = buildProductContext();
+  const tone       = V('eg-tone') || cat.tone;
+  const len        = V('eg-len')  || cat.len;
+  const cta        = V('eg-cta')  || cat.cta;
+  const extra      = V('eg-extra');
+  const catExtra   = catId === 'custom' ? extra : cat.systemPrompt;
+
+  const toneMap = {
+    professionell: 'professionell und direkt, du-Form, auf Augenhöhe',
+    locker: 'locker, persönlich und sympathisch, du-Form',
+    formell: 'formell und konservativ, Sie-Form',
+    neugierig: 'neugierig und fragend, stelle Fragen statt zu pitchen'
+  };
+  const lenMap = { kurz:'3–4 Sätze', mittel:'5–6 Sätze', lang:'7–9 Sätze' };
+  const ctaMap = {
+    call:'Schlage konkret vor sich 15 Minuten für einen Discovery Call Zeit zu nehmen',
+    demo:'Lade zu einer kurzen, auf ihre Situation zugeschnittenen Demo ein',
+    info:'Biete an, relevante Fallstudien oder ein Whitepaper zu schicken',
+    roi:'Biete eine kostenlose ROI-Analyse an',
+    pilot:'Schlage ein kostenloses Pilot-Projekt vor'
+  };
+
+  return `Du bist ${cfg.name||'Daria'}${cfg.role?', '+cfg.role:''}${cfg.co?', '+cfg.co:''}.
+
+═══ DEIN UNTERNEHMEN & ANGEBOT ═══
+${prodPrompt || 'Kein Unternehmensprofil definiert — bitte unter ① ausfüllen.'}
+
+═══ EMPFÄNGER ═══
+Firma: ${lead.name}
+Branche: ${lead.branche||'IT/Fintech'}
+Standort: ${lead.ort||''} · ${lead.ma||'?'} Mitarbeiter
+Firmenfokus: ${lead.fokus||'Bankensektor'}
+${lead.beschreibung?'Company Background: '+lead.beschreibung:''}
+Ansprechpartner: ${lead.vorname||''} ${lead.nachname||lead.kontakt||'Geschäftsführung'}, ${lead.rolle||''}
+Direkte E-Mail: ${lead.kontaktEmail||lead.email||''}
+Telefon: ${lead.telefon||''}
+
+═══ E-MAIL-ANFORDERUNGEN ═══
+Kategorie: ${cat.name}
+${catExtra}
+
+Stilregeln:
+- Tonalität: ${toneMap[tone]||toneMap.professionell}
+- Länge: ${lenMap[len]||lenMap.mittel} reiner Fließtext
+- Call-to-Action: ${ctaMap[cta]||ctaMap.call}
+- Ersten Satz IMMER auf diese Firma beziehen — keine generischen Einstiege
+- Keine Bullet-Points im Text
+- Keine Superlative ohne Beleg
+- Signatur: ${cfg.sig||'Beste Grüße'}, ${cfg.name||'Daria'}${cfg.role?'\n'+cfg.role:''}${cfg.co?'\n'+cfg.co:''}
+${extra && catId!=='custom'?'\nZusätzlich: '+extra:''}
+
+Antworte AUSSCHLIESSLICH in diesem Format:
+BETREFF: [Betreff hier]
+---
+[E-Mail-Text hier]`;
+};
+
+// ─── TEST EMAIL ───────────────────────────────────────────────────────────────
+const runTestEmail = async () => {
+  if(!selectedCat) { showAlert('eg-alrt','Bitte erst eine Kategorie wählen.','warn'); return; }
+  if(!V('eg-prompt')) { showAlert('eg-alrt','Bitte erst den Produkt-Prompt ausfüllen.','warn'); return; }
+
+  const testName = V('eg-test-lead').trim();
+  const testLead = testName
+    ? (leads.find(l=>l.name.toLowerCase().includes(testName.toLowerCase())) || {id:0,name:testName,branche:'IT/Fintech',fokus:'Bankensektor',kontakt:'',ort:'',ma:'~100'})
+    : (leads[0] || {id:0,name:'Beispiel GmbH',branche:'IT-Dienstleister',fokus:'Sparkassen-Software',kontakt:'Max Müller, CEO',ort:'Frankfurt',ma:'~80'});
+
+  $('eg-test-sp').style.display='inline-block';
+  document.querySelector('.btn-purple').disabled=true;
+  $('eg-test-result').style.display='none';
+
+  try {
+    const prompt = buildEmailPrompt(testLead, selectedCat);
+    const raw = await claude(prompt, 900);
+    const parts = raw.split('---');
+    $('eg-test-subj').textContent = parts[0].replace('BETREFF:','').trim();
+    $('eg-test-body').textContent = parts[1]?parts[1].trim():raw;
+    $('eg-test-result').style.display='';
+    showAlert('eg-alrt','Test-E-Mail generiert für: '+testLead.name,'ok');
+  } catch(e) { showAlert('eg-alrt','Fehler: '+e.message,'err'); }
+
+  $('eg-test-sp').style.display='none';
+  document.querySelector('.btn-purple').disabled=false;
+};
+
+// ─── HAUPTGENERIERUNG ────────────────────────────────────────────────────────
+const runEmailGen = async () => {
+  if(!selectedCat) { showAlert('eg-alrt','② Bitte erst eine E-Mail-Kategorie wählen.','warn'); return; }
+  if(!V('eg-prompt')) { showAlert('eg-alrt','① Bitte erst den Produkt-Prompt ausfüllen.','warn'); return; }
+  if(selectedLeadIds.size === 0) { showAlert('eg-alrt','③ Bitte mindestens einen Lead auswählen.','warn'); return; }
+
+  if(!cfg.claudeKey) { showAlert('eg-alrt','Kein Claude API-Key! Bitte zuerst unter Konfiguration eintragen.','err'); return; }
+  const targetLeads = leads.filter(l => selectedLeadIds.has(l.id));
+  const autoMode = V('eg-mode') === 'auto';
+  const cat = EMAIL_CATS.find(c=>c.id===selectedCat);
+
+  $('eg-run-btn').disabled=true;
+  $('eg-progress-panel').style.display='';
+  $('eg-prog-log').innerHTML='';
+  $('eg-prog-bar').style.width='0%';
+  $('eg-prog-lbl').textContent='0 / '+targetLeads.length;
+
+  const plog = (msg, color='var(--t2)') => {
+    const el=$('eg-prog-log'), d=document.createElement('div');
+    d.style.color=color; d.textContent='['+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+'] '+msg;
+    el.appendChild(d); el.scrollTop=el.scrollHeight;
+  };
+
+  plog('Starte: "'+cat.name+'" → '+targetLeads.length+' Leads', 'var(--green)');
+  addLog('E-Mail-Kampagne: '+cat.name+' · '+targetLeads.length+' Leads','agent');
+
+  let ok=0, err=0;
+  for(let i=0; i<targetLeads.length; i++) {
+    const lead = targetLeads[i];
+    plog('('+( i+1)+'/'+targetLeads.length+') '+lead.name+'…');
+    try {
+      const prompt = buildEmailPrompt(lead, selectedCat);
+      const raw = await claude(prompt, 900);
+      const parts = raw.split('---');
+      const subject = parts[0].replace('BETREFF:','').trim();
+      const body    = parts[1]?parts[1].trim():raw;
+
+      const entry = {
+        id:uid(), leadId:lead.id, leadName:lead.name, leadEmail:lead.kontaktEmail||lead.email||'',
+        contactName:[lead.vorname||'',lead.nachname||''].filter(Boolean).join(' ')||(lead.kontakt||''), contactRole:lead.rolle||'', contactPhone:lead.telefon||'',
+        catId:selectedCat, catName:cat.name,
+        subject, body, status:'pending', created:new Date().toISOString()
+      };
+      pending.unshift(entry);
+      ok++;
+      plog('  ✓ '+subject.substring(0,55), 'var(--green)');
+      if(autoMode) { entry.status='approved'; doSend(entry, lead); }
+    } catch(e) {
+      err++;
+      plog('  ✗ '+lead.name+': '+e.message, 'var(--red)');
+      addLog('Fehler '+lead.name+': '+e.message,'err');
+    }
+    const pct = Math.round((i+1)/targetLeads.length*100);
+    $('eg-prog-bar').style.width=pct+'%';
+    $('eg-prog-lbl').textContent=(i+1)+' / '+targetLeads.length;
+    save(); ui();
+    await slp(280);
+  }
+
+  plog('Fertig: '+ok+' E-Mails generiert, '+err+' Fehler.', ok>0?'var(--green)':'var(--red)');
+  if(!autoMode && ok>0) plog('→ Gehe zu "Freigabe" um E-Mails zu prüfen.', 'var(--yellow)');
+  addLog('Kampagne fertig: '+ok+' E-Mails ('+cat.name+')','ok');
+
+  $('eg-run-btn').disabled=false;
+  if(!autoMode && ok>0) setTimeout(() => nav('approve'), 1200);
+};
+
+// ─── SEND ─────────────────────────────────────────────────────────────────────
+const doSend = (entry, lead) => {
+  const to  = entry.leadEmail || '';
+  const sub = encodeURIComponent(entry.subject);
+  const bod = encodeURIComponent(entry.body);
+  if(to) {
+    window.open(`https://mail.google.com/mail/?view=cm&to=${to}&su=${sub}&body=${bod}`, '_blank');
+  } else {
+    addLog('Hinweis: Keine E-Mail-Adresse für '+entry.leadName+' — Gmail ohne Empfänger geöffnet','warn');
+    window.open(`https://mail.google.com/mail/?view=cm&su=${sub}&body=${bod}`, '_blank');
+  }
+  const l = leads.find(x=>x.id===entry.leadId);
+  if(l) { l.status='Kontaktiert'; save(); }
+};
+
+// ─── APPROVE ─────────────────────────────────────────────────────────────────
+let approveFilter = 'all';
+let approveView = 'table';
+const setApproveView = (v) => {
+  approveView = v;
+  const cards = $('view-cards'), tbl = $('view-table');
+  if(cards) cards.style.background = v==='cards' ? 'var(--s3)' : '';
+  if(tbl)   tbl.style.background   = v==='table' ? 'var(--s3)' : '';
+  renderApprove();
+};
+
+const setApproveFilter = (f) => {
+  approveFilter = f;
+  ['all','pend','appr','rej'].forEach(x => {
+    const el = $('af-'+x);
+    if(el) el.style.background = '';
+  });
+  const map = {all:'af-all', pending:'af-pend', approved:'af-appr', rejected:'af-rej'};
+  const active = $(map[f]||'af-all');
+  if(active) active.style.background = 'var(--s3)';
+  renderApprove();
+};
+
+const renderApprove = () => {
+  const total    = pending.length;
+  const pendList = pending.filter(p=>p.status==='pending');
+  const apprList = pending.filter(p=>p.status==='approved');
+  const rejList  = pending.filter(p=>p.status==='rejected');
+
+  // Update stats
+  const safe = (id, val) => { const e=$(id); if(e) e.textContent=val; };
+  safe('as-total', total);
+  safe('as-pend',  pendList.length);
+  safe('as-appr',  apprList.length);
+  safe('as-rej',   rejList.length);
+  safe('app-counter', total + ' E-Mails gesamt');
+
+  // Filter list
+  let list = pending;
+  if(approveFilter==='pending')  list = pendList;
+  if(approveFilter==='approved') list = apprList;
+  if(approveFilter==='rejected') list = rejList;
+
+  const emptyEl = $('app-empty');
+  if(emptyEl) emptyEl.style.display = total===0 ? '' : 'none';
+
+  const statusBadge = s => {
+    if(s==='pending')  return `<span class="pill pill-warn">● AUSSTEHEND</span>`;
+    if(s==='approved') return `<span class="pill pill-on">● FREIGEGEBEN</span>`;
+    return `<span class="pill pill-off">● ABGELEHNT</span>`;
+  };
+
+  // ── TABLE VIEW ──────────────────────────────────────────────────────────────
+  if(approveView === 'table') {
+    const tableHTML = `
+      <div style="overflow-x:auto">
+      <table class="tbl" style="table-layout:fixed;width:100%">
+        <thead><tr>
+          <th style="width:160px">Firma</th>
+          <th style="width:130px">Ansprechpartner</th>
+          <th style="width:90px">Kategorie</th>
+          <th style="width:200px">Betreff</th>
+          <th>E-Mail Text</th>
+          <th style="width:90px">Status</th>
+          <th style="width:130px">Aktionen</th>
+        </tr></thead>
+        <tbody>
+          ${list.map(p => `
+            <tr id="trow-${p.id}" style="vertical-align:top;cursor:pointer" onclick="expandTableRow(${p.id})">
+              <td style="padding:10px 12px">
+                <div style="font-weight:700;font-size:12px;color:var(--t1)">${esc(p.leadName)}</div>
+                ${p.leadEmail?`<div style="font-size:10px;color:var(--t3)">${esc(p.leadEmail)}</div>`:''}
+              </td>
+              <td style="padding:10px 12px;font-size:11px;color:var(--t2)">
+                ${esc(p.contactName||'—')}
+                ${p.contactRole?`<div style="font-size:10px;color:var(--t3)">${esc(p.contactRole)}</div>`:''}
+              </td>
+              <td style="padding:10px 12px">
+                <span style="font-size:10px;color:var(--purple);font-weight:700">${esc(p.catName||'—')}</span>
+              </td>
+              <td style="padding:10px 12px;font-size:11px;color:var(--t1);font-weight:600">
+                ${esc((p.subject||'').substring(0,50))}${(p.subject||'').length>50?'…':''}
+              </td>
+              <td style="padding:10px 12px;font-size:11px;color:var(--t3);line-height:1.5">
+                ${esc((p.body||'').substring(0,120))}${(p.body||'').length>120?'…':''}
+              </td>
+              <td style="padding:10px 12px">${statusBadge(p.status)}</td>
+              <td style="padding:8px 10px;white-space:nowrap">
+                ${p.status==='pending' ? `
+                  <button class="btn btn-sm btn-ok" style="margin-bottom:4px;display:block;width:100%" onclick="event.stopPropagation();approveOne(${p.id})">✓ Senden</button>
+                  <button class="btn btn-sm btn-rej" style="display:block;width:100%" onclick="event.stopPropagation();rejectOne(${p.id})">✕ Ablehnen</button>
+                ` : p.status==='rejected' ? `
+                  <button class="btn btn-sm" onclick="event.stopPropagation();resetTopending(${p.id})">↩ Zurück</button>
+                ` : `
+                  <button class="btn btn-sm" style="color:var(--t3)" onclick="event.stopPropagation();openGmail(${p.id})">Gmail ↗</button>
+                `}
+              </td>
+            </tr>
+            <!-- EXPANDED ROW -->
+            <tr id="texp-${p.id}" style="display:none;background:var(--s2)">
+              <td colspan="7" style="padding:16px 20px">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                  <div>
+                    <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Betreff</div>
+                    <input class="inp" id="ed-subj-${p.id}" value="${esc(p.subject)}"
+                      style="font-size:12px;font-weight:700;padding:7px 10px;margin-bottom:10px"
+                      oninput="livePreview(${p.id})" ${p.status!=='pending'?'disabled':''}>
+                    <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">E-Mail Text</div>
+                    <textarea class="inp" id="ed-${p.id}"
+                      style="min-height:200px;font-size:12px;line-height:1.7;padding:10px 12px"
+                      oninput="livePreview(${p.id})" ${p.status!=='pending'?'disabled':''}>${esc(p.body)}</textarea>
+                    ${p.status==='pending'?`
+                      <div style="display:flex;gap:8px;margin-top:8px">
+                        <button class="btn btn-ok" onclick="approveOne(${p.id})">✓ Freigeben & Senden</button>
+                        <button class="btn btn-sm btn-rej" onclick="rejectOne(${p.id})">✕ Ablehnen</button>
+                        <button class="btn btn-sm" onclick="expandTableRow(${p.id})">Schließen</button>
+                      </div>`:'<div style="margin-top:8px"><button class="btn btn-sm" onclick="expandTableRow('+p.id+')">Schließen</button></div>'}
+                  </div>
+                  <div>
+                    <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Kontaktdaten</div>
+                    <div style="background:var(--s1);border:var(--bd);border-radius:3px;padding:12px;font-size:12px;line-height:2">
+                      <div>👤 <strong>${esc(p.contactName||'—')}</strong>${p.contactRole?' · '+esc(p.contactRole):''}</div>
+                      ${p.leadEmail?`<div>✉ <a href="mailto:${esc(p.leadEmail)}" style="color:var(--blue)">${esc(p.leadEmail)}</a></div>`:''}
+                      ${p.contactPhone?`<div>📞 <a href="tel:${esc(p.contactPhone)}" style="color:var(--green)">${esc(p.contactPhone)}</a></div>`:''}
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      </div>`;
+    $('app-list').innerHTML = list.length ? tableHTML : (total > 0 ? `<div style="text-align:center;padding:40px;color:var(--t3)">Keine E-Mails in dieser Ansicht.</div>` : '');
+    ui();
+    return;
+  }
+
+  // ── CARD VIEW (default for small lists) ────────────────────────────────────
+  $('app-list').innerHTML = list.map(p => `
+    <div class="acard ${p.status}" id="ac-${p.id}" style="margin-bottom:12px">
+
+      <!-- HEAD -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:12px">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">
+            <div style="font-size:14px;font-weight:800;color:var(--t1)">${esc(p.leadName)}</div>
+            ${statusBadge(p.status)}
+            ${p.catName?`<span class="pill pill-purple" style="font-size:9px">${esc(p.catName)}</span>`:''}
+          </div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap">
+            ${p.contactName?`<span style="font-size:11px;color:var(--t2)">👤 ${esc(p.contactName)}${p.contactRole?' · <em style=\'font-style:normal;color:var(--t3)\'>' + esc(p.contactRole) + '</em>':''}</span>`:''}
+            ${p.leadEmail?`<span style="font-size:11px;color:var(--t3)">✉ ${esc(p.leadEmail)}</span>`:''}
+            ${p.contactPhone?`<span style="font-size:11px;color:var(--green)">📞 ${esc(p.contactPhone)}</span>`:''}
+            <span style="font-size:11px;color:var(--t3)">${new Date(p.created).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</span>
+          </div>
+        </div>
+
+        <!-- ACTION BUTTONS top-right -->
+        <div style="display:flex;gap:6px;align-items:flex-start;flex-shrink:0">
+          ${p.status==='rejected' ? `
+            <button class="btn btn-sm" onclick="resetTopending(${p.id})">↩ Zurück</button>
+          ` : p.status==='approved' ? `
+            <button class="btn btn-sm" style="color:var(--t3)" onclick="openGmail(${p.id})">Gmail ↗</button>
+          ` : ''}
+        </div>
+      </div>
+
+      <!-- BETREFF -->
+      <div style="background:var(--s2);border-radius:3px;padding:8px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;flex-shrink:0">Betreff</span>
+        <span class="eml-subj-text" style="font-size:12px;font-weight:700;color:var(--t1)">${esc(p.subject)}</span>
+      </div>
+
+      <!-- EMAIL BODY -->
+      <div class="eml-prev" id="eprev-${p.id}" style="max-height:none;white-space:pre-wrap;line-height:1.75;font-size:12px">${esc(p.body)}</div>
+
+      <!-- EDIT (nur bei pending) -->
+      ${p.status==='pending' ? `
+        <div style="margin-top:12px;border-top:1px solid var(--s3);padding-top:12px">
+          <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">
+            ✏ Betreff &amp; Text vor dem Senden anpassen:
+          </div>
+          <input class="inp" id="ed-subj-${p.id}" value="${esc(p.subject)}"
+            style="font-size:12px;padding:8px 12px;margin-bottom:8px;font-weight:700"
+            placeholder="Betreff" oninput="livePreview(${p.id})">
+          <textarea class="inp" id="ed-${p.id}"
+            style="min-height:180px;font-size:12px;line-height:1.75;padding:10px 12px"
+            oninput="livePreview(${p.id})">${esc(p.body)}</textarea>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn btn-ok" onclick="approveOne(${p.id})">✓ Freigeben &amp; Senden</button>
+            <button class="btn btn-rej btn-sm" onclick="rejectOne(${p.id})">✕ Ablehnen</button>
+          </div>
+        </div>
+      ` : ''}
+    </div>`).join('') || (total > 0 ? `<div style="text-align:center;padding:40px;color:var(--t3)">Keine E-Mails in dieser Ansicht.</div>` : '');
+
+  ui();
+};
+
+const livePreview = id => {
+  const subj = $('ed-subj-'+id);
+  const body  = $('ed-'+id);
+  const prev  = $('eprev-'+id);
+  if(subj && body && prev) {
+    prev.textContent = body.value;
+    const subjEl = document.querySelector(`#ac-${id} .eml-subj-text`);
+    if(subjEl) subjEl.textContent = subj.value;
+  }
+};
+
+const resetTopending = id => {
+  const p = pending.find(x=>x.id===id);
+  if(p) { p.status='pending'; save(); renderApprove(); ui(); }
+};
+
+const openGmail = id => {
+  const p = pending.find(x=>x.id===id);
+  if(!p) return;
+  const to  = p.leadEmail || '';
+  const sub = encodeURIComponent(p.subject);
+  const bod = encodeURIComponent(p.body);
+  window.open(`https://mail.google.com/mail/?view=cm&to=${to}&su=${sub}&body=${bod}`, '_blank');
+};
+
+const approveOne = id => {
+  const p = pending.find(x=>x.id===id); if(!p) return;
+  const ed = $('ed-'+id);       if(ed && ed.value) p.body = ed.value;
+  const es = $('ed-subj-'+id);  if(es && es.value) p.subject = es.value;
+  p.status = 'approved';
+  doSend(p, leads.find(x=>x.id===p.leadId));
+  save(); ui(); renderApprove();
+  addLog('✓ E-Mail freigegeben: '+p.leadName+' ('+p.catName+')','ok');
+};
+const rejectOne = id => {
+  const p=pending.find(x=>x.id===id);
+  if(p) { p.status='rejected'; save(); ui(); renderApprove(); addLog('E-Mail abgelehnt: '+p.leadName,'warn'); }
+};
+const approveAll = () => { pending.filter(p=>p.status==='pending').forEach(p=>approveOne(p.id)); };
+const rejectAll  = () => { pending.filter(p=>p.status==='pending').forEach(p=>p.status='rejected'); save();ui();renderApprove(); };
+
+// ─── INBOX ────────────────────────────────────────────────────────────────────
+const renderInbox = () => {
+  $('inbox-empty').style.display = inbox.length?'none':'';
+  $('inbox-list').innerHTML = inbox.map(item => `
+    <div class="icard ${item.replied?'replied':'unread'}" id="ic-${item.id}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+        <div>
+          <div style="font-size:13px;font-weight:800;color:var(--t1)">${esc(item.from)}
+            <span style="font-size:10px;color:var(--t3)">&lt;${esc(item.fromEmail||'')}&gt;</span>
+          </div>
+          <div style="font-size:11px;color:var(--t3)">Re: ${esc(item.subject)}
+            ${item.catName?` · <span style="color:var(--purple)">${esc(item.catName)}</span>`:''}
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          ${item.replied?'<span class="pill pill-on">BEANTWORTET</span>':'<span class="pill pill-warn">OFFEN</span>'}
+          <span style="font-size:10px;color:var(--t3)">${new Date(item.time).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>
+        </div>
+      </div>
+      <div class="eml-prev" style="max-height:90px">${esc(item.body)}</div>
+      ${!item.replied?`
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-sm btn-purple" onclick="genReply(${item.id})">⚡ KI-Antwort generieren</button>
+          <button class="btn btn-sm" onclick="toggleBox(${item.id})">Manuell schreiben</button>
+        </div>
+        <div id="rbox-${item.id}" style="display:none;margin-top:10px">
+          <textarea class="inp" id="rt-${item.id}" style="min-height:80px" placeholder="Deine Antwort…"></textarea>
+          <div style="margin-top:6px"><button class="btn btn-sm btn-ok" onclick="sendManualReply(${item.id})">Senden</button></div>
+        </div>
+        ${item.aiDraft?`
+          <div style="margin-top:12px">
+            <div style="font-size:10px;color:var(--purple);margin-bottom:5px;text-transform:uppercase;letter-spacing:.08em">⚡ KI-Entwurf — bitte prüfen</div>
+            <div class="eml-prev" style="border-color:rgba(168,85,247,.3)">${esc(item.aiDraft)}</div>
+            <div style="display:flex;gap:8px;margin-top:6px">
+              <button class="btn btn-sm btn-ok" onclick="approveReply(${item.id})">✓ Genehmigen & Senden</button>
+              <button class="btn btn-sm" onclick="editDraft(${item.id})">Bearbeiten</button>
+              <button class="btn btn-sm btn-rej" onclick="discardDraft(${item.id})">Verwerfen</button>
+            </div>
+          </div>`:''}
+      `:item.replyBody?`
+        <div style="margin-top:10px">
+          <div style="font-size:10px;color:var(--green);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">Gesendete Antwort</div>
+          <div class="eml-prev" style="border-color:rgba(0,212,160,.2)">${esc(item.replyBody)}</div>
+        </div>`:''}
+    </div>`).join('');
+};
+
+const toggleBox = id => { const e=$('rbox-'+id); if(e) e.style.display=e.style.display?'':'none'; };
+const discardDraft = id => { const item=inbox.find(x=>x.id===id); if(item){item.aiDraft=null;save();renderInbox();} };
+const editDraft = id => {
+  const item=inbox.find(x=>x.id===id); if(!item) return;
+  const box=$('rbox-'+id); if(box) box.style.display='';
+  const rt=$('rt-'+id); if(rt) rt.value=item.aiDraft||'';
+};
+
+const genReply = async id => {
+  const item = inbox.find(x=>x.id===id); if(!item) return;
+  const lead = leads.find(l=>l.id===item.leadId)||{name:item.from};
+  const btns = document.querySelectorAll('#ic-'+id+' button');
+  btns.forEach(b=>b.disabled=true);
+
+  const savedProd = (() => { try { return JSON.parse(localStorage.getItem('los3_product')||'{}'); } catch(e) { return {}; } })();
+  const prodCtx = savedProd.prompt || V('eg-prompt') || '';
+
+  const prompt = `Du bist ${cfg.name||'Daria'}${cfg.role?', '+cfg.role:''}${cfg.co?', '+cfg.co:''}.
+
+${prodCtx?'Dein Produkt-Kontext:\n'+prodCtx+'\n':''}
+Du hast ${lead.name} eine E-Mail geschrieben (Kategorie: ${item.catName||'Kaltakquise'}).
+Betreff war: "${item.subject}"
+${item.origBody?'Deine E-Mail: '+item.origBody:''}
+
+Antwort des Interessenten:
+"${item.body}"
+
+Schreibe eine kurze, natürliche Follow-up-Antwort auf Deutsch.
+Gehe direkt auf ihre Antwort ein. Schlage einen konkreten nächsten Schritt vor.
+Max. 4–5 Sätze. Keine Bullet-Points.
+Signatur: ${cfg.sig||'Beste Grüße'}, ${cfg.name||'Daria'}${cfg.role?'\n'+cfg.role:''}
+
+Nur den E-Mail-Text, kein Betreff:`;
+
+  try {
+    const reply = await claude(prompt, 600);
+    item.aiDraft = reply;
+    save(); renderInbox();
+    addLog('KI-Antwort für: '+lead.name,'agent');
+  } catch(e) { addLog('Fehler Antwort: '+e.message,'err'); }
+  btns.forEach(b=>b.disabled=false);
+};
+
+const approveReply = id => { const item=inbox.find(x=>x.id===id); if(item?.aiDraft) doSendReply(item,item.aiDraft); };
+const sendManualReply = id => { const item=inbox.find(x=>x.id===id); const t=V('rt-'+id); if(!t){alert('Text eingeben');return;} doSendReply(item,t); };
+const doSendReply = (item, text) => {
+  if(cfg.gFrom && item.fromEmail) {
+    window.open('https://mail.google.com/mail/?view=cm&to='+encodeURIComponent(item.fromEmail)+'&su='+encodeURIComponent('Re: '+item.subject)+'&body='+encodeURIComponent(text),'_blank');
+  }
+  item.replied=true; item.replyBody=text; item.aiDraft=null;
+  const lead = leads.find(l=>l.id===item.leadId);
+  if(lead) lead.status='Warm';
+  save(); ui(); renderInbox(); renderLeads();
+  addLog('Antwort gesendet: '+item.from,'ok');
+};
+
+const simReply = () => {
+  const cl = leads.filter(l=>l.status==='Kontaktiert');
+  if(!cl.length) { alert('Keine kontaktierten Leads. Erst E-Mails senden.'); return; }
+  const lead = cl[Math.floor(Math.random()*cl.length)];
+  const p = pending.find(x=>x.leadId===lead.id&&x.status==='approved');
+  const msgs = [
+    'Interessant — können wir uns nächste Woche kurz sprechen?',
+    'Das klingt relevant. Was kostet das und wie lange dauert die Implementierung?',
+    'Wir haben ein ähnliches Projekt geplant. Haben Sie Referenzen aus dem Genossenschaftsbanken-Bereich?',
+    'Bitte schicken Sie mir mehr Informationen. Was unterscheidet Sie von anderen Anbietern?',
+    'Ich leite das an unseren CIO weiter — können Sie kurz die wichtigsten Punkte zusammenfassen?'
+  ];
+  inbox.unshift({
+    id:uid(), leadId:lead.id, from:[lead.vorname,lead.nachname].filter(Boolean).join(' ')||lead.kontakt||lead.name,
+    fromEmail:lead.email||'reply@'+(lead.web||'beispiel.de'),
+    subject:p?p.subject:'Ihre Anfrage',
+    body:msgs[Math.floor(Math.random()*msgs.length)],
+    catName:p?.catName, origBody:p?.body,
+    time:new Date().toISOString(), replied:false, aiDraft:null, replyBody:''
+  });
+  lead.status='Geantwortet';
+  save(); ui(); renderInbox(); renderLeads(); nav('inbox');
+  addLog('Antwort simuliert von: '+lead.name,'info');
+};
+
+// ─── LEADS ─────────────────────────────────────────────────────────────────────
+const bcls = s => ({'Neu':'bdg-new','Kontaktiert':'bdg-sent','Warm':'bdg-warm','Geantwortet':'bdg-rep','Kalt':'bdg-cold'}[s]||'bdg-cold');
+
+// Helper: full name from lead
+const fullName  = l => [l.vorname||'', l.nachname||''].filter(Boolean).join(' ') || l.kontakt || '';
+const shortRole = r => (r||'').split(' ').slice(0,3).join(' ');
+
+const renderLeads = () => {
+  const q=(V('ld-q')||'').toLowerCase(), fs=V('ld-fs');
+  const list=leads.filter(l=>(
+    !q||l.name.toLowerCase().includes(q)||
+    (l.vorname||'').toLowerCase().includes(q)||
+    (l.nachname||'').toLowerCase().includes(q)||
+    (l.rolle||'').toLowerCase().includes(q)||
+    (l.kontaktEmail||'').toLowerCase().includes(q)||
+    (l.beschreibung||'').toLowerCase().includes(q)
+  )&&(!fs||l.status===fs));
+  $('ld-lbl').textContent=list.length+' Einträge';
+
+  const incomplete = list.filter(l=>!l.vorname||!l.nachname||!l.kontaktEmail||!l.telefon);
+  const hint = incomplete.length
+    ? `<tr><td colspan="8" style="padding:8px 16px;background:rgba(245,194,24,.05);border-bottom:1px solid rgba(245,194,24,.12)">
+        <span style="font-size:11px;color:var(--yellow)">⚠ ${incomplete.length} Leads haben unvollständige Kontaktdaten.</span>
+        <button class="tbtn" style="color:var(--yellow);font-size:11px;margin-left:10px;border:1px solid rgba(245,194,24,.3);border-radius:2px;padding:2px 8px"
+          onclick="autoFillAll()">⚡ Alle auto-ausfüllen</button>
+        <button class="tbtn" style="color:var(--t3);font-size:11px;margin-left:6px" onclick="nav('linkedin')">→ LinkedIn öffnen</button>
+       </td></tr>` : '';
+
+  $('ld-body').innerHTML = hint + list.map(l => {
+    const name = fullName(l);
+    const hasContact = l.vorname && l.nachname;
+    const hasEmail   = l.kontaktEmail;
+    const hasPhone   = l.telefon;
+    return `
+    <tr id="lr-${l.id}" style="vertical-align:top">
+
+      <!-- FIRMA -->
+      <td style="padding:11px 12px;min-width:180px">
+        <div style="font-weight:800;font-size:12px;color:var(--t1);line-height:1.3">
+          ${esc(l.name)}
+          ${l.web?`<a href="https://${esc(l.web)}" target="_blank" style="color:var(--t3);font-size:10px;font-weight:400;margin-left:4px">↗</a>`:''}
+        </div>
+        <div style="font-size:10px;color:var(--t3);margin-top:2px">${esc(l.ort||'')}${l.ma?' · '+esc(l.ma)+' MA':''}</div>
+        <div style="font-size:10px;color:var(--t2);margin-top:1px">${esc(l.branche||'')}</div>
+        ${l.firmenEmail?`<a href="mailto:${esc(l.firmenEmail)}" style="font-size:10px;color:var(--t3);display:block;margin-top:2px">🏢 ${esc(l.firmenEmail)}</a>`:''}
+      </td>
+
+      <!-- ANSPRECHPARTNER -->
+      <td style="padding:11px 12px;min-width:160px">
+        ${hasContact
+          ? `<div style="font-size:12px;font-weight:700;color:var(--t1)">${esc(l.vorname)} ${esc(l.nachname)}</div>
+             <div style="font-size:10px;color:var(--t3);margin-top:1px">${esc(l.rolle||'')}</div>
+             ${l.linkedin?`<a href="${esc(l.linkedin)}" target="_blank" style="font-size:10px;color:var(--blue);display:block;margin-top:2px">LinkedIn ↗</a>`:''}`
+          : `<button class="miss-btn" onclick="editContact(${l.id})">👤 + Eintragen</button>`}
+      </td>
+
+      <!-- TELEFON -->
+      <td style="padding:11px 12px;min-width:130px">
+        ${hasPhone
+          ? `<a href="tel:${esc(l.telefon)}" style="font-size:12px;color:var(--green);font-weight:600">${esc(l.telefon)}</a>`
+          : `<button class="miss-btn" onclick="editContact(${l.id})">📞 + Eintragen</button>`}
+      </td>
+
+      <!-- E-MAIL ANSPRECHPARTNER -->
+      <td style="padding:11px 12px;min-width:160px">
+        ${hasEmail
+          ? `<a href="mailto:${esc(l.kontaktEmail)}" style="font-size:11px;color:var(--blue)">${esc(l.kontaktEmail)}</a>`
+          : `<button class="miss-btn" onclick="editContact(${l.id})">✉ + Eintragen</button>`}
+      </td>
+
+      <!-- BESCHREIBUNG -->
+      <td style="padding:11px 12px;min-width:160px;max-width:200px">
+        ${l.beschreibung
+          ? `<div style="font-size:11px;color:var(--t2);line-height:1.5;cursor:pointer" onclick="editContact(${l.id})"
+               title="Klicken zum Bearbeiten">${esc(l.beschreibung.substring(0,80))}${l.beschreibung.length>80?'…':''}</div>`
+          : `<button class="miss-btn" style="color:var(--t3);border-color:var(--s4)" onclick="editContact(${l.id})">📝 + Beschreibung</button>`}
+      </td>
+
+      <!-- STATUS -->
+      <td style="padding:11px 12px;min-width:90px">
+        <span class="bdg ${bcls(l.status)}">${l.status}</span>
+        <select class="isel" onchange="setStatus(${l.id},this.value)" style="display:block;margin-top:5px;font-size:10px">
+          ${['Neu','Kontaktiert','Warm','Geantwortet','Kalt'].map(s=>`<option${l.status===s?' selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+
+      <!-- AKTIONEN -->
+      <td style="padding:11px 8px;white-space:nowrap">
+        <button class="tbtn" onclick="editContact(${l.id})" title="Bearbeiten">✏</button>
+        <button class="tbtn" onclick="autoFillLead(${l.id})" title="KI auto-ausfüllen" style="color:var(--purple)">⚡</button>
+        <button class="tbtn" onclick="delLead(${l.id})" style="color:var(--red)" title="Löschen">✕</button>
+      </td>
+    </tr>
+
+    <!-- INLINE EDIT ROW -->
+    <tr id="lre-${l.id}" style="display:none;background:var(--s2)">
+      <td colspan="7" style="padding:16px 18px">
+        <div style="font-size:12px;font-weight:800;color:var(--t1);margin-bottom:12px;display:flex;align-items:center;gap:10px">
+          ✏ ${esc(l.name)} — Kontakt bearbeiten
+          <button class="btn btn-sm btn-purple" onclick="autoFillLead(${l.id})" id="af-btn-${l.id}">⚡ KI auto-ausfüllen</button>
+          <span id="af-status-${l.id}" style="font-size:11px;color:var(--t3);font-weight:400"></span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+          <div>
+            <div class="field-lbl">Vorname *</div>
+            <input class="inp" id="ec-vorname-${l.id}" value="${esc(l.vorname||'')}"
+              placeholder="Max" style="font-size:12px;padding:7px 10px">
+          </div>
+          <div>
+            <div class="field-lbl">Nachname *</div>
+            <input class="inp" id="ec-nachname-${l.id}" value="${esc(l.nachname||'')}"
+              placeholder="Müller" style="font-size:12px;padding:7px 10px">
+          </div>
+          <div>
+            <div class="field-lbl">Rolle / Position</div>
+            <input class="inp" id="ec-rolle-${l.id}" value="${esc(l.rolle||'')}"
+              placeholder="CIO, IT-Leiter, CEO…" style="font-size:12px;padding:7px 10px">
+          </div>
+          <div>
+            <div class="field-lbl">LinkedIn Profil</div>
+            <input class="inp" id="ec-linkedin-${l.id}" value="${esc(l.linkedin||'')}"
+              placeholder="linkedin.com/in/..." style="font-size:12px;padding:7px 10px">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+          <div>
+            <div class="field-lbl">📧 E-Mail Ansprechpartner *</div>
+            <input class="inp" id="ec-kemail-${l.id}" value="${esc(l.kontaktEmail||'')}"
+              placeholder="max.mueller@firma.de" type="email" style="font-size:12px;padding:7px 10px">
+          </div>
+          <div>
+            <div class="field-lbl">🏢 Firmen-E-Mail</div>
+            <input class="inp" id="ec-femail-${l.id}" value="${esc(l.firmenEmail||'')}"
+              placeholder="info@firma.de" type="email" style="font-size:12px;padding:7px 10px">
+          </div>
+          <div>
+            <div class="field-lbl">📞 Telefon direkt / Zentrale</div>
+            <input class="inp" id="ec-telefon-${l.id}" value="${esc(l.telefon||'')}"
+              placeholder="+49 30 12345678" style="font-size:12px;padding:7px 10px">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin-bottom:12px">
+          <div>
+            <div class="field-lbl">📝 Company Beschreibung</div>
+            <textarea class="inp" id="ec-beschr-${l.id}"
+              placeholder="Was macht die Firma? Spezialisierung, Kunden, Produkte…"
+              style="font-size:11px;padding:7px 10px;min-height:75px;line-height:1.5">${esc(l.beschreibung||'')}</textarea>
+          </div>
+          <div>
+            <div class="field-lbl">Website</div>
+            <input class="inp" id="ec-web-${l.id}" value="${esc(l.web||'')}"
+              placeholder="firma.de" style="font-size:12px;padding:7px 10px;margin-bottom:8px">
+            <div class="field-lbl">Standort</div>
+            <input class="inp" id="ec-ort-${l.id}" value="${esc(l.ort||'')}"
+              placeholder="Berlin" style="font-size:12px;padding:7px 10px">
+          </div>
+          <div>
+            <div class="field-lbl">Firmenfokus / USP</div>
+            <textarea class="inp" id="ec-fokus-${l.id}"
+              placeholder="z.B. liefert für Sparkassen, RegTech-Spezialist…"
+              style="font-size:11px;padding:7px 10px;min-height:75px;line-height:1.5">${esc(l.fokus||'')}</textarea>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-ok btn-sm" onclick="saveContact(${l.id})">💾 Speichern</button>
+          <button class="btn btn-sm" onclick="editContact(${l.id})">Abbrechen</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="7" style="text-align:center;padding:36px;color:var(--t3)">Keine Leads. Agent starten oder Leads importieren.</td></tr>';
+};
+
+const editContact = id => {
+  const row = $('lre-'+id);
+  if(!row) return;
+  const open = row.style.display !== 'none';
+  document.querySelectorAll('[id^="lre-"]').forEach(r => r.style.display='none');
+  if(!open) { row.style.display=''; row.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+};
+
+const saveContact = id => {
+  const l = leads.find(x=>x.id===id); if(!l) return;
+  l.vorname      = $('ec-vorname-'+id)?.value.trim()  || l.vorname  || '';
+  l.nachname     = $('ec-nachname-'+id)?.value.trim() || l.nachname || '';
+  l.rolle        = $('ec-rolle-'+id)?.value.trim()    || l.rolle    || '';
+  l.linkedin     = $('ec-linkedin-'+id)?.value.trim() || l.linkedin || '';
+  l.kontaktEmail = $('ec-kemail-'+id)?.value.trim()   || l.kontaktEmail || '';
+  l.firmenEmail  = $('ec-femail-'+id)?.value.trim()   || l.firmenEmail  || '';
+  l.telefon      = $('ec-telefon-'+id)?.value.trim()  || l.telefon  || '';
+  l.beschreibung = $('ec-beschr-'+id)?.value.trim()   || l.beschreibung || '';
+  l.web          = $('ec-web-'+id)?.value.trim()      || l.web      || '';
+  l.ort          = $('ec-ort-'+id)?.value.trim()      || l.ort      || '';
+  l.fokus        = $('ec-fokus-'+id)?.value.trim()    || l.fokus    || '';
+  // keep legacy kontakt field in sync
+  l.kontakt = [l.vorname, l.nachname].filter(Boolean).join(' ') + (l.rolle ? ', '+l.rolle : '');
+  l.email   = l.kontaktEmail || l.firmenEmail || l.email;
+  save(); renderLeads(); renderLeadPicker(); renderLinkedInEnrichList();
+  addLog(`Kontakt gespeichert: ${l.name} · ${l.vorname} ${l.nachname} (${l.rolle||''})`, 'ok');
+};
+
+// KI auto-fill ONE lead
+const autoFillLead = async (id) => {
+  const l = leads.find(x=>x.id===id); if(!l) return;
+  const btn = $('af-btn-'+id), st = $('af-status-'+id);
+  if(btn){ btn.disabled=true; btn.innerHTML='<span class="sp"></span>läuft…'; }
+  if(st){ st.textContent=''; st.style.color='var(--t3)'; }
+
+  // open edit row
+  const row = $('lre-'+id);
+  if(row) row.style.display='';
+
+  const prompt = `Du bist ein B2B-Recherche-Assistent. Fülle fehlende Kontaktdaten für dieses Unternehmen aus.
+
+Firma: ${l.name}
+Branche: ${l.branche||''}
+Ort: ${l.ort||''}
+Website: ${l.web||''}
+Mitarbeiter: ${l.ma||''}
+Bekannter Fokus: ${l.fokus||''}
+Bereits bekannt: ${l.vorname?'Vorname: '+l.vorname:''}${l.nachname?' Nachname: '+l.nachname:''}${l.rolle?' Rolle: '+l.rolle:''}
+
+Recherchiere / schätze:
+1. Vorname des Ansprechpartners (CEO/GF/CTO/IT-Leiter)
+2. Nachname des Ansprechpartners
+3. Genaue Rolle/Position (z.B. "Geschäftsführer", "CIO", "Head of IT")
+4. Direkte E-Mail des Ansprechpartners (gängiges Format: vorname.nachname@domain oder v.nachname@domain)
+5. Firmen-E-Mail (info@domain oder kontakt@domain)
+6. Telefon (Zentrale oder direkt, +49 Format)
+7. Company Beschreibung (2-3 präzise Sätze: Was macht die Firma, welche Bankenkunden, welche Hauptprodukte)
+
+Antworte NUR als JSON (kein Text davor/danach):
+{
+  "vorname": "",
+  "nachname": "",
+  "rolle": "",
+  "kontaktEmail": "",
+  "firmenEmail": "",
+  "telefon": "",
+  "beschreibung": ""
+}`;
+
+  try {
+    const raw = await claude(prompt, 700);
+    const cleaned2 = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+    const s=cleaned2.indexOf('{'), e=cleaned2.lastIndexOf('}');
+    if(s<0||e<0) throw new Error('Kein JSON in Antwort');
+    const d = JSON.parse(cleaned2.substring(s,e+1));
+
+    const fill = (fieldId, val, existing) => {
+      if(val && !existing) { const el=$(fieldId); if(el) el.value=val; }
+    };
+    fill('ec-vorname-'+id,   d.vorname,      l.vorname);
+    fill('ec-nachname-'+id,  d.nachname,     l.nachname);
+    fill('ec-rolle-'+id,     d.rolle,        l.rolle);
+    fill('ec-kemail-'+id,    d.kontaktEmail, l.kontaktEmail);
+    fill('ec-femail-'+id,    d.firmenEmail,  l.firmenEmail);
+    fill('ec-telefon-'+id,   d.telefon,      l.telefon);
+    if(d.beschreibung){ const el=$('ec-beschr-'+id); if(el) el.value=d.beschreibung; }
+
+    if(st){ st.textContent='✓ Ausgefüllt — bitte prüfen & speichern'; st.style.color='var(--green)'; }
+    addLog(`Auto-Fill: ${l.name} · ${d.vorname||''} ${d.nachname||''}`, 'agent');
+  } catch(err) {
+    if(st){ st.textContent='Fehler: '+err.message; st.style.color='var(--red)'; }
+    addLog('Auto-Fill Fehler '+l.name+': '+err.message, 'err');
+  }
+  if(btn){ btn.disabled=false; btn.textContent='⚡ KI auto-ausfüllen'; }
+};
+
+// KI auto-fill ALL incomplete leads
+const autoFillAll = async () => {
+  const incomplete = leads.filter(l=>!l.vorname||!l.nachname||!l.kontaktEmail);
+  if(!incomplete.length){ return; }
+  for(const l of incomplete){
+    await autoFillLead(l.id);
+    await slp(400);
+  }
+  addLog(`Auto-Fill Batch: ${incomplete.length} Leads verarbeitet`, 'ok');
+};
+
+const setStatus=(id,st)=>{ const l=leads.find(x=>x.id===id); if(l){l.status=st;save();renderLeads();ui();} };
+const delLead=(id)=>{ const l=leads.find(x=>x.id===id); if(l&&confirm('"'+l.name+'" löschen?')){leads=leads.filter(x=>x.id!==id);save();renderLeads();ui();} };
+const clearLeads=()=>{ if(confirm('Alle Leads löschen?')){leads=[];save();renderLeads();ui();addLog('Alle Leads gelöscht','warn');} };
+
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const applyCfg = () => {
+  if(cfg.provider) { const s=$('c-provider'); if(s) s.value=cfg.provider; switchProvider(cfg.provider); }
+  if(cfg.claudeKey){$('c-key').value=cfg.claudeKey;setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● '+cfg.provider.toUpperCase();}
+  if(cfg.openaiKey) $('c-openai-key').value=cfg.openaiKey;
+  if(cfg.geminiKey) $('c-gemini-key').value=cfg.geminiKey;
+  if(cfg.model) $('c-model').value=cfg.model;
+  if(cfg.name) $('c-name').value=cfg.name;
+  if(cfg.role) $('c-role').value=cfg.role;
+  if(cfg.co) $('c-co').value=cfg.co;
+  if(cfg.sig) $('c-sig').value=cfg.sig;
+  if(cfg.gFrom){$('c-gfrom').value=cfg.gFrom;setPill('p-gmail',true);}
+  if(cfg.gName) $('c-gname').value=cfg.gName;
+  if(cfg.whUrl){$('c-wh').value=cfg.whUrl;setPill('p-wh',true);}
+  if(cfg.backendUrl){$('c-backend').value=cfg.backendUrl;setPill('p-backend',true);}
+  if(cfg.apolloKey){$('li-apollo').value=cfg.apolloKey;setPill('li-api-status',true);$('li-api-status').textContent='● APOLLO ONLINE';}
+  if(cfg.hunterKey&&!cfg.apolloKey){$('li-hunter').value=cfg.hunterKey;setPill('li-api-status',true);$('li-api-status').textContent='● HUNTER ONLINE';}
+  if(cfg.hunterKey) $('li-hunter').value=cfg.hunterKey;
+  // load saved product prompt
+  const raw = localStorage.getItem('los3_product');
+  if(raw) { try { const d=JSON.parse(raw); if(d.saved) $('eg-saved-info').textContent='Zuletzt gespeichert: '+d.saved; } catch(e){} }
+};
+const saveConfig = () => {
+  cfg.provider=V('c-provider')||'claude';
+  const key=V('c-key'); if(key) cfg.claudeKey=key;
+  const okey=V('c-openai-key'); if(okey) cfg.openaiKey=okey;
+  const gkey=V('c-gemini-key'); if(gkey) cfg.geminiKey=gkey;
+  cfg.model=V('c-model'); cfg.name=V('c-name'); cfg.role=V('c-role');
+  cfg.co=V('c-co'); cfg.sig=V('c-sig'); cfg.gFrom=V('c-gfrom'); cfg.gName=V('c-gname'); cfg.whUrl=V('c-wh');
+  if(V('li-apollo')) cfg.apolloKey=V('li-apollo');
+  if(V('li-hunter')) cfg.hunterKey=V('li-hunter');
+  if(V('c-backend')) cfg.backendUrl=V('c-backend').replace(/\/$/,'');
+  save();
+  if(cfg.claudeKey){setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● API';}
+  if(cfg.gFrom) setPill('p-gmail',true);
+  if(cfg.whUrl) setPill('p-wh',true);
+  showAlert('cfg-alrt','Konfiguration gespeichert.','ok');
+  addLog('Konfiguration gespeichert','ok');
+};
+const switchProvider = (prov) => {
+  ['claude','openai','gemini'].forEach(p => {
+    const el = $('key-'+p); if(el) el.style.display = p===prov?'':'none';
+  });
+  const modelSel = $('c-model');
+  if(!modelSel) return;
+  const models = {
+    claude: [
+      {v:'claude-sonnet-4-20250514', l:'Claude Sonnet 4 (empfohlen)'},
+      {v:'claude-opus-4-20250514',   l:'Claude Opus 4'},
+      {v:'claude-haiku-4-5-20251001',l:'Claude Haiku 4.5 (schnell)'},
+    ],
+    openai: [
+      {v:'gpt-4o',       l:'GPT-4o (empfohlen)'},
+      {v:'gpt-4o-mini',  l:'GPT-4o Mini (schnell & günstig)'},
+      {v:'gpt-4-turbo',  l:'GPT-4 Turbo'},
+    ],
+    gemini: [
+      {v:'gemini-1.5-flash', l:'Gemini 1.5 Flash (empfohlen · kostenlos)'},
+      {v:'gemini-1.5-pro',   l:'Gemini 1.5 Pro'},
+      {v:'gemini-2.0-flash', l:'Gemini 2.0 Flash'},
+    ],
+  };
+  const opts = models[prov] || models.claude;
+  modelSel.innerHTML = opts.map(o=>`<option value="${o.v}">${o.l}</option>`).join('');
+  cfg.provider = prov;
+};
+
+const testOpenAI = async () => {
+  const key=V('c-openai-key'); if(!key){alert('OpenAI API Key eintragen');return;}
+  try {
+    const r=await fetch('https://api.openai.com/v1/models',{headers:{'Authorization':'Bearer '+key}});
+    if(r.ok){cfg.openaiKey=key;save();setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● OPENAI';showAlert('cfg-alrt','OpenAI verbunden!','ok');addLog('OpenAI API: OK','ok');}
+    else showAlert('cfg-alrt','OpenAI: Ungültiger Key (HTTP '+r.status+')','err');
+  } catch(e){showAlert('cfg-alrt','Fehler: '+e.message,'err');}
+};
+
+const testGemini = async () => {
+  const key=V('c-gemini-key'); if(!key){alert('Gemini API Key eintragen');return;}
+  try {
+    const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+    if(r.ok){cfg.geminiKey=key;save();setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● GEMINI';showAlert('cfg-alrt','Gemini verbunden!','ok');addLog('Gemini API: OK','ok');}
+    else showAlert('cfg-alrt','Gemini: Ungültiger Key (HTTP '+r.status+')','err');
+  } catch(e){showAlert('cfg-alrt','Fehler: '+e.message,'err');}
+};
+
+const testClaude = async () => {
+  const key=V('c-key'); if(!key){alert('Key eintragen');return;}
+  try {
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:5,messages:[{role:'user',content:'Hi'}]})});
+    if(r.ok){cfg.claudeKey=key;save();setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● API';showAlert('cfg-alrt','Claude API verbunden!','ok');addLog('Claude API OK','ok');}
+    else showAlert('cfg-alrt','Ungültiger Key (HTTP '+r.status+')','err');
+  } catch(e){showAlert('cfg-alrt','Verbindungsfehler: '+e.message,'err');}
+};
+const testBackend = async () => {
+  const url = V('c-backend').replace(/\/$/, '');
+  if(!url) { showAlert('cfg-alrt', 'Backend URL eingeben.', 'warn'); return; }
+  try {
+    const res = await fetch(url + '/api/health');
+    if(res.ok) {
+      cfg.backendUrl = url; save();
+      setPill('p-backend', true);
+      // Switch to backend mode
+      showAlert('cfg-alrt', '✓ Backend verbunden! Auth-Modus wird beim nächsten Laden aktiviert.', 'ok');
+      addLog('Backend verbunden: ' + url, 'ok');
+    } else {
+      showAlert('cfg-alrt', 'Backend antwortet nicht korrekt (HTTP ' + res.status + ')', 'err');
+    }
+  } catch(e) { showAlert('cfg-alrt', 'Backend nicht erreichbar: ' + e.message, 'err'); }
+};
+
+const testWH = async () => {
+  const url=V('c-wh'); if(!url){alert('URL eintragen');return;}
+  try{await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({test:true,source:'LeadOS'})});cfg.whUrl=url;save();setPill('p-wh',true);showAlert('cfg-alrt','Webhook OK!','ok');}
+  catch(e){showAlert('cfg-alrt','Webhook nicht erreichbar.','err');}
+};
+const sendWH = async data => { if(!cfg.whUrl) return; try{await fetch(cfg.whUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data,source:'LeadOS',ts:new Date().toISOString()})});}catch(e){} };
+
+// ─── EXPORT ───────────────────────────────────────────────────────────────────
+const expCSV = () => {
+  const h='Firma,Branche,MA,Ort,Vorname,Nachname,Rolle,Telefon,E-Mail Kontakt,Firmen-E-Mail,LinkedIn,Beschreibung,Fokus,Website,Status';
+  const rows=leads.map(l=>[l.name,l.branche,l.ma,l.ort,l.vorname,l.nachname,l.rolle,l.telefon,l.kontaktEmail,l.firmenEmail,l.linkedin,l.beschreibung,l.fokus,l.web,l.status].map(x=>`"${(x||'').replace(/"/g,'""')}"`).join(','));
+  dl('leads_'+ds()+'.csv','data:text/csv;charset=utf-8,'+encodeURIComponent(h+'\n'+rows.join('\n')));
+  addLog('CSV exportiert');
+};
+const expJSON = () => { dl('leados_'+ds()+'.json','data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify({leads,pending,inbox,logs,cfg,exported:new Date().toISOString()},null,2))); addLog('JSON exportiert'); };
+const impJSON = () => {
+  const inp=document.createElement('input');inp.type='file';inp.accept='.json';
+  inp.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+    r.onload=ev=>{try{const d=JSON.parse(ev.target.result);
+      if(d.leads)leads=d.leads;if(d.pending)pending=d.pending;
+      if(d.inbox)inbox=d.inbox;if(d.logs)logs=d.logs;
+      if(d.cfg)cfg={...cfg,...d.cfg};
+      save();applyCfg();ui();renderLeads();renderApprove();renderInbox();renderLog();renderCatGrid();renderLeadPicker();
+      alert('Import OK: '+leads.length+' Leads');addLog('Import: '+leads.length+' Leads','ok');
+    }catch(e){alert('Fehler: '+e.message);}};r.readAsText(f);};inp.click();
+};
+const nukeAll = () => { if(!confirm('Alle DEINE Daten löschen? (Andere Nutzer bleiben unberührt)'))return; leads=[];pending=[];inbox=[];logs=[];save();ui();renderLeads();renderApprove();renderInbox();renderLog();addLog('Alle Daten gelöscht','warn'); };
+
+// ─── USER MANAGEMENT ─────────────────────────────────────────────────────────
+const renderUsersList = () => {
+  const session = getSession();
+  if(!session) return;
+  const isAdmin = session.role === 'admin';
+  const adminPill = $('p-admin');
+  if(adminPill) {
+    if(isAdmin) { adminPill.style.display=''; adminPill.className='pill pill-purple'; adminPill.textContent='● ADMIN'; }
+    else { adminPill.style.display='none'; }
+  }
+  const users = getUsers();
+  const el = $('users-list'); if(!el) return;
+  if(!isAdmin) {
+    el.innerHTML = `<div style="font-size:12px;color:var(--t2)">Eingeloggt als: <strong style="color:var(--t1)">${esc(session.name)}</strong> &nbsp;·&nbsp; ${esc(session.email)}</div>`;
+    return;
+  }
+  el.innerHTML = users.map(u => `
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--s3)">
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green);flex-shrink:0">
+        ${esc((u.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().substring(0,2))}
+      </div>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:700;color:var(--t1)">${esc(u.name)}
+          ${u.role==='admin'?'<span class="pill pill-purple" style="font-size:9px;margin-left:6px">ADMIN</span>':''}
+          ${u.id===session.userId?'<span class="pill pill-on" style="font-size:9px;margin-left:4px">ICH</span>':''}
+        </div>
+        <div style="font-size:10px;color:var(--t3)">${esc(u.email)} &nbsp;·&nbsp; seit ${new Date(u.created||Date.now()).toLocaleDateString('de-DE')}</div>
+      </div>
+      ${u.id !== session.userId ? `<button class="btn btn-sm btn-r" onclick="deleteUser('${u.id}')">Löschen</button>` : ''}
+    </div>`).join('') || '<div style="font-size:12px;color:var(--t3)">Keine weiteren Nutzer.</div>';
+};
+
+const deleteUserAccount = (userId) => {
+  const users = getUsers();
+  const user = users.find(u=>u.id===userId);
+  if(!user) return;
+  if(!confirm('Nutzer "'+user.name+'" ('+user.email+') löschen?')) return;
+  saveUsers(users.filter(u=>u.id!==userId));
+  renderTeam();
+  addLog('Nutzer gelöscht: '+user.name, 'warn');
+};
+
+// ─── CLOCK ────────────────────────────────────────────────────────────────────
+const tick = () => { $('clk').textContent=new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}); };
+
+
+// ─── LINKEDIN PROSPECTING ─────────────────────────────────────────────────────
+let liProfiles = []; // enriched profile queue
+let liSelectedIds = new Set();
+
+const renderLinkedInEnrichList = () => {
+  const el = $('li-enrich-list');
+  if(!leads.length) {
+    el.innerHTML = '<div style="padding:20px;text-align:center;font-size:12px;color:var(--t3)">Keine Leads. Agent starten um Firmen zu finden.</div>';
+    return;
+  }
+  // show leads that need enrichment (missing kontakt, telefon or email)
+  const needsWork = leads.filter(l => !l.kontaktEmail || !l.telefon || !l.vorname);
+  const enriched  = leads.filter(l => l.kontaktEmail && l.telefon && l.vorname && l.nachname);
+
+  let html = '';
+  if(needsWork.length) {
+    html += `<div style="padding:8px 14px;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;border-bottom:var(--bd)">Needs Enrichment (${needsWork.length})</div>`;
+    html += needsWork.map(l => `
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--s2)" id="liq-${l.id}">
+        <input type="checkbox" style="width:14px;height:14px;accent-color:var(--green);flex-shrink:0" ${liSelectedIds.has(l.id)?'checked':''} onchange="toggleLiSel(${l.id},this.checked)">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:700;color:var(--t1)">${esc(l.name)}</div>
+          <div style="font-size:10px;color:var(--t3)">${esc(l.branche||'')} · ${esc(l.ort||'')}</div>
+          <div style="display:flex;gap:8px;margin-top:3px;flex-wrap:wrap">
+            ${(l.vorname||l.nachname)?`<span style="font-size:10px;color:var(--green)">👤 ${esc(l.vorname||'')} ${esc(l.nachname||'')}${l.rolle?', '+esc(l.rolle):''}</span>`:'<span style="font-size:10px;color:var(--red)">👤 kein Ansprechpartner</span>'}
+            ${l.email?`<span style="font-size:10px;color:var(--green)">✉ ${esc(l.email)}</span>`:'<span style="font-size:10px;color:var(--red)">✉ fehlt</span>'}
+            ${l.telefon?`<span style="font-size:10px;color:var(--green)">📞 ${esc(l.telefon)}</span>`:'<span style="font-size:10px;color:var(--yellow)">📞 fehlt</span>'}
+          </div>
+        </div>
+        <div style="display:flex;gap:5px;flex-shrink:0">
+          <button class="btn btn-sm" onclick="openLinkedInSearch('${esc(l.name)}','${esc(l.kontakt||'')}','${esc(l.ort||'')}')" title="LinkedIn öffnen">🔗</button>
+          <button class="btn btn-sm btn-purple" onclick="enrichOneLead(${l.id})" title="Apollo anreichern">⚡</button>
+        </div>
+      </div>`).join('');
+  }
+  if(enriched.length) {
+    html += `<div style="padding:8px 14px;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;border-bottom:var(--bd)">Vollständig (${enriched.length})</div>`;
+    html += enriched.map(l => `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--s2);opacity:.6">
+        <div style="flex:1">
+          <div style="font-size:12px;font-weight:700;color:var(--t1)">${esc(l.name)}</div>
+          <div style="display:flex;gap:8px;margin-top:2px;flex-wrap:wrap">
+            <span style="font-size:10px;color:var(--green)">👤 ${esc(l.kontakt)}</span>
+            <span style="font-size:10px;color:var(--green)">✉ ${esc(l.email)}</span>
+            <span style="font-size:10px;color:var(--green)">📞 ${esc(l.telefon)}</span>
+            ${l.linkedin?`<a href="${esc(l.linkedin)}" target="_blank" style="font-size:10px;color:var(--blue)">LinkedIn ↗</a>`:''}
+          </div>
+        </div>
+        <span class="pill pill-on" style="font-size:9px">VOLLSTÄNDIG</span>
+      </div>`).join('');
+  }
+  el.innerHTML = html;
+  $('li-st-found').textContent = leads.length;
+  $('li-st-email').textContent = leads.filter(l=>l.email).length;
+  $('li-st-phone').textContent = leads.filter(l=>l.telefon).length;
+  $('li-st-saved').textContent = leads.filter(l=>l.kontakt&&l.email).length;
+  $('b-li').textContent = leads.filter(l=>!l.email||!l.telefon).length;
+  $('b-li').style.display = leads.filter(l=>!l.email||!l.telefon).length ? '' : 'none';
+};
+
+const toggleLiSel = (id, checked) => {
+  if(checked) liSelectedIds.add(id);
+  else liSelectedIds.delete(id);
+};
+
+// Build LinkedIn People Search URL
+const buildLinkedInURL = (name, role, company, region) => {
+  const q = [name, role, company].filter(Boolean).join(' ');
+  const base = 'https://www.linkedin.com/search/results/people/?keywords=';
+  const params = new URLSearchParams({ keywords: q });
+  if(region && region !== 'Deutschland') params.set('geoUrn', region);
+  return base + encodeURIComponent(q);
+};
+
+const buildLinkedInCompanyURL = (company) => {
+  return 'https://www.linkedin.com/search/results/companies/?keywords=' + encodeURIComponent(company);
+};
+
+// Run main LinkedIn search — generates search URLs for all leads
+const runLinkedInSearch = async () => {
+  const jobtitle = V('li-jobtitle');
+  const keywords = V('li-keywords');
+  const region   = V('li-region');
+  const mode     = V('li-mode');
+
+  if(!leads.length && !jobtitle) {
+    showAlert('li-alrt', 'Bitte erst Leads laden oder einen Jobtitel eingeben.', 'warn');
+    return;
+  }
+
+  const btn = $('li-search-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="sp"></span>Generiere…';
+
+  const urls = [];
+
+  // For each lead without a contact, build a search URL
+  const targets = leads.filter(l => !l.kontakt || !l.linkedin);
+
+  if(targets.length > 0) {
+    // Use Claude to generate optimized search queries
+    const prompt = `Erstelle optimierte LinkedIn-Suchanfragen für folgende Firmen.
+Zielposition: ${jobtitle || 'CIO, IT-Leiter, CTO, Head of Operations'}
+Branche: ${keywords || 'Bankensektor, IT-Dienstleister'}
+Region: ${region}
+
+Firmen:
+${targets.slice(0,15).map((l,i) => (i+1)+'. '+l.name+' ('+( l.branche||'IT')+', '+( l.ort||'')+')').join('\n')}
+
+Antworte NUR mit JSON-Array:
+[{"firmId": 0, "firm": "Name", "searchQuery": "Max Muster CIO Sparkasse Berlin", "linkedinUrl": "https://www.linkedin.com/search/results/people/?keywords=...", "companyUrl": "https://www.linkedin.com/search/results/companies/?keywords=..."}]`;
+
+    try {
+      const raw = await claude(prompt, 2000);
+      const cleanedLi = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+      const s = cleanedLi.indexOf('['), e = cleanedLi.lastIndexOf(']');
+      if(s >= 0 && e > s) {
+        const parsed = JSON.parse(cleanedLi.substring(s, e+1));
+        parsed.forEach((item, i) => {
+          const lead = targets[i];
+          if(!lead) return;
+          urls.push({
+            leadId: lead.id,
+            leadName: lead.name,
+            searchQuery: item.searchQuery || (jobtitle + ' ' + lead.name),
+            linkedinUrl: item.linkedinUrl || buildLinkedInURL(jobtitle, '', lead.name, region),
+            companyUrl: item.companyUrl || buildLinkedInCompanyURL(lead.name)
+          });
+        });
+      }
+    } catch(e) {
+      // Fallback: build URLs manually
+      targets.forEach(l => {
+        urls.push({
+          leadId: l.id, leadName: l.name,
+          searchQuery: (jobtitle || 'IT-Leiter') + ' ' + l.name,
+          linkedinUrl: buildLinkedInURL(jobtitle || 'IT-Leiter', '', l.name, region),
+          companyUrl: buildLinkedInCompanyURL(l.name)
+        });
+      });
+    }
+  } else if(jobtitle || keywords) {
+    // Generic search without specific companies
+    urls.push({
+      leadId: null, leadName: 'Allgemeine Suche',
+      searchQuery: [jobtitle, keywords, region].filter(Boolean).join(' '),
+      linkedinUrl: buildLinkedInURL(jobtitle, '', keywords, region),
+      companyUrl: 'https://www.linkedin.com/search/results/companies/?keywords=' + encodeURIComponent(keywords)
+    });
+  }
+
+  // Show URLs
+  $('li-url-panel').style.display = '';
+  $('li-url-list').innerHTML = urls.map(u => `
+    <div style="padding:10px 14px;border-bottom:1px solid var(--s2);display:flex;align-items:center;gap:10px">
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:700;color:var(--t1)">${esc(u.leadName)}</div>
+        <div style="font-size:10px;color:var(--t3)">🔍 ${esc(u.searchQuery)}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        ${u.linkedinUrl?`<a href="${esc(u.linkedinUrl)}" target="_blank" class="btn btn-sm" style="text-decoration:none">👥 Personen ↗</a>`:''}
+        ${u.companyUrl?`<a href="${esc(u.companyUrl)}" target="_blank" class="btn btn-sm" style="text-decoration:none">🏢 Firma ↗</a>`:''}
+      </div>
+    </div>`).join('') || '<div style="padding:16px;color:var(--t3);font-size:12px">Keine URLs generiert.</div>';
+
+  addLog('LinkedIn-Suchen generiert: ' + urls.length + ' URLs', 'agent');
+  showAlert('li-alrt', urls.length + ' LinkedIn-Suchanfragen generiert. Klicke die Links um Profile zu finden.', 'ok');
+
+  btn.disabled = false;
+  btn.textContent = '🔍 Suche starten';
+};
+
+const openAllLinkedIn = () => {
+  const links = $('li-url-list').querySelectorAll('a[href]');
+  links.forEach(a => window.open(a.href, '_blank'));
+  addLog('Alle LinkedIn-Links geöffnet (' + links.length + ')', 'agent');
+};
+
+const openLinkedInSearch = (company, kontakt, ort) => {
+  const jobtitle = V('li-jobtitle') || 'IT-Leiter';
+  const url = buildLinkedInURL(jobtitle, kontakt, company, ort);
+  window.open(url, '_blank');
+  addLog('LinkedIn-Suche geöffnet: ' + company, 'agent');
+};
+
+// ── APOLLO.IO ENRICHMENT ────────────────────────────────────────────────────
+const enrichOneLead = async (id) => {
+  const lead = leads.find(l => l.id === id);
+  if(!lead) return;
+
+  const btn = $('liq-' + id)?.querySelector('.btn-purple');
+  if(btn) { btn.disabled = true; btn.innerHTML = '<span class="sp"></span>'; }
+
+  let enriched = false;
+
+  // Try Apollo.io first
+  if(cfg.apolloKey) {
+    try {
+      const result = await apolloSearch(lead.name, lead.kontakt, lead.ort);
+      if(result) {
+        if(result.email    && !lead.kontaktEmail) { lead.kontaktEmail = result.email; lead.email = result.email; }
+        if(result.telefon  && !lead.telefon)  lead.telefon  = result.telefon;
+        if(result.linkedin && !lead.linkedin) lead.linkedin = result.linkedin;
+        if(result.kontakt && !lead.vorname) {
+          const parts = result.kontakt.split(' ');
+          lead.vorname  = parts[0]||'';
+          const rolePart= parts[parts.length-1];
+          const lastIdx = result.kontakt.indexOf(',');
+          if(lastIdx>0){ lead.nachname=result.kontakt.substring(parts[0].length+1,lastIdx).trim(); lead.rolle=result.kontakt.substring(lastIdx+1).trim(); }
+          else { lead.nachname=parts.slice(1).join(' ')||''; }
+          lead.kontakt = result.kontakt;
+        }
+        enriched = true;
+        addLog('Apollo: ' + lead.name + ' → ' + (result.email||'') + ' · ' + (result.telefon||''), 'ok');
+      }
+    } catch(e) { addLog('Apollo-Fehler: ' + e.message, 'err'); }
+  }
+
+  // Fallback: Hunter.io for email
+  if(!enriched && cfg.hunterKey && lead.web) {
+    try {
+      const result = await hunterSearch(lead.web, lead.kontakt);
+      if(result?.email) {
+        lead.email = result.email;
+        enriched = true;
+        addLog('Hunter: ' + lead.name + ' → ' + result.email, 'ok');
+      }
+    } catch(e) { addLog('Hunter-Fehler: ' + e.message, 'err'); }
+  }
+
+  // Fallback: Claude guesses common email patterns
+  if(!enriched && lead.web && lead.kontakt) {
+    try {
+      const guessed = await claudeGuessEmail(lead);
+      if(guessed) { lead.email = guessed; enriched = true; addLog('E-Mail-Muster: ' + lead.name + ' → ' + guessed, 'warn'); }
+    } catch(e) {}
+  }
+
+  save(); renderLinkedInEnrichList(); renderLeads(); renderLeadPicker();
+  if(btn) { btn.disabled = false; btn.textContent = enriched ? '✓' : '⚡'; }
+};
+
+const enrichSelected = async () => {
+  if(!liSelectedIds.size) { showAlert('li-alrt', 'Bitte Leads auswählen.', 'warn'); return; }
+  const btn = $('li-enrich-sel-btn');
+  btn.disabled = true;
+  for(const id of liSelectedIds) {
+    await enrichOneLead(id);
+    await slp(400);
+  }
+  btn.disabled = false;
+  showAlert('li-alrt', liSelectedIds.size + ' Leads angereichert.', 'ok');
+};
+
+const enrichAllLeads = async () => {
+  const needsWork = leads.filter(l => !l.email || !l.kontakt);
+  if(!needsWork.length) { showAlert('li-alrt', 'Alle Leads bereits vollständig.', 'ok'); return; }
+  const btn = $('li-enrich-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="sp"></span>Läuft…';
+  for(const l of needsWork) {
+    await enrichOneLead(l.id);
+    await slp(500);
+  }
+  btn.disabled = false; btn.textContent = '⚡ Alle anreichern';
+  showAlert('li-alrt', 'Anreicherung abgeschlossen.', 'ok');
+};
+
+// Apollo.io People Search API
+const apolloSearch = async (company, name, city) => {
+  const nameParts = (name||'').split(',')[0].trim().split(' ');
+  const firstName = nameParts[0] || '';
+  const lastName  = nameParts.slice(1).join(' ') || '';
+
+  // Apollo People Search endpoint
+  const res = await fetch('https://api.apollo.io/v1/people/search', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Api-Key': cfg.apolloKey },
+    body: JSON.stringify({
+      q_organization_domains: company ? [company.toLowerCase().replace(/gmbh|ag|kg|ug|se|inc|llc/gi,'').trim().replace(/\s+/g,'')+'.de'] : undefined,
+      q_keywords: [company, firstName, lastName].filter(Boolean).join(' '),
+      person_titles: ['CIO','IT-Leiter','CTO','CEO','Geschäftsführer','Compliance','Head of IT'],
+      page: 1, per_page: 1
+    })
+  });
+  if(!res.ok) throw new Error('Apollo HTTP ' + res.status);
+  const data = await res.json();
+  const person = data.people?.[0];
+  if(!person) return null;
+  return {
+    kontakt: [person.first_name, person.last_name].filter(Boolean).join(' ') + (person.title ? ', ' + person.title : ''),
+    email:   person.email || '',
+    telefon: person.phone_numbers?.[0]?.sanitized_number || person.organization?.phone || '',
+    linkedin: person.linkedin_url || ''
+  };
+};
+
+// Hunter.io Domain Search
+const hunterSearch = async (domain, name) => {
+  const cleanDomain = domain.replace(/https?:\/\//,'').replace(/\/.*/,'');
+  const nameParts = (name||'').split(',')[0].trim().split(' ');
+  const firstName = nameParts[0]||'', lastName = nameParts.slice(1).join(' ')||'';
+  let url = `https://api.hunter.io/v2/email-finder?domain=${encodeURIComponent(cleanDomain)}&api_key=${cfg.hunterKey}`;
+  if(firstName) url += `&first_name=${encodeURIComponent(firstName)}&last_name=${encodeURIComponent(lastName)}`;
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('Hunter HTTP ' + res.status);
+  const data = await res.json();
+  return data.data?.email ? { email: data.data.email } : null;
+};
+
+// Claude guesses email pattern from website + name
+const claudeGuessEmail = async (lead) => {
+  if(!lead.web || !lead.kontakt) return null;
+  const prompt = `Leite die wahrscheinlichste geschäftliche E-Mail-Adresse ab.
+
+Person: ${lead.kontakt.split(',')[0].trim()}
+Firma: ${lead.name}
+Domain: ${lead.web.replace(/https?:\/\//,'').replace(/\/.*/,'')}
+
+Häufige Muster: vorname.nachname@domain, v.nachname@domain, vorname@domain, info@domain
+Antworte NUR mit der E-Mail-Adresse (nichts sonst). Wenn nicht ableitbar: leer lassen.`;
+  const result = await claude(prompt, 50);
+  const email = result.trim().toLowerCase();
+  return /^[^@]+@[^@]+\.[^@]+$/.test(email) ? email : null;
+};
+
+// Apollo test
+const testApollo = async () => {
+  const key = V('li-apollo');
+  if(!key) { showAlert('li-alrt', 'Apollo API-Key eingeben.', 'warn'); return; }
+  try {
+    const res = await fetch('https://api.apollo.io/v1/auth/health', {
+      method: 'GET', headers: { 'X-Api-Key': key }
+    });
+    if(res.ok) {
+      cfg.apolloKey = key; save();
+      setPill('li-api-status', true); $('li-api-status').textContent = '● APOLLO ONLINE';
+      showAlert('li-alrt', 'Apollo API verbunden!', 'ok');
+      addLog('Apollo API: OK', 'ok');
+    } else {
+      showAlert('li-alrt', 'Apollo: Ungültiger Key (HTTP ' + res.status + ')', 'err');
+    }
+  } catch(e) { showAlert('li-alrt', 'Apollo-Fehler: ' + e.message, 'err'); }
+};
+
+// Hunter test
+const testHunter = async () => {
+  const key = V('li-hunter');
+  if(!key) { showAlert('li-alrt', 'Hunter API-Key eingeben.', 'warn'); return; }
+  try {
+    const res = await fetch(`https://api.hunter.io/v2/account?api_key=${key}`);
+    if(res.ok) {
+      cfg.hunterKey = key; save();
+      if(!cfg.apolloKey) { setPill('li-api-status', true); $('li-api-status').textContent = '● HUNTER ONLINE'; }
+      showAlert('li-alrt', 'Hunter API verbunden!', 'ok');
+      addLog('Hunter API: OK', 'ok');
+    } else {
+      showAlert('li-alrt', 'Hunter: Ungültiger Key (HTTP ' + res.status + ')', 'err');
+    }
+  } catch(e) { showAlert('li-alrt', 'Hunter-Fehler: ' + e.message, 'err'); }
+};
+
+// Manual capture from LinkedIn
+const saveManualCapture = () => {
+  const firma = V('mc-firma').trim();
+  const kontakt = V('mc-kontakt').trim();
+  if(!firma && !kontakt) { showAlert('li-alrt', 'Firma oder Name eingeben.', 'warn'); return; }
+
+  // Check if lead already exists
+  let lead = leads.find(l => l.name.toLowerCase() === firma.toLowerCase());
+  if(lead) {
+    // Update existing lead
+    if(kontakt)     lead.kontakt  = kontakt;
+    if(V('mc-linkedin')) lead.linkedin = V('mc-linkedin');
+    if(V('mc-email'))    lead.email    = V('mc-email');
+    if(V('mc-tel'))      lead.telefon  = V('mc-tel');
+    if(V('mc-branche'))  lead.branche  = V('mc-branche');
+    if(V('mc-ma'))       lead.ma       = V('mc-ma');
+    if(V('mc-ort'))      lead.ort      = V('mc-ort');
+    addLog('Lead aktualisiert: ' + firma + ' · ' + kontakt, 'ok');
+  } else {
+    // Create new lead
+    const nameParts = kontakt.split(' ');
+    lead = {
+      id: uid(), name: firma,
+      vorname: nameParts[0]||'', nachname: nameParts.slice(1,-1).join(' ')||nameParts[1]||'',
+      rolle: nameParts[nameParts.length-1]!==nameParts[0]&&nameParts.length>2?'':'',
+      kontakt, linkedin: V('mc-linkedin'),
+      kontaktEmail: V('mc-email'), firmenEmail: V('mc-email'),
+      email: V('mc-email'), telefon: V('mc-tel'), branche: V('mc-branche'),
+      ma: V('mc-ma'), ort: V('mc-ort'), fokus: '', web: '',
+      status: 'Neu', created: new Date().toLocaleDateString('de-DE')
+    };
+    leads.unshift(lead);
+    addLog('Lead aus LinkedIn erstellt: ' + firma + ' · ' + kontakt, 'ok');
+  }
+
+  save(); ui(); renderLinkedInEnrichList(); renderLeads(); renderLeadPicker();
+  ['mc-kontakt','mc-firma','mc-linkedin','mc-email','mc-tel','mc-branche','mc-ma','mc-ort'].forEach(id => { const e=$(id); if(e) e.value=''; });
+  showAlert('li-alrt', (lead ? 'Gespeichert' : 'Erstellt') + ': ' + firma, 'ok');
+};
+
+
+// ─── LEGACY MIGRATION ────────────────────────────────────────────────────────
+// Converts old leads (kontakt string) to new structure (vorname/nachname/rolle)
+const migrateLegacyLeads = () => {
+  let changed = 0;
+  leads.forEach(l => {
+    // If new fields missing but old kontakt string exists — split it
+    if(!l.vorname && !l.nachname && l.kontakt) {
+      const parts = l.kontakt.split(',');
+      const namePart = (parts[0]||'').trim().split(' ');
+      l.vorname  = namePart[0] || '';
+      l.nachname = namePart.slice(1).join(' ') || '';
+      l.rolle    = (parts[1]||'').trim();
+      changed++;
+    }
+    // kontaktEmail: use existing email if not set
+    if(!l.kontaktEmail && l.email && l.email !== 'info@'+( l.web||'')) {
+      l.kontaktEmail = l.email;
+    }
+    // firmenEmail: guess info@ if web exists
+    if(!l.firmenEmail && l.web) {
+      l.firmenEmail = 'info@' + l.web.replace(/https?:\/\//, '').split('/')[0];
+    }
+    // Ensure kontakt string stays in sync for legacy code
+    if(l.vorname || l.nachname) {
+      l.kontakt = [l.vorname, l.nachname].filter(Boolean).join(' ') + (l.rolle ? ', '+l.rolle : '');
+    }
+  });
+  if(changed > 0) { save(); }
+};
+
+
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+// Mode: 'local' (localStorage) or 'backend' (API)
+// Switch to 'backend' once Node.js server is running
+const AUTH_MODE = 'local';
+const AUTH_API  = () => (cfg.backendUrl || '').replace(/\/$/, '');
+
+// ── Token storage ──────────────────────────────────────────────────────────
+const getToken    = ()    => localStorage.getItem('los3_token') || '';
+const saveToken   = (t)   => localStorage.setItem('los3_token', t);
+const clearToken  = ()    => localStorage.removeItem('los3_token');
+const getSession  = ()    => { try { return JSON.parse(localStorage.getItem('los3_session')||'null'); } catch(e){return null;} };
+const saveSession = (s)   => localStorage.setItem('los3_session', JSON.stringify(s));
+const clearSession= ()    => { localStorage.removeItem('los3_session'); clearToken(); };
+
+// ── Local user store (fallback when no backend) ────────────────────────────
+const getUsers  = ()    => { try { return JSON.parse(localStorage.getItem('los3_users')||'[]'); } catch(e){return[];} };
+const saveUsers = (u)   => localStorage.setItem('los3_users', JSON.stringify(u));
+
+const hashPass = async (pass) => {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pass + 'leados_salt_2025'));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+};
+
+// ── Auth fetch helper (adds JWT token to every request) ────────────────────
+const authFetch = async (path, opts = {}) => {
+  const token = getToken();
+  const headers = { 'Content-Type': 'application/json', ...(opts.headers||{}) };
+  if(token) headers['Authorization'] = 'Bearer ' + token;
+  const res = await fetch(AUTH_API() + path, { ...opts, headers });
+  return res;
+};
+
+// ── UI helpers ──────────────────────────────────────────────────────────────
+const showLoginView = () => { $('login-view').style.display='';  $('register-view').style.display='none'; };
+const showRegView   = () => { $('login-view').style.display='none'; $('register-view').style.display=''; };
+const showLoginErr  = (msg) => { const e=$('login-err'); e.textContent=msg; e.style.display=''; };
+const showRegErr    = (msg) => { const e=$('reg-err');   e.textContent=msg; e.style.display=''; };
+
+// ── LOGIN ───────────────────────────────────────────────────────────────────
+const doLogin = async () => {
+  const email = ($('li-email').value||'').trim().toLowerCase();
+  const pass  = $('li-pass').value||'';
+  if(!email || !pass) { showLoginErr('Bitte E-Mail und Passwort eingeben.'); return; }
+
+  const btn = $('li-btn');
+  btn.disabled=true; btn.textContent='...';
+
+  try {
+    if(AUTH_MODE === 'backend' && AUTH_API()) {
+      // ── Backend login ──────────────────────────────────────────────────
+      const res = await fetch(AUTH_API() + '/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pass })
+      });
+      const data = await res.json();
+      if(!res.ok) {
+        showLoginErr(data.error || 'Login fehlgeschlagen ('+res.status+')');
+        btn.disabled=false; btn.textContent='Einloggen'; return;
+      }
+      saveToken(data.token);
+      onLoginSuccess(data.user);
+    } else {
+      // ── Local login ────────────────────────────────────────────────────
+      const users = getUsers();
+      if(users.length === 0) {
+        // First run: auto-create admin with these credentials
+        const hash = await hashPass(pass);
+        const admin = {id:uid(), name:'Admin', email, passHash:hash, role:'admin', created:new Date().toISOString()};
+        saveUsers([admin]);
+        onLoginSuccess(admin);
+        return;
+      }
+      const user = users.find(u => u.email === email);
+      if(!user) { showLoginErr('E-Mail nicht gefunden.'); btn.disabled=false; btn.textContent='Einloggen'; return; }
+      const hash = await hashPass(pass);
+      if(hash !== user.passHash) { showLoginErr('Falsches Passwort.'); btn.disabled=false; btn.textContent='Einloggen'; return; }
+      onLoginSuccess(user);
+    }
+  } catch(err) {
+    showLoginErr('Verbindungsfehler: ' + err.message);
+    btn.disabled=false; btn.textContent='Einloggen';
+  }
+};
+
+// ── REGISTER ────────────────────────────────────────────────────────────────
+const doRegister = async () => {
+  const name  = ($('reg-name').value||'').trim();
+  const email = ($('reg-email').value||'').trim().toLowerCase();
+  const pass  = $('reg-pass').value||'';
+  const pass2 = $('reg-pass2').value||'';
+
+  if(!name)                         { showRegErr('Name eingeben.'); return; }
+  if(!email||!email.includes('@'))  { showRegErr('Gültige E-Mail eingeben.'); return; }
+  if(pass.length < 8)               { showRegErr('Passwort min. 8 Zeichen.'); return; }
+  if(pass !== pass2)                { showRegErr('Passwörter stimmen nicht überein.'); return; }
+
+  const btn = $('reg-btn');
+  btn.disabled=true; btn.textContent='...';
+
+  try {
+    if(AUTH_MODE === 'backend' && AUTH_API()) {
+      // ── Backend register ───────────────────────────────────────────────
+      const res = await fetch(AUTH_API() + '/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password: pass })
+      });
+      const data = await res.json();
+      if(!res.ok) {
+        showRegErr(data.error || 'Registrierung fehlgeschlagen ('+res.status+')');
+        btn.disabled=false; btn.textContent='Account erstellen'; return;
+      }
+      saveToken(data.token);
+      onLoginSuccess(data.user);
+    } else {
+      // ── Local register ─────────────────────────────────────────────────
+      const users = getUsers();
+      if(users.find(u=>u.email===email)) { showRegErr('Diese E-Mail ist bereits registriert.'); btn.disabled=false; btn.textContent='Account erstellen'; return; }
+      const hash = await hashPass(pass);
+      const newUser = {id:uid(), name, email, passHash:hash, role:'user', created:new Date().toISOString()};
+      saveUsers([...users, newUser]);
+      onLoginSuccess(newUser);
+    }
+  } catch(err) {
+    showRegErr('Verbindungsfehler: ' + err.message);
+    btn.disabled=false; btn.textContent='Account erstellen';
+  }
+};
+
+// ── SESSION CHECK ────────────────────────────────────────────────────────────
+const checkSession = async () => {
+  const token = getToken();
+
+  if(AUTH_MODE === 'backend' && AUTH_API() && token) {
+    try {
+      const res = await authFetch('/api/auth/me');
+      if(res.ok) {
+        const data = await res.json();
+        onLoginSuccess(data.user);
+        return true;
+      }
+    } catch(e) {}
+    clearToken();
+    return false;
+  }
+
+  // Local session fallback
+  const s = getSession();
+  if(!s) return false;
+  const days = (new Date() - new Date(s.loginAt)) / (1000*60*60*24);
+  if(days > 7) { clearSession(); return false; }
+  onLoginSuccess({id:s.userId, name:s.name, email:s.email, role:s.role});
+  return true;
+};
+
+// ── ON LOGIN SUCCESS ─────────────────────────────────────────────────────────
+const onLoginSuccess = (user) => {
+  saveSession({userId:user.id, name:user.name, email:user.email, role:user.role, loginAt:new Date().toISOString()});
+
+  // Track lastLogin
+  const allUsers = getUsers();
+  const uu = allUsers.find(x=>x.id===user.id);
+  if(uu){ uu.lastLogin=new Date().toISOString(); saveUsers(allUsers); }
+
+  $('login-overlay').style.display = 'none';
+  $('main-shell').style.display = '';
+
+  const initials = (user.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().substring(0,2);
+  const av = $('user-avatar'); if(av) av.textContent=initials;
+  const nl = $('user-name-lbl'); if(nl) nl.textContent=user.name;
+
+  // Admin badge
+  if(user.role==='admin'){
+    const topR = document.querySelector('.user-pill');
+    if(topR && !topR.querySelector('.pill-purple')){
+      const pill=document.createElement('span');
+      pill.className='pill pill-purple'; pill.style.fontSize='9px'; pill.textContent='ADMIN';
+      topR.insertBefore(pill, topR.querySelector('button'));
+    }
+  }
+
+  // Team page: only visible for admins
+  const teamNav=$('nav-team');
+  if(teamNav) teamNav.style.display = user.role==='admin' ? '' : 'none';
+
+  addLog('✓ Login: '+user.name+' ('+user.email+') · '+(user.role||'user'), 'ok');
+};
+
+// ── LOGOUT ───────────────────────────────────────────────────────────────────
+const doLogout = async () => {
+  if(!confirm('Ausloggen?')) return;
+  if(AUTH_MODE === 'backend' && AUTH_API()) {
+    try { await authFetch('/api/auth/logout', {method:'POST'}); } catch(e) {}
+  }
+  clearSession();
+  location.reload();
+};
+
+
+
+
+// ─── TEAM MANAGEMENT ─────────────────────────────────────────────────────────
+const renderTeam = () => {
+  const users = getUsers();
+  const session = getSession();
+  $('team-count').textContent = users.length + ' Benutzer';
+
+  $('team-body').innerHTML = users.map(u => `
+    <tr>
+      <td style="padding:10px 12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:30px;height:30px;border-radius:50%;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--green);flex-shrink:0">
+            ${(u.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().substring(0,2)}
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--t1)">${esc(u.name)}
+              ${u.id === session?.userId ? '<span style="font-size:10px;color:var(--t3);font-weight:400;margin-left:4px">(du)</span>' : ''}
+            </div>
+          </div>
+        </div>
+      </td>
+      <td style="padding:10px 12px;font-size:12px;color:var(--t2)">${esc(u.email)}</td>
+      <td style="padding:10px 12px">
+        <span class="pill ${u.role==='admin'?'pill-purple':'pill-info'}" style="font-size:10px">
+          ${u.role==='admin'?'● ADMIN':'● MITARBEITER'}
+        </span>
+      </td>
+      <td style="padding:10px 12px;font-size:11px;color:var(--t3)">
+        ${u.created ? new Date(u.created).toLocaleDateString('de-DE') : '—'}
+      </td>
+      <td style="padding:10px 12px;font-size:11px;color:var(--t3)">
+        ${u.lastLogin ? new Date(u.lastLogin).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—'}
+      </td>
+      <td style="padding:10px 12px;white-space:nowrap">
+        ${u.id !== session?.userId ? `
+          <button class="tbtn" onclick="toggleRole('${u.id}')" title="${u.role==='admin'?'Zu Mitarbeiter machen':'Zu Admin machen'}" style="font-size:11px">
+            ${u.role==='admin'?'↓ User':'↑ Admin'}
+          </button>
+          <button class="tbtn" onclick="resetPassword('${u.id}')" title="Passwort zurücksetzen" style="font-size:11px;color:var(--yellow)">🔑</button>
+          <button class="tbtn" onclick="deleteUser('${u.id}')" title="Löschen" style="font-size:11px;color:var(--red)">✕</button>
+        ` : '<span style="font-size:10px;color:var(--t3)">—</span>'}
+      </td>
+    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;padding:28px;color:var(--t3)">Keine Benutzer.</td></tr>';
+};
+
+const showAddUser = () => { $('add-user-panel').style.display=''; };
+const hideAddUser = () => { $('add-user-panel').style.display='none'; };
+
+const createUser = async () => {
+  const name  = ($('nu-name').value||'').trim();
+  const email = ($('nu-email').value||'').trim().toLowerCase();
+  const pass  = $('nu-pass').value||'';
+  const role  = $('nu-role').value||'user';
+
+  if(!name)  { showAlert('team-alrt','Name eingeben.','err'); return; }
+  if(!email || !email.includes('@')) { showAlert('team-alrt','Gültige E-Mail eingeben.','err'); return; }
+  if(pass.length < 8) { showAlert('team-alrt','Passwort min. 8 Zeichen.','err'); return; }
+
+  const users = getUsers();
+  if(users.find(u=>u.email===email)) { showAlert('team-alrt','Diese E-Mail ist bereits registriert.','err'); return; }
+
+  const hash = await hashPass(pass);
+  const newUser = {id: uid(), name, email, passHash: hash, role, created: new Date().toISOString(), lastLogin: null};
+  saveUsers([...users, newUser]);
+
+  // Clear form
+  ['nu-name','nu-email','nu-pass'].forEach(id => { const el=$(id); if(el) el.value=''; });
+  hideAddUser();
+  renderTeam();
+  showAlert('team-alrt', `✓ Benutzer "${name}" (${email}) wurde angelegt.`,'ok');
+  addLog('Benutzer erstellt: '+name+' ('+email+') · Rolle: '+role,'ok');
+};
+
+const toggleRole = (userId) => {
+  const users = getUsers();
+  const u = users.find(x=>x.id===userId);
+  if(!u) return;
+  u.role = u.role==='admin' ? 'user' : 'admin';
+  saveUsers(users);
+  renderTeam();
+  addLog('Rolle geändert: '+u.name+' → '+u.role,'warn');
+};
+
+const resetPassword = async (userId) => {
+  const newPass = prompt('Neues Passwort für diesen Benutzer (min. 8 Zeichen):');
+  if(!newPass || newPass.length < 8) { alert('Passwort zu kurz.'); return; }
+  const users = getUsers();
+  const u = users.find(x=>x.id===userId);
+  if(!u) return;
+  u.passHash = await hashPass(newPass);
+  saveUsers(users);
+  showAlert('team-alrt','Passwort für '+u.name+' wurde zurückgesetzt.','ok');
+  addLog('Passwort zurückgesetzt: '+u.name,'warn');
+};
+
+const deleteUser = (userId) => {
+  const users = getUsers();
+  const u = users.find(x=>x.id===userId);
+  if(!u) return;
+  if(!confirm(`Benutzer "${u.name}" (${u.email}) wirklich löschen?`)) return;
+  saveUsers(users.filter(x=>x.id!==userId));
+  renderTeam();
+  showAlert('team-alrt','Benutzer gelöscht.','warn');
+  addLog('Benutzer gelöscht: '+u.name,'warn');
+};
+
+const changeOwnPassword = async () => {
+  const oldPass = $('cp-old').value||'';
+  const newPass = $('cp-new').value||'';
+  const newPass2= $('cp-new2').value||'';
+  const session = getSession();
+  if(!session) return;
+
+  if(!oldPass) { showAlert('team-alrt','Aktuelles Passwort eingeben.','err'); return; }
+  if(newPass.length < 8) { showAlert('team-alrt','Neues Passwort min. 8 Zeichen.','err'); return; }
+  if(newPass !== newPass2) { showAlert('team-alrt','Passwörter stimmen nicht überein.','err'); return; }
+
+  const users = getUsers();
+  const u = users.find(x=>x.id===session.userId);
+  if(!u) return;
+
+  const oldHash = await hashPass(oldPass);
+  if(oldHash !== u.passHash) { showAlert('team-alrt','Aktuelles Passwort ist falsch.','err'); return; }
+
+  u.passHash = await hashPass(newPass);
+  saveUsers(users);
+  $('cp-old').value=''; $('cp-new').value=''; $('cp-new2').value='';
+  showAlert('team-alrt','Passwort erfolgreich geändert.','ok');
+  addLog('Eigenes Passwort geändert: '+u.name,'ok');
+};
+
+// ─── BOOT ────────────────────────────────────────────────────────────────────
+// Check login session before loading app
+(async () => {
+  const loggedIn = await checkSession();
+  if(!loggedIn) return;
+  load(); migrateLegacyLeads(); applyCfg(); ui();
+  renderLeads(); renderApprove(); renderInbox(); renderLog();
+  renderCatGrid(); renderLeadPicker(); renderLinkedInEnrichList();
+  setInterval(tick,1000); tick();
+})();
+</script>
+</body>
+</html>
