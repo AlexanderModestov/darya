@@ -10,6 +10,7 @@ import usersRoutes from './routes/users.js';
 import settingsRoutes from './routes/settings.js';
 import logsRoutes from './routes/logs.js';
 import { authMiddleware } from './middleware/auth.js';
+import { apiLimiter, authLimiter } from './middleware/rateLimit.js';
 
 const app = express();
 
@@ -20,6 +21,10 @@ app.use(cors({
 }));
 
 app.use(express.json({ limit: '5mb' }));
+
+app.use('/api/', apiLimiter);
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/register', authLimiter);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', version: '2.0' });
