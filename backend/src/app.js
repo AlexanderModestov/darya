@@ -12,6 +12,11 @@ import logsRoutes from './routes/logs.js';
 import { authMiddleware } from './middleware/auth.js';
 import { apiLimiter, authLimiter } from './middleware/rateLimit.js';
 
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.includes('change-me')) {
+  console.error('FATAL: Set a secure JWT_SECRET in .env');
+  process.exit(1);
+}
+
 const app = express();
 
 const origins = (process.env.CORS_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);

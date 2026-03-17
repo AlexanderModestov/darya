@@ -69,7 +69,7 @@ router.get('/export', async (req, res) => {
 
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', `attachment; filename=leads_${today}.csv`);
-    res.send(csv);
+    res.send('\uFEFF' + csv);
   } catch (err) {
     console.error('Export error:', err);
     res.status(500).json({ error: 'Export failed' });
