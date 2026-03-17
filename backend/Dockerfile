@@ -5,4 +5,4 @@ RUN npm ci --production
 COPY src/ src/
 COPY migrations/ migrations/
 EXPOSE 3000
-CMD ["node", "src/app.js"]
+CMD ["sh", "-c", "node src/migrate.js && node src/app.js"]

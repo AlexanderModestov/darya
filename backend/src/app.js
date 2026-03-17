@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './swagger.js';
 
 import authRoutes from './routes/auth.js';
 import leadsRoutes from './routes/leads.js';
@@ -30,6 +32,9 @@ app.use(express.json({ limit: '5mb' }));
 app.use('/api/', apiLimiter);
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
+
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get('/api/docs.json', (_req, res) => res.json(swaggerSpec));
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', version: '2.0' });
