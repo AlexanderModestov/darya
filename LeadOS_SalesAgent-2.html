@@ -1312,12 +1312,14 @@ Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array (kein Text davor/danach)
   step(2,'act'); stepD(2,'Speichere Leads…');
   const existing = new Set(leads.map(l=>l.name));
   const toAdd = newLeads.filter(l=>l.name&&!existing.has(l.name));
-  toAdd.forEach(l => {
+  for (const l of toAdd) {
     l.id=uid(); l.status='Neu'; l.created=new Date().toLocaleDateString('de-DE');
+    const saved = await apiSave('/api/leads', 'POST', l);
+    if (saved) l.id = saved.id;
     leads.unshift(l);
     tlog('  + '+l.name,'lw');
     if(cfg.whUrl) sendWH(l);
-  });
+  }
   save(); ui();
   step(2,'done'); stepD(2, toAdd.length+' Leads gespeichert');
   addLog(toAdd.length+' Leads gespeichert','ok');
@@ -1369,7 +1371,7 @@ const selectCat = id => {
 };
 
 // ─── PRODUCT PROMPT SAVE/LOAD ─────────────────────────────────────────────────
-const saveProductPrompt = () => {
+const saveProductPrompt = async () => {
   const data = {
     name:     V('eg-prodname'),
     target:   V('eg-target'),
@@ -1386,6 +1388,7 @@ const saveProductPrompt = () => {
     showAlert('eg-alrt','Bitte mindestens Produktname oder Beschreibung ausfüllen.','err'); return;
   }
   localStorage.setItem('los3_product', JSON.stringify(data));
+  await apiSave('/api/settings', 'PUT', { product: data });
   $('eg-saved-info').textContent = '✓ Gespeichert: ' + data.saved;
   showAlert('eg-alrt','Unternehmensprofil gespeichert.','ok');
   addLog('Produkt-Profil gespeichert: ' + (data.name||data.what||'').substring(0,40), 'ok');
@@ -1604,10 +1607,12 @@ const runEmailGen = async () => {
         catId:selectedCat, catName:cat.name,
         subject, body, status:'pending', created:new Date().toISOString()
       };
+      const savedEmail = await apiSave('/api/emails', 'POST', entry);
+      if (savedEmail) entry.id = savedEmail.id;
       pending.unshift(entry);
       ok++;
       plog('  ✓ '+subject.substring(0,55), 'var(--green)');
-      if(autoMode) { entry.status='approved'; doSend(entry, lead); }
+      if(autoMode) { entry.status='approved'; await doSend(entry, lead); }
     } catch(e) {
       err++;
       plog('  ✗ '+lead.name+': '+e.message, 'var(--red)');
@@ -1894,12 +1899,12 @@ const approveOne = id => {
   save(); ui(); renderApprove();
   addLog('✓ E-Mail freigegeben: '+p.leadName+' ('+p.catName+')','ok');
 };
-const rejectOne = id => {
+const rejectOne = async id => {
   const p=pending.find(x=>x.id===id);
-  if(p) { p.status='rejected'; save(); ui(); renderApprove(); addLog('E-Mail abgelehnt: '+p.leadName,'warn'); }
+  if(p) { await apiSave('/api/emails/'+id+'/reject','POST'); p.status='rejected'; save(); ui(); renderApprove(); addLog('E-Mail abgelehnt: '+(p.leadName||p.lead_name),'warn'); }
 };
 const approveAll = () => { pending.filter(p=>p.status==='pending').forEach(p=>approveOne(p.id)); };
-const rejectAll  = () => { pending.filter(p=>p.status==='pending').forEach(p=>p.status='rejected'); save();ui();renderApprove(); };
+const rejectAll = async () => { for(const p of pending.filter(p=>p.status==='pending')){ await apiSave('/api/emails/'+p.id+'/reject','POST'); p.status='rejected'; } save();ui();renderApprove(); };
 
 // ─── INBOX ────────────────────────────────────────────────────────────────────
 const renderInbox = () => {
@@ -2333,8 +2338,8 @@ const autoFillAll = async () => {
   addLog(`Auto-Fill Batch: ${incomplete.length} Leads verarbeitet`, 'ok');
 };
 
-const setStatus=(id,st)=>{ const l=leads.find(x=>x.id===id); if(l){l.status=st;save();renderLeads();ui();} };
-const delLead=(id)=>{ const l=leads.find(x=>x.id===id); if(l&&confirm('"'+l.name+'" löschen?')){leads=leads.filter(x=>x.id!==id);save();renderLeads();ui();} };
+const setStatus=async(id,st)=>{ const l=leads.find(x=>x.id===id); if(l){l.status=st; await apiSave('/api/leads/'+id,'PUT',{status:st}); save();renderLeads();ui();} };
+const delLead=async(id)=>{ const l=leads.find(x=>x.id===id); if(l&&confirm('"'+l.name+'" löschen?')){await apiSave('/api/leads/'+id,'DELETE'); leads=leads.filter(x=>x.id!==id);save();renderLeads();ui();} };
 const clearLeads=()=>{ if(confirm('Alle Leads löschen?')){leads=[];save();renderLeads();ui();addLog('Alle Leads gelöscht','warn');} };
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
@@ -2359,7 +2364,7 @@ const applyCfg = () => {
   const raw = localStorage.getItem('los3_product');
   if(raw) { try { const d=JSON.parse(raw); if(d.saved) $('eg-saved-info').textContent='Zuletzt gespeichert: '+d.saved; } catch(e){} }
 };
-const saveConfig = () => {
+const saveConfig = async () => {
   cfg.provider=V('c-provider')||'claude';
   const key=V('c-key'); if(key) cfg.claudeKey=key;
   const okey=V('c-openai-key'); if(okey) cfg.openaiKey=okey;
@@ -2370,6 +2375,7 @@ const saveConfig = () => {
   if(V('li-hunter')) cfg.hunterKey=V('li-hunter');
   if(V('c-backend')) cfg.backendUrl=V('c-backend').replace(/\/$/,'');
   save();
+  await apiSave('/api/settings', 'PUT', { cfg });
   if(cfg.claudeKey){setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● API';}
   if(cfg.gFrom) setPill('p-gmail',true);
   if(cfg.whUrl) setPill('p-wh',true);
@@ -2455,9 +2461,21 @@ const testWH = async () => {
 const sendWH = async data => { if(!cfg.whUrl) return; try{await fetch(cfg.whUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data,source:'LeadOS',ts:new Date().toISOString()})});}catch(e){} };
 
 // ─── EXPORT ───────────────────────────────────────────────────────────────────
-const expCSV = () => {
+const expCSV = async () => {
+  if (AUTH_MODE === 'backend' && AUTH_API()) {
+    try {
+      const res = await authFetch('/api/leads/export');
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        dl('leads_'+ds()+'.csv', url);
+        addLog('CSV exportiert (Server)');
+        return;
+      }
+    } catch(e) {}
+  }
   const h='Firma,Branche,MA,Ort,Vorname,Nachname,Rolle,Telefon,E-Mail Kontakt,Firmen-E-Mail,LinkedIn,Beschreibung,Fokus,Website,Status';
-  const rows=leads.map(l=>[l.name,l.branche,l.ma,l.ort,l.vorname,l.nachname,l.rolle,l.telefon,l.kontaktEmail,l.firmenEmail,l.linkedin,l.beschreibung,l.fokus,l.web,l.status].map(x=>`"${(x||'').replace(/"/g,'""')}"`).join(','));
+  const rows=leads.map(l=>[l.name,l.branche,l.ma,l.ort,l.vorname,l.nachname,l.rolle,l.telefon,l.kontaktEmail||l.kontakt_email,l.firmenEmail||l.firmen_email,l.linkedin,l.beschreibung,l.fokus,l.web,l.status].map(x=>`"${(x||'').replace(/"/g,'""')}"`).join(','));
   dl('leads_'+ds()+'.csv','data:text/csv;charset=utf-8,'+encodeURIComponent(h+'\n'+rows.join('\n')));
   addLog('CSV exportiert');
 };
@@ -2465,9 +2483,16 @@ const expJSON = () => { dl('leados_'+ds()+'.json','data:application/json;charset
 const impJSON = () => {
   const inp=document.createElement('input');inp.type='file';inp.accept='.json';
   inp.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
-    r.onload=ev=>{try{const d=JSON.parse(ev.target.result);
-      if(d.leads)leads=d.leads;if(d.pending)pending=d.pending;
-      if(d.inbox)inbox=d.inbox;if(d.logs)logs=d.logs;
+    r.onload=async ev=>{try{const d=JSON.parse(ev.target.result);
+      if(d.leads) {
+        if (AUTH_MODE === 'backend' && AUTH_API()) {
+          const res = await authFetch('/api/leads/import', { method: 'POST', body: JSON.stringify(d.leads) });
+          if (res.ok) { const data = await res.json(); leads = [...(data.leads||[]), ...leads]; }
+        } else {
+          leads=d.leads;
+        }
+      }
+      if(d.pending)pending=d.pending;if(d.inbox)inbox=d.inbox;if(d.logs)logs=d.logs;
       if(d.cfg)cfg={...cfg,...d.cfg};
       save();applyCfg();ui();renderLeads();renderApprove();renderInbox();renderLog();renderCatGrid();renderLeadPicker();
       alert('Import OK: '+leads.length+' Leads');addLog('Import: '+leads.length+' Leads','ok');
@@ -2883,7 +2908,7 @@ const testHunter = async () => {
 };
 
 // Manual capture from LinkedIn
-const saveManualCapture = () => {
+const saveManualCapture = async () => {
   const firma = V('mc-firma').trim();
   const kontakt = V('mc-kontakt').trim();
   if(!firma && !kontakt) { showAlert('li-alrt', 'Firma oder Name eingeben.', 'warn'); return; }
@@ -2899,6 +2924,7 @@ const saveManualCapture = () => {
     if(V('mc-branche'))  lead.branche  = V('mc-branche');
     if(V('mc-ma'))       lead.ma       = V('mc-ma');
     if(V('mc-ort'))      lead.ort      = V('mc-ort');
+    await apiSave('/api/leads/' + lead.id, 'PUT', lead);
     addLog('Lead aktualisiert: ' + firma + ' · ' + kontakt, 'ok');
   } else {
     // Create new lead
@@ -2913,6 +2939,8 @@ const saveManualCapture = () => {
       ma: V('mc-ma'), ort: V('mc-ort'), fokus: '', web: '',
       status: 'Neu', created: new Date().toLocaleDateString('de-DE')
     };
+    const savedLead = await apiSave('/api/leads', 'POST', lead);
+    if (savedLead) lead.id = savedLead.id;
     leads.unshift(lead);
     addLog('Lead aus LinkedIn erstellt: ' + firma + ' · ' + kontakt, 'ok');
   }
@@ -2984,6 +3012,23 @@ const authFetch = async (path, opts = {}) => {
   if(token) headers['Authorization'] = 'Bearer ' + token;
   const res = await fetch(AUTH_API() + path, { ...opts, headers });
   return res;
+};
+
+// ── Backend CRUD helpers ─────────────────────────────────────────────────────
+const apiSave = async (endpoint, method, body) => {
+  if (AUTH_MODE !== 'backend' || !AUTH_API()) return null;
+  try {
+    const res = await authFetch(endpoint, {
+      method,
+      body: body ? JSON.stringify(body) : undefined
+    });
+    if (res.ok) return await res.json();
+    console.error('API error:', res.status, await res.text().catch(()=>''));
+    return null;
+  } catch (e) {
+    console.error('API call failed:', e.message);
+    return null;
+  }
 };
 
 // ── UI helpers ──────────────────────────────────────────────────────────────
@@ -3157,8 +3202,16 @@ const doLogout = async () => {
 
 
 // ─── TEAM MANAGEMENT ─────────────────────────────────────────────────────────
-const renderTeam = () => {
-  const users = getUsers();
+const renderTeam = async () => {
+  let users;
+  if (AUTH_MODE === 'backend' && AUTH_API()) {
+    try {
+      const res = await authFetch('/api/users');
+      users = res.ok ? await res.json() : [];
+    } catch(e) { users = []; }
+  } else {
+    users = getUsers();
+  }
   const session = getSession();
   $('team-count').textContent = users.length + ' Benutzer';
 
@@ -3213,12 +3266,17 @@ const createUser = async () => {
   if(!email || !email.includes('@')) { showAlert('team-alrt','Gültige E-Mail eingeben.','err'); return; }
   if(pass.length < 8) { showAlert('team-alrt','Passwort min. 8 Zeichen.','err'); return; }
 
-  const users = getUsers();
-  if(users.find(u=>u.email===email)) { showAlert('team-alrt','Diese E-Mail ist bereits registriert.','err'); return; }
+  if (AUTH_MODE === 'backend' && AUTH_API()) {
+    const res = await authFetch('/api/users', { method: 'POST', body: JSON.stringify({ name, email, password: pass, role }) });
+    if (!res.ok) { const d = await res.json().catch(()=>({})); showAlert('team-alrt', d.error || 'Fehler', 'err'); return; }
+  } else {
+    const users = getUsers();
+    if(users.find(u=>u.email===email)) { showAlert('team-alrt','Diese E-Mail ist bereits registriert.','err'); return; }
 
-  const hash = await hashPass(pass);
-  const newUser = {id: uid(), name, email, passHash: hash, role, created: new Date().toISOString(), lastLogin: null};
-  saveUsers([...users, newUser]);
+    const hash = await hashPass(pass);
+    const newUser = {id: uid(), name, email, passHash: hash, role, created: new Date().toISOString(), lastLogin: null};
+    saveUsers([...users, newUser]);
+  }
 
   // Clear form
   ['nu-name','nu-email','nu-pass'].forEach(id => { const el=$(id); if(el) el.value=''; });
@@ -3228,7 +3286,17 @@ const createUser = async () => {
   addLog('Benutzer erstellt: '+name+' ('+email+') · Rolle: '+role,'ok');
 };
 
-const toggleRole = (userId) => {
+const toggleRole = async (userId) => {
+  if (AUTH_MODE === 'backend' && AUTH_API()) {
+    const users = await (await authFetch('/api/users')).json();
+    const u = users.find(x=>x.id===userId);
+    if (!u) return;
+    const newRole = u.role === 'admin' ? 'user' : 'admin';
+    await authFetch('/api/users/' + userId, { method: 'PUT', body: JSON.stringify({ role: newRole }) });
+    renderTeam();
+    addLog('Rolle geändert: ' + u.name + ' → ' + newRole, 'warn');
+    return;
+  }
   const users = getUsers();
   const u = users.find(x=>x.id===userId);
   if(!u) return;
@@ -3241,6 +3309,13 @@ const toggleRole = (userId) => {
 const resetPassword = async (userId) => {
   const newPass = prompt('Neues Passwort für diesen Benutzer (min. 8 Zeichen):');
   if(!newPass || newPass.length < 8) { alert('Passwort zu kurz.'); return; }
+  if (AUTH_MODE === 'backend' && AUTH_API()) {
+    const res = await authFetch('/api/users/' + userId + '/password', { method: 'PUT', body: JSON.stringify({ password: newPass }) });
+    if (!res.ok) { const d = await res.json().catch(()=>({})); showAlert('team-alrt', d.error || 'Fehler', 'err'); return; }
+    showAlert('team-alrt','Passwort wurde zurückgesetzt.','ok');
+    addLog('Passwort zurückgesetzt','warn');
+    return;
+  }
   const users = getUsers();
   const u = users.find(x=>x.id===userId);
   if(!u) return;
@@ -3250,7 +3325,18 @@ const resetPassword = async (userId) => {
   addLog('Passwort zurückgesetzt: '+u.name,'warn');
 };
 
-const deleteUser = (userId) => {
+const deleteUser = async (userId) => {
+  if (AUTH_MODE === 'backend' && AUTH_API()) {
+    const users = await (await authFetch('/api/users')).json();
+    const u = users.find(x=>x.id===userId);
+    if(!u) return;
+    if(!confirm(`Benutzer "${u.name}" (${u.email}) wirklich löschen?`)) return;
+    await authFetch('/api/users/' + userId, { method: 'DELETE' });
+    renderTeam();
+    showAlert('team-alrt','Benutzer gelöscht.','warn');
+    addLog('Benutzer gelöscht: '+u.name,'warn');
+    return;
+  }
   const users = getUsers();
   const u = users.find(x=>x.id===userId);
   if(!u) return;
@@ -3271,6 +3357,15 @@ const changeOwnPassword = async () => {
   if(!oldPass) { showAlert('team-alrt','Aktuelles Passwort eingeben.','err'); return; }
   if(newPass.length < 8) { showAlert('team-alrt','Neues Passwort min. 8 Zeichen.','err'); return; }
   if(newPass !== newPass2) { showAlert('team-alrt','Passwörter stimmen nicht überein.','err'); return; }
+
+  if (AUTH_MODE === 'backend' && AUTH_API()) {
+    const res = await authFetch('/api/auth/password', { method: 'PUT', body: JSON.stringify({ oldPassword: oldPass, newPassword: newPass }) });
+    if (!res.ok) { const d = await res.json().catch(()=>({})); showAlert('team-alrt', d.error || 'Fehler beim Ändern.', 'err'); return; }
+    $('cp-old').value=''; $('cp-new').value=''; $('cp-new2').value='';
+    showAlert('team-alrt','Passwort erfolgreich geändert.','ok');
+    addLog('Eigenes Passwort geändert','ok');
+    return;
+  }
 
   const users = getUsers();
   const u = users.find(x=>x.id===session.userId);
