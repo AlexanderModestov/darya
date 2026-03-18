@@ -11,6 +11,7 @@ import inboxRoutes from './routes/inbox.js';
 import usersRoutes from './routes/users.js';
 import settingsRoutes from './routes/settings.js';
 import logsRoutes from './routes/logs.js';
+import llmRoutes from './routes/llm.js';
 import { authMiddleware } from './middleware/auth.js';
 import { apiLimiter, authLimiter } from './middleware/rateLimit.js';
 
@@ -48,6 +49,7 @@ app.use('/api/inbox', authMiddleware, inboxRoutes);
 app.use('/api/users', authMiddleware, usersRoutes);
 app.use('/api/settings', authMiddleware, settingsRoutes);
 app.use('/api/logs', authMiddleware, logsRoutes);
+app.use('/api/llm', authMiddleware, llmRoutes);
 
 app.use((err, _req, res, _next) => {
   console.error(err.stack || err);

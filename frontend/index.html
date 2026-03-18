@@ -1204,50 +1204,22 @@ const setPill = (id, on) => { const e=$(id); if(!e) return; e.className='pill '+
 // ─── CLAUDE API ───────────────────────────────────────────────────────────────
 // Universal LLM router — Claude / OpenAI / Gemini
 const claude = async (prompt, max=1200) => {
+  if(AUTH_MODE === 'backend' && AUTH_API()) return await llmViaBackend(prompt, max);
+  throw new Error('Backend nicht verbunden – LLM-Proxy benötigt Backend.');
+};
+
+const llmViaBackend = async (prompt, max) => {
   const prov = cfg.provider || 'claude';
-  if(prov === 'openai')  return await llmOpenAI(prompt, max);
-  if(prov === 'gemini')  return await llmGemini(prompt, max);
-  return await llmClaude(prompt, max);
-};
-
-const llmClaude = async (prompt, max) => {
-  if(!cfg.claudeKey) throw new Error('Kein Claude API-Key eingetragen (Konfiguration)');
-  const r = await fetch('https://api.anthropic.com/v1/messages', {
+  const r = await authFetch('/api/llm', {
     method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':cfg.claudeKey},
-    body: JSON.stringify({model:cfg.model||'claude-sonnet-4-20250514', max_tokens:max, messages:[{role:'user',content:prompt}]})
+    body: JSON.stringify({ provider:prov, model:cfg.model, prompt, max_tokens:max })
   });
-  if(!r.ok) throw new Error('Claude HTTP '+r.status);
+  if(!r.ok) {
+    const d = await r.json().catch(()=>({}));
+    throw new Error(d.error || `LLM HTTP ${r.status}`);
+  }
   const d = await r.json();
-  return (d.content||[]).map(c=>c.text||'').join('');
-};
-
-const llmOpenAI = async (prompt, max) => {
-  if(!cfg.openaiKey) throw new Error('Kein OpenAI API-Key eingetragen (Konfiguration)');
-  const modelMap = {'gpt-4o':'gpt-4o','gpt-4o-mini':'gpt-4o-mini','gpt-4-turbo':'gpt-4-turbo'};
-  const model = modelMap[cfg.model] || 'gpt-4o';
-  const r = await fetch('https://api.openai.com/v1/chat/completions', {
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+cfg.openaiKey},
-    body: JSON.stringify({model, max_tokens:max, messages:[{role:'user',content:prompt}]})
-  });
-  if(!r.ok) throw new Error('OpenAI HTTP '+r.status);
-  const d = await r.json();
-  return d.choices?.[0]?.message?.content || '';
-};
-
-const llmGemini = async (prompt, max) => {
-  if(!cfg.geminiKey) throw new Error('Kein Gemini API-Key eingetragen (Konfiguration)');
-  const model = cfg.model || 'gemini-1.5-flash';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${cfg.geminiKey}`;
-  const r = await fetch(url, {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({contents:[{parts:[{text:prompt}]}], generationConfig:{maxOutputTokens:max}})
-  });
-  if(!r.ok) throw new Error('Gemini HTTP '+r.status);
-  const d = await r.json();
-  return d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  return d.text || '';
 };
 
 // ─── AGENT (FIRMENSUCHE) ─────────────────────────────────────────────────────
@@ -1262,8 +1234,8 @@ const runAgent = async () => {
   const count  = parseInt(V('a-count'));
   const after  = V('a-after');
 
-  if(!cfg.claudeKey) {
-    tlog('✗ Kein Claude API-Key! Bitte zuerst unter Konfiguration eintragen.','lr');
+  if(AUTH_MODE !== 'backend' || !AUTH_API()) {
+    tlog('✗ Backend nicht verbunden! Bitte Backend-URL unter Konfiguration eintragen.','lr');
     endAgent(); return;
   }
   tlog('Firmensuche gestartet…','lg');
@@ -1570,7 +1542,7 @@ const runEmailGen = async () => {
   if(!V('eg-prompt')) { showAlert('eg-alrt','① Bitte erst den Produkt-Prompt ausfüllen.','warn'); return; }
   if(selectedLeadIds.size === 0) { showAlert('eg-alrt','③ Bitte mindestens einen Lead auswählen.','warn'); return; }
 
-  if(!cfg.claudeKey) { showAlert('eg-alrt','Kein Claude API-Key! Bitte zuerst unter Konfiguration eintragen.','err'); return; }
+  if(AUTH_MODE !== 'backend' || !AUTH_API()) { showAlert('eg-alrt','Backend nicht verbunden! Bitte Backend-URL unter Konfiguration eintragen.','err'); return; }
   const targetLeads = leads.filter(l => selectedLeadIds.has(l.id));
   const autoMode = V('eg-mode') === 'auto';
   const cat = EMAIL_CATS.find(c=>c.id===selectedCat);
@@ -2413,27 +2385,30 @@ const switchProvider = (prov) => {
 const testOpenAI = async () => {
   const key=V('c-openai-key'); if(!key){alert('OpenAI API Key eintragen');return;}
   try {
-    const r=await fetch('https://api.openai.com/v1/models',{headers:{'Authorization':'Bearer '+key}});
-    if(r.ok){cfg.openaiKey=key;save();setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● OPENAI';showAlert('cfg-alrt','OpenAI verbunden!','ok');addLog('OpenAI API: OK','ok');}
-    else showAlert('cfg-alrt','OpenAI: Ungültiger Key (HTTP '+r.status+')','err');
+    const r=await authFetch('/api/llm/test',{method:'POST',body:JSON.stringify({provider:'openai',key})});
+    const d=await r.json();
+    if(d.ok){cfg.openaiKey=key;save();setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● OPENAI';showAlert('cfg-alrt','OpenAI verbunden!','ok');addLog('OpenAI API: OK','ok');}
+    else showAlert('cfg-alrt','OpenAI: Ungültiger Key (HTTP '+(d.status||'?')+')','err');
   } catch(e){showAlert('cfg-alrt','Fehler: '+e.message,'err');}
 };
 
 const testGemini = async () => {
   const key=V('c-gemini-key'); if(!key){alert('Gemini API Key eintragen');return;}
   try {
-    const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
-    if(r.ok){cfg.geminiKey=key;save();setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● GEMINI';showAlert('cfg-alrt','Gemini verbunden!','ok');addLog('Gemini API: OK','ok');}
-    else showAlert('cfg-alrt','Gemini: Ungültiger Key (HTTP '+r.status+')','err');
+    const r=await authFetch('/api/llm/test',{method:'POST',body:JSON.stringify({provider:'gemini',key})});
+    const d=await r.json();
+    if(d.ok){cfg.geminiKey=key;save();setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● GEMINI';showAlert('cfg-alrt','Gemini verbunden!','ok');addLog('Gemini API: OK','ok');}
+    else showAlert('cfg-alrt','Gemini: Ungültiger Key (HTTP '+(d.status||'?')+')','err');
   } catch(e){showAlert('cfg-alrt','Fehler: '+e.message,'err');}
 };
 
 const testClaude = async () => {
   const key=V('c-key'); if(!key){alert('Key eintragen');return;}
   try {
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:5,messages:[{role:'user',content:'Hi'}]})});
-    if(r.ok){cfg.claudeKey=key;save();setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● API';showAlert('cfg-alrt','Claude API verbunden!','ok');addLog('Claude API OK','ok');}
-    else showAlert('cfg-alrt','Ungültiger Key (HTTP '+r.status+')','err');
+    const r=await authFetch('/api/llm/test',{method:'POST',body:JSON.stringify({provider:'claude',key})});
+    const d=await r.json();
+    if(d.ok){cfg.claudeKey=key;save();setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● API';showAlert('cfg-alrt','Claude API verbunden!','ok');addLog('Claude API OK','ok');}
+    else showAlert('cfg-alrt','Ungültiger Key (HTTP '+(d.status||'?')+')','err');
   } catch(e){showAlert('cfg-alrt','Verbindungsfehler: '+e.message,'err');}
 };
 const testBackend = async () => {
