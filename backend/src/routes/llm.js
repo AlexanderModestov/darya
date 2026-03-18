@@ -137,6 +137,7 @@ router.post('/test', async (req, res) => {
 
     return res.status(400).json({ error: 'Unknown provider' });
   } catch (e) {
+    console.error('LLM test error:', e.message);
     return res.json({ ok: false, error: e.message });
   }
 });
