@@ -2962,7 +2962,7 @@ const migrateLegacyLeads = () => {
 // Mode: 'local' (localStorage) or 'backend' (API)
 // Switch to 'backend' once Node.js server is running
 const AUTH_MODE = 'backend';
-const AUTH_API  = () => (cfg.backendUrl || '').replace(/\/$/, '');
+const AUTH_API  = () => (cfg.backendUrl || window.location.origin).replace(/\/$/, '');
 
 // ── Token storage ──────────────────────────────────────────────────────────
 const getToken    = ()    => localStorage.getItem('los3_token') || '';
