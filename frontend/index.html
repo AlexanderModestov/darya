@@ -2407,8 +2407,11 @@ const testClaude = async () => {
   const key=V('c-key'); if(!key){alert('Key eintragen');return;}
   try {
     const r=await authFetch('/api/llm/test',{method:'POST',body:JSON.stringify({provider:'claude',key})});
-    if(!r.ok){showAlert('cfg-alrt','Server-Fehler (HTTP '+r.status+'): '+(await r.text()),'err');return;}
-    const d=await r.json();
+    const txt=await r.text();
+    console.log('testClaude response:', r.status, txt);
+    if(!r.ok){showAlert('cfg-alrt','Server-Fehler (HTTP '+r.status+'): '+txt,'err');return;}
+    if(!txt){showAlert('cfg-alrt','Server gab leere Antwort (HTTP '+r.status+')','err');return;}
+    const d=JSON.parse(txt);
     if(d.ok){cfg.claudeKey=key;save();setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● API';showAlert('cfg-alrt','Claude API verbunden!','ok');addLog('Claude API OK','ok');}
     else showAlert('cfg-alrt','Ungültiger Key (HTTP '+(d.status||'?')+')' + (d.error ? ': '+d.error : ''),'err');
   } catch(e){showAlert('cfg-alrt','Verbindungsfehler: '+e.message,'err');}
