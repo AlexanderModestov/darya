@@ -1097,9 +1097,10 @@ Diese E-Mails funktionieren durch ihre Direktheit — halte sie ehrlich und knap
 let _currentUserId = null;
 const userKey = (k) => _currentUserId ? 'los3_u_'+_currentUserId+'_'+k : 'los3_'+k;
 const save = () => {
+  // Always persist cfg to localStorage (needed to bootstrap backend URL)
+  localStorage.setItem('los3_cfg', JSON.stringify(cfg));
   if (AUTH_MODE === 'backend' && AUTH_API()) return;
   ['leads','pending','inbox','logs'].forEach(k => localStorage.setItem(userKey(k), JSON.stringify(eval(k))));
-  localStorage.setItem('los3_cfg', JSON.stringify(cfg));
 };
 const load = async () => {
   if (AUTH_MODE === 'backend' && AUTH_API()) {
