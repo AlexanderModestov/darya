@@ -1,10 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swagger.js';
 
@@ -54,13 +50,6 @@ app.use('/api/users', authMiddleware, usersRoutes);
 app.use('/api/settings', authMiddleware, settingsRoutes);
 app.use('/api/logs', authMiddleware, logsRoutes);
 app.use('/api/llm', authMiddleware, llmRoutes);
-
-// Serve frontend static files
-app.use(express.static(join(__dirname, '../../frontend')));
-app.get('*', (req, res, next) => {
-  if (req.path.startsWith('/api/')) return next();
-  res.sendFile(join(__dirname, '../../frontend/index.html'));
-});
 
 app.use((err, _req, res, _next) => {
   console.error(err.stack || err);
