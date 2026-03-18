@@ -50,7 +50,29 @@ app.use('/api/users', authMiddleware, usersRoutes);
 app.use('/api/settings', authMiddleware, settingsRoutes);
 app.use('/api/logs', authMiddleware, logsRoutes);
 // LLM test endpoint — no auth needed (just validates external API keys)
-app.post('/api/llm/test', llmRoutes);
+app.post('/api/llm/test', async (req, res) => {
+  const { provider, key } = req.body;
+  try {
+    let r;
+    if (provider === 'claude') {
+      r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 5, messages: [{ role: 'user', content: 'Hi' }] })
+      });
+    } else if (provider === 'openai') {
+      r = await fetch('https://api.openai.com/v1/models', { headers: { 'Authorization': `Bearer ${key}` } });
+    } else if (provider === 'gemini') {
+      r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+    } else {
+      return res.status(400).json({ error: 'Unknown provider' });
+    }
+    return res.json({ ok: r.ok, status: r.status });
+  } catch (e) {
+    console.error('LLM test error:', e.message);
+    return res.json({ ok: false, error: e.message });
+  }
+});
 app.use('/api/llm', authMiddleware, llmRoutes);
 
 app.use((err, _req, res, _next) => {
