@@ -1103,8 +1103,12 @@ const save = () => {
   ['leads','pending','inbox','logs'].forEach(k => localStorage.setItem(userKey(k), JSON.stringify(eval(k))));
 };
 const load = async () => {
+  // Restore local-only settings from localStorage before server overwrite
+  try { const c = localStorage.getItem('los3_cfg'); if(c) { const lc = JSON.parse(c); cfg = { ...cfg, ...lc }; } } catch(e){}
+
   if (AUTH_MODE === 'backend' && AUTH_API()) {
     try {
+      const localOnly = { backendUrl: cfg.backendUrl };
       const [leadsRes, emailsRes, inboxRes, settingsRes, logsRes] = await Promise.all([
         authFetch('/api/leads'),
         authFetch('/api/emails'),
@@ -1117,7 +1121,7 @@ const load = async () => {
       if (inboxRes.ok) inbox = await inboxRes.json();
       if (settingsRes.ok) {
         const s = await settingsRes.json();
-        if (s.cfg) cfg = { ...cfg, ...s.cfg };
+        if (s.cfg) cfg = { ...cfg, ...s.cfg, ...localOnly };
         if (s.product) try { localStorage.setItem('los3_product', JSON.stringify(s.product)); } catch(e){}
       }
       if (logsRes.ok) {

@@ -49,6 +49,8 @@ app.use('/api/inbox', authMiddleware, inboxRoutes);
 app.use('/api/users', authMiddleware, usersRoutes);
 app.use('/api/settings', authMiddleware, settingsRoutes);
 app.use('/api/logs', authMiddleware, logsRoutes);
+// LLM test endpoint — no auth needed (just validates external API keys)
+app.post('/api/llm/test', llmRoutes);
 app.use('/api/llm', authMiddleware, llmRoutes);
 
 app.use((err, _req, res, _next) => {
