@@ -1821,24 +1821,47 @@ const saveProductPrompt = async () => {
   addLog('Produkt-Profil gespeichert: ' + (data.name||data.what||'').substring(0,40), 'ok');
 };
 
-const loadProductPrompt = () => {
-  const raw = localStorage.getItem('los3_product');
-  if(!raw) { showAlert('eg-alrt',t('msg_no_profile'),'warn'); return; }
+const fillProductFields = (d) => {
+  if(!d) return false;
+  const fill = (id, val) => { const el=$(id); if(el) el.value = val||''; };
+  fill('eg-prodname', d.name);
+  fill('eg-target',   d.target);
+  fill('eg-what',     d.what);
+  fill('eg-problems', d.problems);
+  fill('eg-usp',      d.usp);
+  fill('eg-roi',      d.roi);
+  fill('eg-pricing',  d.pricing);
+  fill('eg-refs',     d.refs);
+  fill('eg-prompt',   d.prompt);
+  return !!(d.name || d.what || d.prompt);
+};
+
+const loadProductPrompt = async () => {
+  // Try server first, then localStorage
+  let d = null;
   try {
-    const d = JSON.parse(raw);
-    const fill = (id, val) => { const el=$(id); if(el) el.value = val||''; };
-    fill('eg-prodname', d.name);
-    fill('eg-target',   d.target);
-    fill('eg-what',     d.what);
-    fill('eg-problems', d.problems);
-    fill('eg-usp',      d.usp);
-    fill('eg-roi',      d.roi);
-    fill('eg-pricing',  d.pricing);
-    fill('eg-refs',     d.refs);
-    fill('eg-prompt',   d.prompt);
-    $('eg-saved-info').textContent = '✓ Geladen: ' + (d.saved||'');
-    showAlert('eg-alrt',t('msg_profile_loaded'),'ok');
-  } catch(e) { showAlert('eg-alrt',t('msg_load_error')+e.message,'err'); }
+    const res = await authFetch('/api/settings');
+    if(res.ok) {
+      const s = await res.json();
+      if(s.product && (s.product.name || s.product.what || s.product.prompt)) {
+        d = s.product;
+        localStorage.setItem('los3_product', JSON.stringify(d));
+      }
+    }
+  } catch(e) {}
+
+  if(!d) {
+    const raw = localStorage.getItem('los3_product');
+    if(raw) try { d = JSON.parse(raw); } catch(e) {}
+  }
+
+  if(!d || (!d.name && !d.what && !d.prompt)) {
+    showAlert('eg-alrt',t('msg_no_profile'),'warn'); return;
+  }
+
+  fillProductFields(d);
+  $('eg-saved-info').textContent = '✓ Geladen: ' + (d.saved||'');
+  showAlert('eg-alrt',t('msg_profile_loaded'),'ok');
 };
 
 const togglePromptPreview = () => {
@@ -2317,10 +2340,14 @@ const openGmail = id => {
   window.open(`https://mail.google.com/mail/?view=cm&to=${to}&su=${sub}&body=${bod}`, '_blank');
 };
 
-const approveOne = id => {
+const approveOne = async (id) => {
   const p = pending.find(x=>x.id===id); if(!p) return;
   const ed = $('ed-'+id);       if(ed && ed.value) p.body = ed.value;
   const es = $('ed-subj-'+id);  if(es && es.value) p.subject = es.value;
+
+  // Save edits to backend before approving
+  await apiSave('/api/emails/' + id, 'PUT', { subject: p.subject, body: p.body });
+
   p.status = 'approved';
   doSend(p, leads.find(x=>x.id===p.leadId));
   save(); ui(); renderApprove();
@@ -2786,9 +2813,15 @@ const applyCfg = () => {
   if(cfg.backendUrl){$('c-backend').value=cfg.backendUrl;setPill('p-backend',true);}
   if(cfg.apolloKey){$('c-apollo').value=cfg.apolloKey;setPill('p-apollo',true);setPill('li-api-status',true);$('li-api-status').textContent='● APOLLO ONLINE';}
   if(cfg.lang){$('c-lang').value=cfg.lang;}
-  // load saved product prompt
+  // load saved product prompt and fill fields
   const raw = localStorage.getItem('los3_product');
-  if(raw) { try { const d=JSON.parse(raw); if(d.saved) $('eg-saved-info').textContent='Zuletzt gespeichert: '+d.saved; } catch(e){} }
+  if(raw) {
+    try {
+      const d = JSON.parse(raw);
+      if(d.saved) $('eg-saved-info').textContent='Zuletzt gespeichert: '+d.saved;
+      fillProductFields(d);
+    } catch(e){}
+  }
 };
 const saveConfig = async () => {
   cfg.provider=V('c-provider')||'claude';
