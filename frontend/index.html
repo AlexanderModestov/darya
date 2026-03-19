@@ -155,32 +155,32 @@ textarea.inp{resize:vertical;line-height:1.6}
 
     <div id="login-view">
       <div id="login-err" class="login-err"></div>
-      <div class="login-lbl">E-Mail</div>
+      <div class="login-lbl" data-t="email">E-Mail</div>
       <input class="login-inp" id="li-email" type="email" placeholder="daria@firma.de" autocomplete="username">
-      <div class="login-lbl">Passwort</div>
+      <div class="login-lbl" data-t="password">Passwort</div>
       <input class="login-inp" id="li-pass" type="password" placeholder="••••••••" autocomplete="current-password"
         onkeydown="if(event.key==='Enter') doLogin()">
-      <button class="login-btn" id="li-btn" onclick="doLogin()">Einloggen</button>
+      <button class="login-btn" id="li-btn" onclick="doLogin()" data-t="login">Einloggen</button>
       <div class="login-footer">
-        <span style="cursor:pointer;color:#555" onclick="showRegView()">Neuen Account erstellen →</span>
+        <span style="cursor:pointer;color:#555" onclick="showRegView()" data-t="create_account">Neuen Account erstellen →</span>
       </div>
     </div>
 
     <div id="register-view" style="display:none">
       <div id="reg-err" class="login-err"></div>
-      <div class="login-lbl">Name</div>
+      <div class="login-lbl" data-t="name">Name</div>
       <input class="login-inp" id="reg-name" type="text" placeholder="Max Müller">
-      <div class="login-lbl">E-Mail</div>
+      <div class="login-lbl" data-t="email">E-Mail</div>
       <input class="login-inp" id="reg-email" type="email" placeholder="max@firma.de">
-      <div class="login-lbl">Passwort (min. 8 Zeichen)</div>
+      <div class="login-lbl" data-t="password_min8">Passwort (min. 8 Zeichen)</div>
       <input class="login-inp" id="reg-pass" type="password" placeholder="••••••••"
         onkeydown="if(event.key==='Enter') doRegister()">
-      <div class="login-lbl">Passwort wiederholen</div>
+      <div class="login-lbl" data-t="password_repeat">Passwort wiederholen</div>
       <input class="login-inp" id="reg-pass2" type="password" placeholder="••••••••"
         onkeydown="if(event.key==='Enter') doRegister()">
-      <button class="login-btn" id="reg-btn" onclick="doRegister()">Account erstellen</button>
+      <button class="login-btn" id="reg-btn" onclick="doRegister()" data-t="register">Account erstellen</button>
       <div class="login-footer">
-        <span style="cursor:pointer;color:#555" onclick="showLoginView()">← Zurück zum Login</span>
+        <span style="cursor:pointer;color:#555" onclick="showLoginView()" data-t="back_to_login">← Zurück zum Login</span>
       </div>
     </div>
   </div>
@@ -191,7 +191,7 @@ textarea.inp{resize:vertical;line-height:1.6}
 <!-- TOP -->
 <div class="top">
   <div class="brand">LeadOS <em>AGENT</em></div>
-  <div style="font-size:11px;color:var(--t3)">Autonomer B2B Sales-Agent · Bankensektor Deutschland</div>
+  <div style="font-size:11px;color:var(--t3)" data-t="subtitle">Autonomer B2B Sales-Agent · Bankensektor Deutschland</div>
   <div class="top-right">
     <div class="user-pill"><div class="user-avatar" id="user-avatar">?</div><span id="user-name-lbl" style="font-size:11px;color:var(--t2)"></span><button class="tbtn" onclick="doLogout()" style="font-size:10px;color:var(--t3);margin-left:4px" title="Ausloggen">⏻</button></div>
     <span id="pill-agent" class="pill pill-off">● AGENT OFFLINE</span>
@@ -202,28 +202,28 @@ textarea.inp{resize:vertical;line-height:1.6}
 
 <!-- SIDEBAR -->
 <div class="side">
-  <div class="nav-sec">Agent</div>
-  <div class="ni on" onclick="nav('agent')"><span>⚡</span> Agent & Suche</div>
+  <div class="nav-sec" data-t="nav_agent_sec">Agent</div>
+  <div class="ni on" onclick="nav('agent')"><span>⚡</span> <span data-t="nav_agent">Agent & Suche</span></div>
   <div class="ni" onclick="nav('linkedin')">
-    <span>🔗</span> LinkedIn Prospecting
+    <span>🔗</span> <span data-t="nav_linkedin">LinkedIn Prospecting</span>
     <span class="ni-badge" id="b-li" style="display:none">0</span>
   </div>
-  <div class="nav-sec">E-Mails</div>
-  <div class="ni" onclick="nav('emailgen')"><span>✉</span> E-Mails generieren</div>
+  <div class="nav-sec" data-t="nav_emails_sec">E-Mails</div>
+  <div class="ni" onclick="nav('emailgen')"><span>✉</span> <span data-t="nav_emailgen">E-Mails generieren</span></div>
   <div class="ni" onclick="nav('approve')">
-    <span>✓</span> Freigabe
+    <span>✓</span> <span data-t="nav_approve">Freigabe</span>
     <span class="ni-badge" id="b-app" style="display:none">0</span>
   </div>
   <div class="ni" onclick="nav('inbox')">
-    <span>📥</span> Inbox / Antworten
+    <span>📥</span> <span data-t="nav_inbox">Inbox / Antworten</span>
     <span class="ni-badge" id="b-inbox" style="display:none">0</span>
   </div>
-  <div class="nav-sec">Daten</div>
-  <div class="ni" onclick="nav('leads')"><span>◈</span> Lead-Datenbank</div>
-  <div class="ni" onclick="nav('log')"><span>≡</span> Aktivitätslog</div>
-  <div class="nav-sec">System</div>
-  <div class="ni" onclick="nav('config')"><span>⊕</span> Konfiguration</div>
-  <div class="ni" id="nav-team" onclick="nav('team')" style="display:none"><span>👥</span> Team & Benutzer</div>
+  <div class="nav-sec" data-t="nav_data_sec">Daten</div>
+  <div class="ni" onclick="nav('leads')"><span>◈</span> <span data-t="nav_leads">Lead-Datenbank</span></div>
+  <div class="ni" onclick="nav('log')"><span>≡</span> <span data-t="nav_log">Aktivitätslog</span></div>
+  <div class="nav-sec" data-t="nav_system_sec">System</div>
+  <div class="ni" onclick="nav('config')"><span>⊕</span> <span data-t="nav_config">Konfiguration</span></div>
+  <div class="ni" id="nav-team" onclick="nav('team')" style="display:none"><span>👥</span> <span data-t="nav_team">Team & Benutzer</span></div>
   <div class="side-foot">
     <div id="sb-inf">0 Leads · 0 Produkte</div>
     <div style="color:var(--t3);margin-top:2px">lokal · localStorage</div>
@@ -237,37 +237,37 @@ textarea.inp{resize:vertical;line-height:1.6}
 <div id="pg-agent" class="pg on">
   <div class="ph">
     <div>
-      <div class="ph-t">Agent & Firmensuche</div>
-      <div class="ph-s">Agent recherchiert Firmen und speichert sie als Leads — E-Mails werden separat generiert</div>
+      <div class="ph-t" data-t="agent_title">Agent & Firmensuche</div>
+      <div class="ph-s" data-t="agent_subtitle">Agent recherchiert Firmen und speichert sie als Leads — E-Mails werden separat generiert</div>
     </div>
     <div style="display:flex;gap:8px">
-      <button class="btn btn-sm btn-r" id="btn-stop" style="display:none" onclick="stopAgent()">⬛ Stopp</button>
-      <button class="btn btn-g" id="btn-run" onclick="runAgent()">▶ Agent starten</button>
+      <button class="btn btn-sm btn-r" id="btn-stop" style="display:none" onclick="stopAgent()" data-t="agent_stop">⬛ Stopp</button>
+      <button class="btn btn-g" id="btn-run" onclick="runAgent()" data-t="agent_start">▶ Agent starten</button>
     </div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;margin-bottom:14px">
     <div class="pn">
-      <div class="pn-h"><span class="pn-ht">Suchauftrag / Prompt</span></div>
+      <div class="pn-h"><span class="pn-ht" data-t="agent_search_prompt">Suchauftrag / Prompt</span></div>
       <div class="pn-b">
         <div class="fg">
-          <label>Was soll der Agent suchen?</label>
+          <label data-t="agent_search_label">Was soll der Agent suchen?</label>
           <textarea class="inp" id="a-prompt" style="min-height:110px">Suche nach deutschen IT-Dienstleistern und Fintech-Unternehmen mit 50–200 Mitarbeitern, die aktiv Banken, Sparkassen oder Volksbanken als Kunden haben. Fokus auf: RegTech, Core-Banking, Compliance-Software, Zahlungsverkehr. Keine Großkonzerne.</textarea>
         </div>
         <div class="fr">
           <div class="fg" style="margin-bottom:0">
-            <label>Anzahl neue Leads</label>
+            <label data-t="agent_lead_count">Anzahl neue Leads</label>
             <select class="inp" id="a-count">
-              <option value="5">5 Leads</option>
-              <option value="8" selected>8 Leads</option>
-              <option value="10">10 Leads</option>
-              <option value="15">15 Leads</option>
+              <option value="5" data-t="agent_5leads">5 Leads</option>
+              <option value="8" selected data-t="agent_8leads">8 Leads</option>
+              <option value="10" data-t="agent_10leads">10 Leads</option>
+              <option value="15" data-t="agent_15leads">15 Leads</option>
             </select>
           </div>
           <div class="fg" style="margin-bottom:0">
-            <label>Nach Suche</label>
+            <label data-t="agent_after_search">Nach Suche</label>
             <select class="inp" id="a-after">
-              <option value="nothing">Nur Leads speichern</option>
-              <option value="emailgen">Direkt zu E-Mails generieren</option>
+              <option value="nothing" data-t="agent_save_only">Nur Leads speichern</option>
+              <option value="emailgen" data-t="agent_goto_emails">Direkt zu E-Mails generieren</option>
             </select>
           </div>
         </div>
@@ -275,27 +275,27 @@ textarea.inp{resize:vertical;line-height:1.6}
     </div>
     <div>
       <div class="pn" style="margin-bottom:10px">
-        <div class="pn-h"><span class="pn-ht">Schritte</span></div>
+        <div class="pn-h"><span class="pn-ht" data-t="agent_steps">Schritte</span></div>
         <div class="pn-b" style="padding:10px 16px">
-          <div class="step"><div class="sn sn-pend" id="s1">1</div><div><div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:2px">Firmen recherchieren</div><div style="font-size:11px;color:var(--t3)" id="s1d">Wartet…</div></div></div>
-          <div class="step"><div class="sn sn-pend" id="s2">2</div><div><div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:2px">Leads speichern</div><div style="font-size:11px;color:var(--t3)" id="s2d">Wartet…</div></div></div>
-          <div class="step" style="border:none"><div class="sn sn-pend" id="s3">3</div><div><div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:2px">Fertig</div><div style="font-size:11px;color:var(--t3)" id="s3d">Wartet…</div></div></div>
+          <div class="step"><div class="sn sn-pend" id="s1">1</div><div><div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:2px" data-t="agent_step1">Firmen recherchieren</div><div style="font-size:11px;color:var(--t3)" id="s1d" data-t="agent_waiting">Wartet…</div></div></div>
+          <div class="step"><div class="sn sn-pend" id="s2">2</div><div><div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:2px" data-t="agent_step2">Leads speichern</div><div style="font-size:11px;color:var(--t3)" id="s2d" data-t="agent_waiting">Wartet…</div></div></div>
+          <div class="step" style="border:none"><div class="sn sn-pend" id="s3">3</div><div><div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:2px" data-t="agent_step3">Fertig</div><div style="font-size:11px;color:var(--t3)" id="s3d" data-t="agent_waiting">Wartet…</div></div></div>
         </div>
       </div>
       <div class="pn">
-        <div class="pn-h"><span class="pn-ht">Statistik</span></div>
+        <div class="pn-h"><span class="pn-ht" data-t="stats">Statistik</span></div>
         <div class="pn-b" style="padding:10px 16px">
-          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)">Leads gesamt</span><span id="st-tot" style="color:var(--t1);font-weight:700">0</span></div>
-          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)">Pending Freigaben</span><span id="st-pen" style="color:var(--yellow);font-weight:700">0</span></div>
-          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)">E-Mails genehmigt</span><span id="st-app" style="color:var(--green);font-weight:700">0</span></div>
-          <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--t3)">Antworten</span><span id="st-rep" style="color:var(--blue);font-weight:700">0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)" data-t="stat_total_leads">Leads gesamt</span><span id="st-tot" style="color:var(--t1);font-weight:700">0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)" data-t="stat_pending">Pending Freigaben</span><span id="st-pen" style="color:var(--yellow);font-weight:700">0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)" data-t="stat_approved_emails">E-Mails genehmigt</span><span id="st-app" style="color:var(--green);font-weight:700">0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--t3)" data-t="stat_replies">Antworten</span><span id="st-rep" style="color:var(--blue);font-weight:700">0</span></div>
         </div>
       </div>
     </div>
   </div>
   <div class="pn">
-    <div class="pn-h"><span class="pn-ht">Terminal</span><button class="btn btn-sm btn-r" onclick="clearTerm()">Leeren</button></div>
-    <div class="term" id="term"><div class="ln ld">// LeadOS Agent bereit. Starte die Firmensuche oben.</div></div>
+    <div class="pn-h"><span class="pn-ht" data-t="terminal">Terminal</span><button class="btn btn-sm btn-r" onclick="clearTerm()" data-t="clear">Leeren</button></div>
+    <div class="term" id="term"><div class="ln ld" data-t="terminal_ready">// LeadOS Agent bereit. Starte die Firmensuche oben.</div></div>
   </div>
 </div>
 
@@ -303,29 +303,29 @@ textarea.inp{resize:vertical;line-height:1.6}
 <div id="pg-emailgen" class="pg">
   <div class="ph">
     <div>
-      <div class="ph-t">E-Mails generieren</div>
-      <div class="ph-s">Dein Produkt-Prompt → Kategorie wählen → Leads auswählen → KI generiert personalisierte E-Mails</div>
+      <div class="ph-t" data-t="emailgen_title">E-Mails generieren</div>
+      <div class="ph-s" data-t="emailgen_subtitle">Dein Produkt-Prompt → Kategorie wählen → Leads auswählen → KI generiert personalisierte E-Mails</div>
     </div>
-    <button class="btn btn-g" id="eg-run-btn" onclick="runEmailGen()">⚡ E-Mails generieren</button>
+    <button class="btn btn-g" id="eg-run-btn" onclick="runEmailGen()" data-t="emailgen_run">⚡ E-Mails generieren</button>
   </div>
   <div id="eg-alrt" style="display:none" class="alrt"></div>
 
   <!-- SCHRITT 1: DEIN PRODUKT -->
   <div class="pn">
     <div class="pn-h">
-      <span class="pn-ht">① Profil deines Unternehmens</span>
-      <span style="font-size:10px;color:var(--t3)">Wird bei jeder E-Mail-Generierung verwendet — einmal ausfüllen, immer nutzen</span>
+      <span class="pn-ht" data-t="eg_step1">① Profil deines Unternehmens</span>
+      <span style="font-size:10px;color:var(--t3)" data-t="eg_step1_hint">Wird bei jeder E-Mail-Generierung verwendet — einmal ausfüllen, immer nutzen</span>
     </div>
     <div class="pn-b">
 
       <!-- ROW 1: Name + Zielgruppe -->
       <div class="fr" style="margin-bottom:12px">
         <div class="fg" style="margin-bottom:0">
-          <label>Produktname / Angebotsbezeichnung</label>
+          <label data-t="eg_product_name">Produktname / Angebotsbezeichnung</label>
           <input class="inp" id="eg-prodname" placeholder="z.B. AI-Prozessautomatisierung für Banken">
         </div>
         <div class="fg" style="margin-bottom:0">
-          <label>Zielgruppe / Ansprechpartner</label>
+          <label data-t="eg_target">Zielgruppe / Ansprechpartner</label>
           <input class="inp" id="eg-target" placeholder="z.B. CIO, IT-Leiter, Compliance-Chef">
         </div>
       </div>
@@ -333,11 +333,11 @@ textarea.inp{resize:vertical;line-height:1.6}
       <!-- ROW 2: Was wir machen + Probleme die wir lösen -->
       <div class="fr" style="margin-bottom:12px">
         <div class="fg" style="margin-bottom:0">
-          <label>Was wir machen (2-3 Sätze)</label>
+          <label data-t="eg_what">Was wir machen (2-3 Sätze)</label>
           <textarea class="inp" id="eg-what" style="min-height:72px;line-height:1.6" placeholder="Wir entwickeln KI-Agenten die Vertriebsprozesse automatisieren — von der Lead-Recherche bis zur E-Mail-Generierung. Unsere Lösung reduziert den manuellen Aufwand im B2B-Vertrieb um 60%."></textarea>
         </div>
         <div class="fg" style="margin-bottom:0">
-          <label>Welche Probleme lösen wir?</label>
+          <label data-t="eg_problems">Welche Probleme lösen wir?</label>
           <textarea class="inp" id="eg-problems" style="min-height:72px;line-height:1.6" placeholder="Vertriebsteams verlieren zu viel Zeit mit manueller Recherche und copy-paste E-Mails. CRM-Daten sind unvollständig. Follow-ups werden vergessen."></textarea>
         </div>
       </div>
@@ -345,11 +345,11 @@ textarea.inp{resize:vertical;line-height:1.6}
       <!-- ROW 3: USP + ROI -->
       <div class="fr" style="margin-bottom:12px">
         <div class="fg" style="margin-bottom:0">
-          <label>USP — Was macht uns einzigartig?</label>
+          <label data-t="eg_usp">USP — Was macht uns einzigartig?</label>
           <input class="inp" id="eg-usp" placeholder="z.B. Setup in 2 Wochen, kein IT-Team nötig, nachweisbar 40% Zeitersparnis">
         </div>
         <div class="fg" style="margin-bottom:0">
-          <label>ROI / konkrete Kennzahlen</label>
+          <label data-t="eg_roi">ROI / konkrete Kennzahlen</label>
           <input class="inp" id="eg-roi" placeholder="z.B. ROI nach 8 Monaten, 15h/Woche gespart, +23% Conversion">
         </div>
       </div>
@@ -357,31 +357,31 @@ textarea.inp{resize:vertical;line-height:1.6}
       <!-- ROW 4: Preise + Referenzen -->
       <div class="fr" style="margin-bottom:12px">
         <div class="fg" style="margin-bottom:0">
-          <label>Preise / Pakete (optional)</label>
+          <label data-t="eg_pricing">Preise / Pakete (optional)</label>
           <input class="inp" id="eg-pricing" placeholder="z.B. ab 2.900 €/Monat, Setup einmalig 5.000 €, kostenlose Pilotphase">
         </div>
         <div class="fg" style="margin-bottom:0">
-          <label>Referenzen / Kunden-Beispiele</label>
+          <label data-t="eg_refs">Referenzen / Kunden-Beispiele</label>
           <input class="inp" id="eg-refs" placeholder="z.B. 3 Sparkassen in Bayern, FinTech-Startup Berlin, 200-MA IT-Dienstleister">
         </div>
       </div>
 
       <!-- ROW 5: Freier Zusatz-Prompt -->
       <div class="fg" style="margin-bottom:12px">
-        <label>Zusätzlicher Kontext (optional) — Besonderheiten, aktuelle Aktionen, Sprache</label>
+        <label data-t="eg_context">Zusätzlicher Kontext (optional) — Besonderheiten, aktuelle Aktionen, Sprache</label>
         <textarea class="inp" id="eg-prompt" style="min-height:60px;line-height:1.6" placeholder="z.B. Wir haben gerade eine Case Study mit Commerzbank veröffentlicht. Aktuell bieten wir bis Ende Q1 eine kostenlose Pilotphase an. Schreib immer auf Deutsch, Sie-Form."></textarea>
       </div>
 
       <!-- Preview & Save -->
       <div style="background:var(--s2);border:var(--bd);border-radius:3px;padding:10px 14px;margin-bottom:12px;display:none" id="eg-preview-box">
-        <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Vorschau — was Claude sieht:</div>
+        <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px" data-t="eg_preview_label">Vorschau — was Claude sieht:</div>
         <div id="eg-preview-text" style="font-size:11px;color:var(--t2);line-height:1.7;white-space:pre-wrap;max-height:140px;overflow-y:auto"></div>
       </div>
 
       <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn btn-sm btn-g" onclick="saveProductPrompt()">💾 Profil speichern</button>
-        <button class="btn btn-sm" onclick="loadProductPrompt()">📂 Gespeichertes laden</button>
-        <button class="btn btn-sm" onclick="togglePromptPreview()">👁 Vorschau</button>
+        <button class="btn btn-sm btn-g" onclick="saveProductPrompt()" data-t="eg_save_profile">💾 Profil speichern</button>
+        <button class="btn btn-sm" onclick="loadProductPrompt()" data-t="eg_load_profile">📂 Gespeichertes laden</button>
+        <button class="btn btn-sm" onclick="togglePromptPreview()" data-t="eg_preview">👁 Vorschau</button>
         <span id="eg-saved-info" style="font-size:10px;color:var(--t3)"></span>
       </div>
     </div>
@@ -390,8 +390,8 @@ textarea.inp{resize:vertical;line-height:1.6}
   <!-- SCHRITT 2: KATEGORIE -->
   <div class="pn">
     <div class="pn-h">
-      <span class="pn-ht">② E-Mail-Kategorie wählen</span>
-      <span style="font-size:10px;color:var(--t3)">Bestimmt Stil, Ton und Ziel der E-Mail</span>
+      <span class="pn-ht" data-t="eg_step2">② E-Mail-Kategorie wählen</span>
+      <span style="font-size:10px;color:var(--t3)" data-t="eg_step2_hint">Bestimmt Stil, Ton und Ziel der E-Mail</span>
     </div>
     <div class="pn-b">
       <div class="cat-grid" id="cat-grid">
@@ -402,35 +402,35 @@ textarea.inp{resize:vertical;line-height:1.6}
         <div class="sep"></div>
         <div class="fr3">
           <div class="fg" style="margin-bottom:0">
-            <label>Tonalität</label>
+            <label data-t="eg_tone">Tonalität</label>
             <select class="inp" id="eg-tone">
-              <option value="professionell">Professionell & direkt</option>
-              <option value="locker">Locker & persönlich</option>
-              <option value="formell">Formell (Sie-Form)</option>
-              <option value="neugierig">Neugierig & fragend</option>
+              <option value="professionell" data-t="tone_professional">Professionell & direkt</option>
+              <option value="locker" data-t="tone_casual">Locker & persönlich</option>
+              <option value="formell" data-t="tone_formal">Formell (Sie-Form)</option>
+              <option value="neugierig" data-t="tone_curious">Neugierig & fragend</option>
             </select>
           </div>
           <div class="fg" style="margin-bottom:0">
-            <label>E-Mail-Länge</label>
+            <label data-t="eg_length">E-Mail-Länge</label>
             <select class="inp" id="eg-len">
-              <option value="kurz">Kurz (3–4 Sätze)</option>
-              <option value="mittel" selected>Mittel (5–6 Sätze)</option>
-              <option value="lang">Ausführlich (7–9 Sätze)</option>
+              <option value="kurz" data-t="len_short">Kurz (3–4 Sätze)</option>
+              <option value="mittel" selected data-t="len_medium">Mittel (5–6 Sätze)</option>
+              <option value="lang" data-t="len_long">Ausführlich (7–9 Sätze)</option>
             </select>
           </div>
           <div class="fg" style="margin-bottom:0">
-            <label>Call-to-Action</label>
+            <label data-t="eg_cta">Call-to-Action</label>
             <select class="inp" id="eg-cta">
-              <option value="call">15-Min Discovery Call</option>
-              <option value="demo">Kurze Demo</option>
-              <option value="info">Infomaterial senden</option>
-              <option value="roi">ROI-Analyse anbieten</option>
-              <option value="pilot">Pilot-Projekt vorschlagen</option>
+              <option value="call" data-t="cta_call">15-Min Discovery Call</option>
+              <option value="demo" data-t="cta_demo">Kurze Demo</option>
+              <option value="info" data-t="cta_info">Infomaterial senden</option>
+              <option value="roi" data-t="cta_roi">ROI-Analyse anbieten</option>
+              <option value="pilot" data-t="cta_pilot">Pilot-Projekt vorschlagen</option>
             </select>
           </div>
         </div>
         <div class="fg" style="margin-top:12px;margin-bottom:0">
-          <label>Zusätzliche Anweisungen (optional)</label>
+          <label data-t="eg_extra">Zusätzliche Anweisungen (optional)</label>
           <input class="inp" id="eg-extra" placeholder="z.B. Erwähne DORA-Regulierung. Vermeide das Wort 'revolutionär'. Beziehe dich auf aktuelle BaFin-Anforderungen.">
         </div>
       </div>
@@ -440,16 +440,16 @@ textarea.inp{resize:vertical;line-height:1.6}
   <!-- SCHRITT 3: LEADS AUSWÄHLEN -->
   <div class="pn">
     <div class="pn-h">
-      <span class="pn-ht">③ Leads auswählen</span>
+      <span class="pn-ht" data-t="eg_step3">③ Leads auswählen</span>
       <span id="eg-lead-count-lbl" style="font-size:10px;color:var(--t3)">0 ausgewählt</span>
     </div>
     <div class="pn-b">
       <div class="fr" style="margin-bottom:12px">
         <div style="display:flex;gap:8px">
-          <button class="btn btn-sm" onclick="selectLeadsFilter('Neu')">Alle Neu</button>
-          <button class="btn btn-sm" onclick="selectLeadsFilter('Kalt')">Alle Kalt</button>
-          <button class="btn btn-sm" onclick="selectLeadsFilter('all')">Alle</button>
-          <button class="btn btn-sm btn-r" onclick="selectLeadsFilter('none')">Keine</button>
+          <button class="btn btn-sm" onclick="selectLeadsFilter('Neu')" data-t="eg_all_new">Alle Neu</button>
+          <button class="btn btn-sm" onclick="selectLeadsFilter('Kalt')" data-t="eg_all_cold">Alle Kalt</button>
+          <button class="btn btn-sm" onclick="selectLeadsFilter('all')" data-t="eg_all">Alle</button>
+          <button class="btn btn-sm btn-r" onclick="selectLeadsFilter('none')" data-t="eg_none">Keine</button>
         </div>
         <input class="inp" id="eg-lead-search" placeholder="Leads filtern…" oninput="renderLeadPicker()">
       </div>
@@ -460,19 +460,19 @@ textarea.inp{resize:vertical;line-height:1.6}
   <!-- SCHRITT 4: VORSCHAU & START -->
   <div class="pn">
     <div class="pn-h">
-      <span class="pn-ht">④ Freigabe-Modus</span>
+      <span class="pn-ht" data-t="eg_step4">④ Freigabe-Modus</span>
     </div>
     <div class="pn-b">
       <div class="fr">
         <div class="fg" style="margin-bottom:0">
-          <label>Modus</label>
+          <label data-t="eg_mode">Modus</label>
           <select class="inp" id="eg-mode">
-            <option value="review">Ich prüfe jede E-Mail vor dem Senden</option>
-            <option value="auto">Auto-Approve — sofort senden (simuliert)</option>
+            <option value="review" data-t="mode_review">Ich prüfe jede E-Mail vor dem Senden</option>
+            <option value="auto" data-t="mode_auto">Auto-Approve — sofort senden (simuliert)</option>
           </select>
         </div>
         <div class="fg" style="margin-bottom:0">
-          <label>Test-E-Mail (optional)</label>
+          <label data-t="eg_test_email">Test-E-Mail (optional)</label>
           <div style="display:flex;gap:8px">
             <input class="inp" id="eg-test-lead" placeholder="Lead-Name für Test…" style="flex:1">
             <button class="btn btn-sm btn-purple" onclick="runTestEmail()"><span id="eg-test-sp" style="display:none" class="sp"></span>Test</button>
@@ -480,8 +480,8 @@ textarea.inp{resize:vertical;line-height:1.6}
         </div>
       </div>
       <div id="eg-test-result" style="display:none;margin-top:12px">
-        <div style="font-size:10px;color:var(--yellow);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">Test-E-Mail Vorschau</div>
-        <div style="font-size:11px;color:var(--yellow);margin-bottom:4px">Betreff: <span id="eg-test-subj" style="color:var(--t1)"></span></div>
+        <div style="font-size:10px;color:var(--yellow);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em" data-t="eg_test_preview">Test-E-Mail Vorschau</div>
+        <div style="font-size:11px;color:var(--yellow);margin-bottom:4px"><span data-t="eg_subject">Betreff:</span> <span id="eg-test-subj" style="color:var(--t1)"></span></div>
         <div class="eml-prev" id="eg-test-body"></div>
       </div>
     </div>
@@ -490,7 +490,7 @@ textarea.inp{resize:vertical;line-height:1.6}
   <!-- FORTSCHRITT -->
   <div id="eg-progress-panel" class="pn" style="display:none">
     <div class="pn-h">
-      <span class="pn-ht">Generierung läuft</span>
+      <span class="pn-ht" data-t="eg_generating">Generierung läuft</span>
       <span id="eg-prog-lbl" style="font-size:11px;color:var(--t3)">0 / 0</span>
     </div>
     <div class="pn-b">
@@ -504,47 +504,47 @@ textarea.inp{resize:vertical;line-height:1.6}
 <div id="pg-approve" class="pg">
   <div class="ph">
     <div>
-      <div class="ph-t">Freigabe</div>
-      <div class="ph-s">Alle generierten E-Mails prüfen · bearbeiten · freigeben zum Versand</div>
+      <div class="ph-t" data-t="approve_title">Freigabe</div>
+      <div class="ph-s" data-t="approve_subtitle">Alle generierten E-Mails prüfen · bearbeiten · freigeben zum Versand</div>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <span id="app-counter" style="font-size:11px;color:var(--t3)"></span>
-      <button class="btn btn-sm" onclick="setApproveFilter('all')" id="af-all">Alle</button>
-      <button class="btn btn-sm" onclick="setApproveFilter('pending')" id="af-pend">Ausstehend</button>
-      <button class="btn btn-sm" onclick="setApproveFilter('approved')" id="af-appr">Gesendet</button>
-      <button class="btn btn-sm" onclick="setApproveFilter('rejected')" id="af-rej">Abgelehnt</button>
+      <button class="btn btn-sm" onclick="setApproveFilter('all')" id="af-all" data-t="all">Alle</button>
+      <button class="btn btn-sm" onclick="setApproveFilter('pending')" id="af-pend" data-t="pending">Ausstehend</button>
+      <button class="btn btn-sm" onclick="setApproveFilter('approved')" id="af-appr" data-t="sent">Gesendet</button>
+      <button class="btn btn-sm" onclick="setApproveFilter('rejected')" id="af-rej" data-t="rejected">Abgelehnt</button>
       <div style="width:1px;height:20px;background:var(--s4)"></div>
-      <button class="btn btn-sm" id="view-cards" onclick="setApproveView('cards')" title="Kartenansicht">☰ Karten</button>
-      <button class="btn btn-sm" id="view-table" onclick="setApproveView('table')" title="Tabellenansicht">⊞ Tabelle</button>
+      <button class="btn btn-sm" id="view-cards" onclick="setApproveView('cards')" title="Kartenansicht" data-t="cards">☰ Karten</button>
+      <button class="btn btn-sm" id="view-table" onclick="setApproveView('table')" title="Tabellenansicht" data-t="table">⊞ Tabelle</button>
       <div style="width:1px;height:20px;background:var(--s4)"></div>
-      <button class="btn btn-sm btn-ok" onclick="approveAll()">✓ Alle freigeben</button>
-      <button class="btn btn-sm btn-rej" onclick="rejectAll()">✕ Alle ablehnen</button>
+      <button class="btn btn-sm btn-ok" onclick="approveAll()" data-t="approve_all">✓ Alle freigeben</button>
+      <button class="btn btn-sm btn-rej" onclick="rejectAll()" data-t="reject_all">✕ Alle ablehnen</button>
     </div>
   </div>
 
   <!-- STATS ROW -->
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
     <div style="background:var(--s1);border:var(--bd);border-radius:3px;padding:12px 14px">
-      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Gesamt</div>
+      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px" data-t="total">Gesamt</div>
       <div style="font-size:22px;font-weight:800;color:var(--t1)" id="as-total">0</div>
     </div>
     <div style="background:var(--s1);border:var(--bd);border-left:3px solid var(--yellow);border-radius:3px;padding:12px 14px">
-      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Ausstehend</div>
+      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px" data-t="stat_pending_label">Ausstehend</div>
       <div style="font-size:22px;font-weight:800;color:var(--yellow)" id="as-pend">0</div>
     </div>
     <div style="background:var(--s1);border:var(--bd);border-left:3px solid var(--green);border-radius:3px;padding:12px 14px">
-      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Freigegeben</div>
+      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px" data-t="approved">Freigegeben</div>
       <div style="font-size:22px;font-weight:800;color:var(--green)" id="as-appr">0</div>
     </div>
     <div style="background:var(--s1);border:var(--bd);border-left:3px solid var(--red);border-radius:3px;padding:12px 14px">
-      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Abgelehnt</div>
+      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px" data-t="stat_rejected_label">Abgelehnt</div>
       <div style="font-size:22px;font-weight:800;color:var(--red)" id="as-rej">0</div>
     </div>
   </div>
 
   <div id="app-empty" style="display:none;text-align:center;padding:60px;color:var(--t3);font-size:13px">
-    Noch keine E-Mails generiert.<br>
-    <span style="font-size:11px;color:var(--t3);margin-top:8px;display:block">Gehe zu "E-Mails generieren" um Kampagnen zu starten.</span>
+    <span data-t="no_emails_yet">Noch keine E-Mails generiert.</span><br>
+    <span style="font-size:11px;color:var(--t3);margin-top:8px;display:block" data-t="go_to_emailgen">Gehe zu "E-Mails generieren" um Kampagnen zu starten.</span>
   </div>
   <div id="app-list"></div>
 </div>
@@ -552,34 +552,34 @@ textarea.inp{resize:vertical;line-height:1.6}
 <!-- ═══ INBOX ═══ -->
 <div id="pg-inbox" class="pg">
   <div class="ph">
-    <div><div class="ph-t">Inbox / Antworten</div><div class="ph-s">Agent antwortet kontextbasiert — immer mit Produkt-Kontext</div></div>
-    <button class="btn btn-sm" onclick="simReply()">+ Antwort simulieren</button>
+    <div><div class="ph-t" data-t="inbox_title">Inbox / Antworten</div><div class="ph-s" data-t="inbox_subtitle">Agent antwortet kontextbasiert — immer mit Produkt-Kontext</div></div>
+    <button class="btn btn-sm" onclick="simReply()" data-t="inbox_simulate">+ Antwort simulieren</button>
   </div>
-  <div id="inbox-empty" style="display:none;text-align:center;padding:60px;color:var(--t3)">Keine Antworten.</div>
+  <div id="inbox-empty" style="display:none;text-align:center;padding:60px;color:var(--t3)" data-t="inbox_empty">Keine Antworten.</div>
   <div id="inbox-list"></div>
 </div>
 
 <!-- ═══ LEADS ═══ -->
 <div id="pg-leads" class="pg">
   <div class="ph">
-    <div><div class="ph-t">Lead-Datenbank</div><div class="ph-s" id="ld-lbl">0 Einträge</div></div>
+    <div><div class="ph-t" data-t="leads_title">Lead-Datenbank</div><div class="ph-s" id="ld-lbl">0 Einträge</div></div>
     <div style="display:flex;gap:8px">
-      <button class="btn btn-sm" onclick="expCSV()">↓ CSV</button>
-      <button class="btn btn-sm" onclick="expJSON()">↓ JSON</button>
-      <button class="btn btn-sm" onclick="impJSON()">↑ Import</button>
-      <button class="btn btn-sm btn-r" onclick="clearLeads()">DB leeren</button>
+      <button class="btn btn-sm" onclick="expCSV()" data-t="leads_csv">↓ CSV</button>
+      <button class="btn btn-sm" onclick="expJSON()" data-t="leads_json">↓ JSON</button>
+      <button class="btn btn-sm" onclick="impJSON()" data-t="leads_import">↑ Import</button>
+      <button class="btn btn-sm btn-r" onclick="clearLeads()" data-t="leads_clear">DB leeren</button>
     </div>
   </div>
   <div style="display:flex;gap:10px;margin-bottom:14px">
     <input class="inp" id="ld-q" placeholder="Suchen…" oninput="renderLeads()" style="flex:1">
     <select class="inp" id="ld-fs" style="width:160px" onchange="renderLeads()">
-      <option value="">Alle Status</option>
+      <option value="" data-t="leads_all_status">Alle Status</option>
       <option>Neu</option><option>Kontaktiert</option><option>Warm</option><option>Geantwortet</option><option>Kalt</option>
     </select>
   </div>
   <div class="pn"><div class="pn-b" style="padding:0">
     <table class="tbl">
-      <thead><tr><th>Firma + E-Mail</th><th>Ansprechpartner</th><th>Telefon</th><th>E-Mail Kontakt</th><th>Beschreibung</th><th>Status</th><th></th></tr></thead>
+      <thead><tr><th data-t="th_company">Firma + E-Mail</th><th data-t="th_contact">Ansprechpartner</th><th data-t="th_phone">Telefon</th><th data-t="th_email">E-Mail Kontakt</th><th data-t="th_desc">Beschreibung</th><th data-t="th_status">Status</th><th></th></tr></thead>
       <tbody id="ld-body"></tbody>
     </table>
   </div></div>
@@ -588,8 +588,8 @@ textarea.inp{resize:vertical;line-height:1.6}
 <!-- ═══ LOG ═══ -->
 <div id="pg-log" class="pg">
   <div class="ph">
-    <div><div class="ph-t">Aktivitätslog</div></div>
-    <button class="btn btn-sm btn-r" onclick="clearLog()">Log leeren</button>
+    <div><div class="ph-t" data-t="log_title">Aktivitätslog</div></div>
+    <button class="btn btn-sm btn-r" onclick="clearLog()" data-t="log_clear">Log leeren</button>
   </div>
   <div class="pn"><div class="pn-b" id="log-body" style="max-height:560px;overflow-y:auto;padding:0 16px"></div></div>
 </div>
@@ -597,16 +597,27 @@ textarea.inp{resize:vertical;line-height:1.6}
 <!-- ═══ CONFIG ═══ -->
 <div id="pg-config" class="pg">
   <div class="ph">
-    <div><div class="ph-t">Konfiguration</div><div class="ph-s">API-Keys, Absender-Profil, Webhook</div></div>
-    <button class="btn btn-g" onclick="saveConfig()">Speichern</button>
+    <div><div class="ph-t" data-t="config_title">Konfiguration</div><div class="ph-s" data-t="config_subtitle">API-Keys, Absender-Profil, Webhook</div></div>
+    <button class="btn btn-g" onclick="saveConfig()" data-t="save">Speichern</button>
+  </div>
+  <div class="pn">
+    <div class="pn-h"><span class="pn-ht" data-t="lang_title">Sprache / Language</span></div>
+    <div class="pn-b">
+      <div class="fg" style="margin-bottom:0">
+        <select class="inp" id="c-lang" onchange="switchLang(this.value)">
+          <option value="de">Deutsch</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+    </div>
   </div>
   <div id="cfg-alrt" style="display:none" class="alrt"></div>
   <div class="pn">
-    <div class="pn-h"><span class="pn-ht">KI-Anbieter</span><span id="p-claude" class="pill pill-off">● OFFLINE</span></div>
+    <div class="pn-h"><span class="pn-ht" data-t="ai_provider">KI-Anbieter</span><span id="p-claude" class="pill pill-off">● OFFLINE</span></div>
     <div class="pn-b">
       <div class="fr" style="margin-bottom:14px">
         <div class="fg" style="margin-bottom:0">
-          <label>Anbieter wählen</label>
+          <label data-t="choose_provider">Anbieter wählen</label>
           <select class="inp" id="c-provider" onchange="switchProvider(this.value)">
             <option value="claude">Anthropic Claude</option>
             <option value="openai">OpenAI (ChatGPT)</option>
@@ -614,7 +625,7 @@ textarea.inp{resize:vertical;line-height:1.6}
           </select>
         </div>
         <div class="fg" style="margin-bottom:0">
-          <label>Modell</label>
+          <label data-t="model">Modell</label>
           <select class="inp" id="c-model" style="max-width:360px">
             <option value="claude-sonnet-4-20250514">Claude Sonnet 4 (empfohlen)</option>
             <option value="claude-opus-4-20250514">Claude Opus 4</option>
@@ -627,7 +638,7 @@ textarea.inp{resize:vertical;line-height:1.6}
         <label>Claude API Key</label>
         <div style="display:flex;gap:10px">
           <input class="inp" id="c-key" type="password" placeholder="sk-ant-api03-…">
-          <button class="btn btn-sm" onclick="testClaude()">Testen</button>
+          <button class="btn btn-sm" onclick="testClaude()" data-t="test">Testen</button>
         </div>
         <div style="font-size:10px;color:var(--t3);margin-top:4px">console.anthropic.com → API Keys</div>
       </div>
@@ -636,7 +647,7 @@ textarea.inp{resize:vertical;line-height:1.6}
         <label>OpenAI API Key</label>
         <div style="display:flex;gap:10px">
           <input class="inp" id="c-openai-key" type="password" placeholder="sk-proj-…">
-          <button class="btn btn-sm" onclick="testOpenAI()">Testen</button>
+          <button class="btn btn-sm" onclick="testOpenAI()" data-t="test">Testen</button>
         </div>
         <div style="font-size:10px;color:var(--t3);margin-top:4px">platform.openai.com → API Keys</div>
       </div>
@@ -645,7 +656,7 @@ textarea.inp{resize:vertical;line-height:1.6}
         <label>Gemini API Key</label>
         <div style="display:flex;gap:10px">
           <input class="inp" id="c-gemini-key" type="password" placeholder="AIzaSy…">
-          <button class="btn btn-sm" onclick="testGemini()">Testen</button>
+          <button class="btn btn-sm" onclick="testGemini()" data-t="test">Testen</button>
         </div>
         <div style="font-size:10px;color:var(--t3);margin-top:4px">aistudio.google.com → Get API Key · Kostenlos</div>
       </div>
@@ -655,12 +666,12 @@ textarea.inp{resize:vertical;line-height:1.6}
     <div class="pn-h"><span class="pn-ht">Backend</span><span id="p-backend" class="pill pill-off">● OFFLINE</span></div>
     <div class="pn-b">
       <div class="fg" style="margin-bottom:0">
-        <label>Backend URL</label>
+        <label data-t="backend_url">Backend URL</label>
         <div style="display:flex;gap:10px">
           <input class="inp" id="c-backend" placeholder="http://localhost:3000 oder https://your-app.railway.app">
-          <button class="btn btn-sm" onclick="testBackend()">Testen</button>
+          <button class="btn btn-sm" onclick="testBackend()" data-t="test">Testen</button>
         </div>
-        <div style="font-size:10px;color:var(--t3);margin-top:5px">
+        <div style="font-size:10px;color:var(--t3);margin-top:5px" data-t="backend_hint">
           Leer lassen = lokaler Modus (Daten im Browser). Mit Backend-URL = Server-Modus (Daten in PostgreSQL).
         </div>
       </div>
@@ -668,54 +679,54 @@ textarea.inp{resize:vertical;line-height:1.6}
   </div>
 
   <div class="pn">
-    <div class="pn-h"><span class="pn-ht">Absender-Profil</span></div>
+    <div class="pn-h"><span class="pn-ht" data-t="sender_profile">Absender-Profil</span></div>
     <div class="pn-b">
       <div class="fr">
         <div class="fg"><label>Name</label><input class="inp" id="c-name" placeholder="Daria"></div>
-        <div class="fg"><label>Rolle</label><input class="inp" id="c-role" placeholder="Lead AI Architect"></div>
+        <div class="fg"><label data-t="role">Rolle</label><input class="inp" id="c-role" placeholder="Lead AI Architect"></div>
       </div>
       <div class="fr" style="margin-bottom:0">
-        <div class="fg" style="margin-bottom:0"><label>Unternehmen</label><input class="inp" id="c-co" placeholder="Meine GmbH"></div>
-        <div class="fg" style="margin-bottom:0"><label>Signatur</label><input class="inp" id="c-sig" placeholder="Beste Grüße, Daria"></div>
+        <div class="fg" style="margin-bottom:0"><label data-t="company">Unternehmen</label><input class="inp" id="c-co" placeholder="Meine GmbH"></div>
+        <div class="fg" style="margin-bottom:0"><label data-t="signature">Signatur</label><input class="inp" id="c-sig" placeholder="Beste Grüße, Daria"></div>
       </div>
     </div>
   </div>
   <div class="pn">
-    <div class="pn-h"><span class="pn-ht">Gmail / E-Mail</span><span id="p-gmail" class="pill pill-off">● OFFLINE</span></div>
+    <div class="pn-h"><span class="pn-ht" data-t="gmail_email">Gmail / E-Mail</span><span id="p-gmail" class="pill pill-off">● OFFLINE</span></div>
     <div class="pn-b">
       <div class="fr" style="margin-bottom:0">
-        <div class="fg" style="margin-bottom:0"><label>Absender-E-Mail</label><input class="inp" id="c-gfrom" placeholder="daria@firma.de" type="email"></div>
-        <div class="fg" style="margin-bottom:0"><label>Anzeigename</label><input class="inp" id="c-gname" placeholder="Daria, Lead AI Architect"></div>
+        <div class="fg" style="margin-bottom:0"><label data-t="sender_email">Absender-E-Mail</label><input class="inp" id="c-gfrom" placeholder="daria@firma.de" type="email"></div>
+        <div class="fg" style="margin-bottom:0"><label data-t="display_name">Anzeigename</label><input class="inp" id="c-gname" placeholder="Daria, Lead AI Architect"></div>
       </div>
     </div>
   </div>
   <div class="pn">
-    <div class="pn-h"><span class="pn-ht">Webhook / CRM</span><span id="p-wh" class="pill pill-off">● OFFLINE</span></div>
+    <div class="pn-h"><span class="pn-ht" data-t="webhook_crm">Webhook / CRM</span><span id="p-wh" class="pill pill-off">● OFFLINE</span></div>
     <div class="pn-b">
       <div class="fg" style="margin-bottom:0"><label>Webhook URL</label>
         <div style="display:flex;gap:10px">
           <input class="inp" id="c-wh" placeholder="https://hook.zapier.com/…">
-          <button class="btn btn-sm" onclick="testWH()">Testen</button>
+          <button class="btn btn-sm" onclick="testWH()" data-t="test">Testen</button>
         </div>
       </div>
     </div>
   </div>
   <div class="pn">
-    <div class="pn-h"><span class="pn-ht">Daten</span></div>
+    <div class="pn-h"><span class="pn-ht" data-t="data">Daten</span></div>
     <div class="pn-b" style="display:flex;gap:8px">
-      <button class="btn btn-sm" onclick="expJSON()">JSON Export</button>
-      <button class="btn btn-sm" onclick="impJSON()">JSON Import</button>
-      <button class="btn btn-sm btn-r" onclick="nukeAll()">Meine Daten löschen</button>
+      <button class="btn btn-sm" onclick="expJSON()" data-t="json_export">JSON Export</button>
+      <button class="btn btn-sm" onclick="impJSON()" data-t="json_import">JSON Import</button>
+      <button class="btn btn-sm btn-r" onclick="nukeAll()" data-t="delete_data">Meine Daten löschen</button>
     </div>
   </div>
   <div class="pn">
     <div class="pn-h">
-      <span class="pn-ht">Nutzer-Verwaltung</span>
+      <span class="pn-ht" data-t="user_mgmt">Nutzer-Verwaltung</span>
       <span id="p-admin" class="pill" style="display:none"></span>
     </div>
     <div class="pn-b">
       <div id="users-list" style="margin-bottom:10px"></div>
-      <div style="font-size:10px;color:var(--t3)">Neue Nutzer registrieren sich selbst über den Login-Screen. Als Admin kannst du alle Accounts sehen und löschen.</div>
+      <div style="font-size:10px;color:var(--t3)" data-t="user_mgmt_hint">Neue Nutzer registrieren sich selbst über den Login-Screen. Als Admin kannst du alle Accounts sehen und löschen.</div>
     </div>
   </div>
 </div>
@@ -724,23 +735,23 @@ textarea.inp{resize:vertical;line-height:1.6}
 <div id="pg-linkedin" class="pg">
   <div class="ph">
     <div>
-      <div class="ph-t">LinkedIn Prospecting</div>
-      <div class="ph-s">Ansprechpartner recherchieren · Profile öffnen · Kontaktdaten via Apollo.io / Hunter.io anreichern</div>
+      <div class="ph-t" data-t="linkedin_title">LinkedIn Prospecting</div>
+      <div class="ph-s" data-t="linkedin_subtitle">Ansprechpartner recherchieren · Profile öffnen · Kontaktdaten via Apollo.io / Hunter.io anreichern</div>
     </div>
     <div style="display:flex;gap:8px">
-      <button class="btn btn-sm btn-purple" id="li-enrich-btn" onclick="enrichAllLeads()">⚡ Alle anreichern</button>
-      <button class="btn btn-g" id="li-search-btn" onclick="runLinkedInSearch()">🔍 Suche starten</button>
+      <button class="btn btn-sm btn-purple" id="li-enrich-btn" onclick="enrichAllLeads()" data-t="linkedin_enrich_all">⚡ Alle anreichern</button>
+      <button class="btn btn-g" id="li-search-btn" onclick="runLinkedInSearch()" data-t="linkedin_search">🔍 Suche starten</button>
     </div>
   </div>
   <div id="li-alrt" style="display:none" class="alrt"></div>
 
   <!-- HOW IT WORKS BANNER -->
   <div style="background:rgba(75,143,255,.08);border:1px solid rgba(75,143,255,.2);border-radius:3px;padding:12px 16px;margin-bottom:14px;font-size:11px;color:var(--blue);line-height:1.7">
-    <strong style="color:var(--t1)">Wie es funktioniert:</strong>
-    &nbsp;① Agent generiert optimierte LinkedIn-Suchanfragen für deine Leads
+    <strong style="color:var(--t1)" data-t="linkedin_howto">Wie es funktioniert:</strong>
+    <span data-t="linkedin_howto_text">&nbsp;① Agent generiert optimierte LinkedIn-Suchanfragen für deine Leads
     &nbsp;·&nbsp;② Suchanfragen öffnen sich direkt in LinkedIn Sales Navigator / LinkedIn Search
     &nbsp;·&nbsp;③ Apollo.io API findet E-Mail + Telefon automatisch
-    &nbsp;·&nbsp;④ Gefundene Kontakte werden direkt in die Lead-DB gespeichert
+    &nbsp;·&nbsp;④ Gefundene Kontakte werden direkt in die Lead-DB gespeichert</span>
   </div>
 
   <div style="display:grid;grid-template-columns:340px 1fr;gap:16px">
@@ -748,18 +759,18 @@ textarea.inp{resize:vertical;line-height:1.6}
     <div>
       <!-- SEARCH CONFIG -->
       <div class="pn">
-        <div class="pn-h"><span class="pn-ht">① LinkedIn-Suche konfigurieren</span></div>
+        <div class="pn-h"><span class="pn-ht" data-t="linkedin_step1">① LinkedIn-Suche konfigurieren</span></div>
         <div class="pn-b">
           <div class="fg">
-            <label>Zielgruppe / Jobtitel</label>
+            <label data-t="linkedin_jobtitle">Zielgruppe / Jobtitel</label>
             <input class="inp" id="li-jobtitle" placeholder="z.B. CIO, IT-Leiter, Head of Compliance, CTO">
           </div>
           <div class="fg">
-            <label>Branche / Keywords</label>
+            <label data-t="linkedin_keywords">Branche / Keywords</label>
             <input class="inp" id="li-keywords" placeholder="z.B. Bankensektor, Sparkasse, Volksbank, RegTech">
           </div>
           <div class="fg">
-            <label>Region</label>
+            <label data-t="linkedin_region">Region</label>
             <select class="inp" id="li-region">
               <option value="Deutschland">Deutschland</option>
               <option value="DACH">DACH (DE/AT/CH)</option>
@@ -772,11 +783,11 @@ textarea.inp{resize:vertical;line-height:1.6}
             </select>
           </div>
           <div class="fg" style="margin-bottom:0">
-            <label>Suchmodus</label>
+            <label data-t="linkedin_mode">Suchmodus</label>
             <select class="inp" id="li-mode">
-              <option value="people">People Search (nach Person)</option>
-              <option value="company">Company Search (nach Firma)</option>
-              <option value="both">Beides</option>
+              <option value="people" data-t="linkedin_mode_people">People Search (nach Person)</option>
+              <option value="company" data-t="linkedin_mode_company">Company Search (nach Firma)</option>
+              <option value="both" data-t="linkedin_mode_both">Beides</option>
             </select>
           </div>
         </div>
@@ -785,7 +796,7 @@ textarea.inp{resize:vertical;line-height:1.6}
       <!-- APIS -->
       <div class="pn">
         <div class="pn-h">
-          <span class="pn-ht">② Daten-Anreicherung</span>
+          <span class="pn-ht" data-t="linkedin_step2">② Daten-Anreicherung</span>
           <span id="li-api-status" class="pill pill-off">KEIN API</span>
         </div>
         <div class="pn-b">
@@ -810,12 +821,12 @@ textarea.inp{resize:vertical;line-height:1.6}
 
       <!-- STATS -->
       <div class="pn">
-        <div class="pn-h"><span class="pn-ht">Statistik</span></div>
+        <div class="pn-h"><span class="pn-ht" data-t="stats">Statistik</span></div>
         <div class="pn-b" style="padding:10px 16px">
-          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)">Profile gefunden</span><span id="li-st-found" style="color:var(--t1);font-weight:700">0</span></div>
-          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)">E-Mails angereichert</span><span id="li-st-email" style="color:var(--green);font-weight:700">0</span></div>
-          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)">Telefon gefunden</span><span id="li-st-phone" style="color:var(--green);font-weight:700">0</span></div>
-          <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--t3)">Gespeichert in Leads</span><span id="li-st-saved" style="color:var(--blue);font-weight:700">0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)" data-t="stat_profiles_found">Profile gefunden</span><span id="li-st-found" style="color:var(--t1);font-weight:700">0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)" data-t="stat_emails_enriched">E-Mails angereichert</span><span id="li-st-email" style="color:var(--green);font-weight:700">0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)" data-t="stat_phone_found">Telefon gefunden</span><span id="li-st-phone" style="color:var(--green);font-weight:700">0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--t3)" data-t="stat_saved_leads">Gespeichert in Leads</span><span id="li-st-saved" style="color:var(--blue);font-weight:700">0</span></div>
         </div>
       </div>
     </div>
@@ -825,8 +836,8 @@ textarea.inp{resize:vertical;line-height:1.6}
       <!-- GENERATED SEARCH URLS -->
       <div class="pn" id="li-url-panel" style="display:none">
         <div class="pn-h">
-          <span class="pn-ht">③ Generierte LinkedIn-Suchen</span>
-          <button class="btn btn-sm" onclick="openAllLinkedIn()">Alle öffnen ↗</button>
+          <span class="pn-ht" data-t="linkedin_step3">③ Generierte LinkedIn-Suchen</span>
+          <button class="btn btn-sm" onclick="openAllLinkedIn()" data-t="linkedin_open_all">Alle öffnen ↗</button>
         </div>
         <div class="pn-b" id="li-url-list" style="max-height:200px;overflow-y:auto"></div>
       </div>
@@ -970,8 +981,248 @@ let leads   = [];
 let pending = [];
 let inbox   = [];
 let logs    = [];
-let cfg = { provider:'claude', claudeKey:'', openaiKey:'', geminiKey:'', model:'claude-sonnet-4-20250514', name:'Daria', role:'Lead AI Architect', co:'', sig:'Beste Grüße', gFrom:'', gName:'', whUrl:'', apolloKey:'', hunterKey:'', backendUrl:'https://darya-production.up.railway.app' };
+let cfg = { provider:'claude', claudeKey:'', openaiKey:'', geminiKey:'', model:'claude-sonnet-4-20250514', name:'Daria', role:'Lead AI Architect', co:'', sig:'Beste Grüße', gFrom:'', gName:'', whUrl:'', apolloKey:'', hunterKey:'', backendUrl:'https://darya-production.up.railway.app', lang:'de' };
 let agentOn = false, abort = false;
+
+// ─── I18N ────────────────────────────────────────────────────────────────────
+const I18N = {
+  de: {
+    // Login
+    email: 'E-Mail', password: 'Passwort', login: 'Einloggen',
+    create_account: 'Neuen Account erstellen →', name: 'Name',
+    password_min8: 'Passwort (min. 8 Zeichen)', password_repeat: 'Passwort wiederholen',
+    register: 'Account erstellen', back_to_login: '← Zurück zum Login',
+    // Top
+    subtitle: 'Autonomer B2B Sales-Agent · Bankensektor Deutschland',
+    // Nav
+    nav_agent_sec: 'Agent', nav_agent: 'Agent & Suche', nav_linkedin: 'LinkedIn Prospecting',
+    nav_emails_sec: 'E-Mails', nav_emailgen: 'E-Mails generieren', nav_approve: 'Freigabe',
+    nav_inbox: 'Inbox / Antworten', nav_data_sec: 'Daten', nav_leads: 'Lead-Datenbank',
+    nav_log: 'Aktivitätslog', nav_system_sec: 'System', nav_config: 'Konfiguration',
+    nav_team: 'Team & Benutzer',
+    // Agent
+    agent_title: 'Agent & Firmensuche',
+    agent_subtitle: 'Agent recherchiert Firmen und speichert sie als Leads — E-Mails werden separat generiert',
+    agent_stop: '⬛ Stopp', agent_start: '▶ Agent starten',
+    agent_search_prompt: 'Suchauftrag / Prompt', agent_search_label: 'Was soll der Agent suchen?',
+    agent_lead_count: 'Anzahl neue Leads',
+    agent_5leads: '5 Leads', agent_8leads: '8 Leads', agent_10leads: '10 Leads', agent_15leads: '15 Leads',
+    agent_after_search: 'Nach Suche', agent_save_only: 'Nur Leads speichern',
+    agent_goto_emails: 'Direkt zu E-Mails generieren',
+    agent_steps: 'Schritte', agent_step1: 'Firmen recherchieren', agent_step2: 'Leads speichern',
+    agent_step3: 'Fertig', agent_waiting: 'Wartet…',
+    stats: 'Statistik', stat_total_leads: 'Leads gesamt', stat_pending: 'Pending Freigaben',
+    stat_approved_emails: 'E-Mails genehmigt', stat_replies: 'Antworten',
+    terminal: 'Terminal', clear: 'Leeren',
+    terminal_ready: '// LeadOS Agent bereit. Starte die Firmensuche oben.',
+    // Email gen
+    emailgen_title: 'E-Mails generieren',
+    emailgen_subtitle: 'Dein Produkt-Prompt → Kategorie wählen → Leads auswählen → KI generiert personalisierte E-Mails',
+    emailgen_run: '⚡ E-Mails generieren',
+    eg_step1: '① Profil deines Unternehmens',
+    eg_step1_hint: 'Wird bei jeder E-Mail-Generierung verwendet — einmal ausfüllen, immer nutzen',
+    eg_product_name: 'Produktname / Angebotsbezeichnung',
+    eg_target: 'Zielgruppe / Ansprechpartner',
+    eg_what: 'Was wir machen (2-3 Sätze)', eg_problems: 'Welche Probleme lösen wir?',
+    eg_usp: 'USP — Was macht uns einzigartig?', eg_roi: 'ROI / konkrete Kennzahlen',
+    eg_pricing: 'Preise / Pakete (optional)', eg_refs: 'Referenzen / Kunden-Beispiele',
+    eg_context: 'Zusätzlicher Kontext (optional) — Besonderheiten, aktuelle Aktionen, Sprache',
+    eg_preview_label: 'Vorschau — was Claude sieht:',
+    eg_save_profile: '💾 Profil speichern', eg_load_profile: '📂 Gespeichertes laden',
+    eg_preview: '👁 Vorschau',
+    eg_step2: '② E-Mail-Kategorie wählen', eg_step2_hint: 'Bestimmt Stil, Ton und Ziel der E-Mail',
+    eg_tone: 'Tonalität',
+    tone_professional: 'Professionell & direkt', tone_casual: 'Locker & persönlich',
+    tone_formal: 'Formell (Sie-Form)', tone_curious: 'Neugierig & fragend',
+    eg_length: 'E-Mail-Länge',
+    len_short: 'Kurz (3–4 Sätze)', len_medium: 'Mittel (5–6 Sätze)', len_long: 'Ausführlich (7–9 Sätze)',
+    eg_cta: 'Call-to-Action',
+    cta_call: '15-Min Discovery Call', cta_demo: 'Kurze Demo', cta_info: 'Infomaterial senden',
+    cta_roi: 'ROI-Analyse anbieten', cta_pilot: 'Pilot-Projekt vorschlagen',
+    eg_extra: 'Zusätzliche Anweisungen (optional)',
+    eg_step3: '③ Leads auswählen',
+    eg_all_new: 'Alle Neu', eg_all_cold: 'Alle Kalt', eg_all: 'Alle', eg_none: 'Keine',
+    eg_step4: '④ Freigabe-Modus', eg_mode: 'Modus',
+    mode_review: 'Ich prüfe jede E-Mail vor dem Senden',
+    mode_auto: 'Auto-Approve — sofort senden (simuliert)',
+    eg_test_email: 'Test-E-Mail (optional)', eg_test_preview: 'Test-E-Mail Vorschau',
+    eg_subject: 'Betreff:', eg_generating: 'Generierung läuft',
+    // Approve
+    approve_title: 'Freigabe',
+    approve_subtitle: 'Alle generierten E-Mails prüfen · bearbeiten · freigeben zum Versand',
+    all: 'Alle', pending: 'Ausstehend', sent: 'Gesendet', rejected: 'Abgelehnt',
+    cards: '☰ Karten', table: '⊞ Tabelle',
+    approve_all: '✓ Alle freigeben', reject_all: '✕ Alle ablehnen',
+    total: 'Gesamt', stat_pending_label: 'Ausstehend', approved: 'Freigegeben',
+    stat_rejected_label: 'Abgelehnt',
+    no_emails_yet: 'Noch keine E-Mails generiert.',
+    go_to_emailgen: 'Gehe zu "E-Mails generieren" um Kampagnen zu starten.',
+    // Inbox
+    inbox_title: 'Inbox / Antworten', inbox_subtitle: 'Agent antwortet kontextbasiert — immer mit Produkt-Kontext',
+    inbox_simulate: '+ Antwort simulieren', inbox_empty: 'Keine Antworten.',
+    // Leads
+    leads_title: 'Lead-Datenbank', leads_csv: '↓ CSV', leads_json: '↓ JSON',
+    leads_import: '↑ Import', leads_clear: 'DB leeren', leads_all_status: 'Alle Status',
+    th_company: 'Firma + E-Mail', th_contact: 'Ansprechpartner', th_phone: 'Telefon',
+    th_email: 'E-Mail Kontakt', th_desc: 'Beschreibung', th_status: 'Status',
+    // Log
+    log_title: 'Aktivitätslog', log_clear: 'Log leeren',
+    // Config
+    config_title: 'Konfiguration', config_subtitle: 'API-Keys, Absender-Profil, Webhook',
+    save: 'Speichern', ai_provider: 'KI-Anbieter', choose_provider: 'Anbieter wählen',
+    model: 'Modell', test: 'Testen', backend_url: 'Backend URL',
+    backend_hint: 'Leer lassen = lokaler Modus (Daten im Browser). Mit Backend-URL = Server-Modus (Daten in PostgreSQL).',
+    sender_profile: 'Absender-Profil', role: 'Rolle', company: 'Unternehmen', signature: 'Signatur',
+    gmail_email: 'Gmail / E-Mail', sender_email: 'Absender-E-Mail', display_name: 'Anzeigename',
+    webhook_crm: 'Webhook / CRM', data: 'Daten',
+    json_export: 'JSON Export', json_import: 'JSON Import', delete_data: 'Meine Daten löschen',
+    user_mgmt: 'Nutzer-Verwaltung',
+    user_mgmt_hint: 'Neue Nutzer registrieren sich selbst über den Login-Screen. Als Admin kannst du alle Accounts sehen und löschen.',
+    lang_title: 'Sprache / Language',
+    // LinkedIn
+    linkedin_title: 'LinkedIn Prospecting',
+    linkedin_subtitle: 'Ansprechpartner recherchieren · Profile öffnen · Kontaktdaten via Apollo.io / Hunter.io anreichern',
+    linkedin_enrich_all: '⚡ Alle anreichern', linkedin_search: '🔍 Suche starten',
+    linkedin_howto: 'Wie es funktioniert:',
+    linkedin_howto_text: '① Agent generiert optimierte LinkedIn-Suchanfragen für deine Leads ·② Suchanfragen öffnen sich direkt in LinkedIn Sales Navigator / LinkedIn Search ·③ Apollo.io API findet E-Mail + Telefon automatisch ·④ Gefundene Kontakte werden direkt in die Lead-DB gespeichert',
+    linkedin_step1: '① LinkedIn-Suche konfigurieren',
+    linkedin_jobtitle: 'Zielgruppe / Jobtitel', linkedin_keywords: 'Branche / Keywords',
+    linkedin_region: 'Region', linkedin_mode: 'Suchmodus',
+    linkedin_mode_people: 'People Search (nach Person)', linkedin_mode_company: 'Company Search (nach Firma)',
+    linkedin_mode_both: 'Beides',
+    linkedin_step2: '② Daten-Anreicherung',
+    stat_profiles_found: 'Profile gefunden', stat_emails_enriched: 'E-Mails angereichert',
+    stat_phone_found: 'Telefon gefunden', stat_saved_leads: 'Gespeichert in Leads',
+    linkedin_step3: '③ Generierte LinkedIn-Suchen', linkedin_open_all: 'Alle öffnen ↗',
+  },
+  en: {
+    // Login
+    email: 'Email', password: 'Password', login: 'Log in',
+    create_account: 'Create new account →', name: 'Name',
+    password_min8: 'Password (min. 8 characters)', password_repeat: 'Repeat password',
+    register: 'Create account', back_to_login: '← Back to login',
+    // Top
+    subtitle: 'Autonomous B2B Sales Agent · Banking Sector Germany',
+    // Nav
+    nav_agent_sec: 'Agent', nav_agent: 'Agent & Search', nav_linkedin: 'LinkedIn Prospecting',
+    nav_emails_sec: 'Emails', nav_emailgen: 'Generate Emails', nav_approve: 'Approval',
+    nav_inbox: 'Inbox / Replies', nav_data_sec: 'Data', nav_leads: 'Lead Database',
+    nav_log: 'Activity Log', nav_system_sec: 'System', nav_config: 'Configuration',
+    nav_team: 'Team & Users',
+    // Agent
+    agent_title: 'Agent & Company Search',
+    agent_subtitle: 'Agent researches companies and saves them as leads — emails are generated separately',
+    agent_stop: '⬛ Stop', agent_start: '▶ Start Agent',
+    agent_search_prompt: 'Search Query / Prompt', agent_search_label: 'What should the agent search for?',
+    agent_lead_count: 'Number of new leads',
+    agent_5leads: '5 Leads', agent_8leads: '8 Leads', agent_10leads: '10 Leads', agent_15leads: '15 Leads',
+    agent_after_search: 'After Search', agent_save_only: 'Save leads only',
+    agent_goto_emails: 'Go to email generation',
+    agent_steps: 'Steps', agent_step1: 'Research companies', agent_step2: 'Save leads',
+    agent_step3: 'Done', agent_waiting: 'Waiting…',
+    stats: 'Statistics', stat_total_leads: 'Total leads', stat_pending: 'Pending approvals',
+    stat_approved_emails: 'Emails approved', stat_replies: 'Replies',
+    terminal: 'Terminal', clear: 'Clear',
+    terminal_ready: '// LeadOS Agent ready. Start company search above.',
+    // Email gen
+    emailgen_title: 'Generate Emails',
+    emailgen_subtitle: 'Your product prompt → Choose category → Select leads → AI generates personalized emails',
+    emailgen_run: '⚡ Generate Emails',
+    eg_step1: '① Your Company Profile',
+    eg_step1_hint: 'Used for every email generation — fill in once, use always',
+    eg_product_name: 'Product Name / Offer Description',
+    eg_target: 'Target Audience / Contact Person',
+    eg_what: 'What we do (2-3 sentences)', eg_problems: 'What problems do we solve?',
+    eg_usp: 'USP — What makes us unique?', eg_roi: 'ROI / Key Metrics',
+    eg_pricing: 'Pricing / Packages (optional)', eg_refs: 'References / Customer Examples',
+    eg_context: 'Additional context (optional) — Specifics, current promotions, language',
+    eg_preview_label: 'Preview — what Claude sees:',
+    eg_save_profile: '💾 Save Profile', eg_load_profile: '📂 Load Saved',
+    eg_preview: '👁 Preview',
+    eg_step2: '② Choose Email Category', eg_step2_hint: 'Determines style, tone and goal of the email',
+    eg_tone: 'Tone',
+    tone_professional: 'Professional & direct', tone_casual: 'Casual & personal',
+    tone_formal: 'Formal', tone_curious: 'Curious & questioning',
+    eg_length: 'Email Length',
+    len_short: 'Short (3–4 sentences)', len_medium: 'Medium (5–6 sentences)', len_long: 'Detailed (7–9 sentences)',
+    eg_cta: 'Call-to-Action',
+    cta_call: '15-Min Discovery Call', cta_demo: 'Short Demo', cta_info: 'Send Info Material',
+    cta_roi: 'Offer ROI Analysis', cta_pilot: 'Propose Pilot Project',
+    eg_extra: 'Additional instructions (optional)',
+    eg_step3: '③ Select Leads',
+    eg_all_new: 'All New', eg_all_cold: 'All Cold', eg_all: 'All', eg_none: 'None',
+    eg_step4: '④ Approval Mode', eg_mode: 'Mode',
+    mode_review: 'I review each email before sending',
+    mode_auto: 'Auto-Approve — send immediately (simulated)',
+    eg_test_email: 'Test Email (optional)', eg_test_preview: 'Test Email Preview',
+    eg_subject: 'Subject:', eg_generating: 'Generation in progress',
+    // Approve
+    approve_title: 'Approval',
+    approve_subtitle: 'Review · edit · approve all generated emails for sending',
+    all: 'All', pending: 'Pending', sent: 'Sent', rejected: 'Rejected',
+    cards: '☰ Cards', table: '⊞ Table',
+    approve_all: '✓ Approve All', reject_all: '✕ Reject All',
+    total: 'Total', stat_pending_label: 'Pending', approved: 'Approved',
+    stat_rejected_label: 'Rejected',
+    no_emails_yet: 'No emails generated yet.',
+    go_to_emailgen: 'Go to "Generate Emails" to start campaigns.',
+    // Inbox
+    inbox_title: 'Inbox / Replies', inbox_subtitle: 'Agent replies context-based — always with product context',
+    inbox_simulate: '+ Simulate Reply', inbox_empty: 'No replies.',
+    // Leads
+    leads_title: 'Lead Database', leads_csv: '↓ CSV', leads_json: '↓ JSON',
+    leads_import: '↑ Import', leads_clear: 'Clear DB', leads_all_status: 'All Status',
+    th_company: 'Company + Email', th_contact: 'Contact Person', th_phone: 'Phone',
+    th_email: 'Email Contact', th_desc: 'Description', th_status: 'Status',
+    // Log
+    log_title: 'Activity Log', log_clear: 'Clear Log',
+    // Config
+    config_title: 'Configuration', config_subtitle: 'API Keys, Sender Profile, Webhook',
+    save: 'Save', ai_provider: 'AI Provider', choose_provider: 'Choose Provider',
+    model: 'Model', test: 'Test', backend_url: 'Backend URL',
+    backend_hint: 'Leave empty = local mode (data in browser). With backend URL = server mode (data in PostgreSQL).',
+    sender_profile: 'Sender Profile', role: 'Role', company: 'Company', signature: 'Signature',
+    gmail_email: 'Gmail / Email', sender_email: 'Sender Email', display_name: 'Display Name',
+    webhook_crm: 'Webhook / CRM', data: 'Data',
+    json_export: 'JSON Export', json_import: 'JSON Import', delete_data: 'Delete my data',
+    user_mgmt: 'User Management',
+    user_mgmt_hint: 'New users register themselves via the login screen. As admin you can see and delete all accounts.',
+    lang_title: 'Language',
+    // LinkedIn
+    linkedin_title: 'LinkedIn Prospecting',
+    linkedin_subtitle: 'Research contacts · Open profiles · Enrich contact data via Apollo.io / Hunter.io',
+    linkedin_enrich_all: '⚡ Enrich All', linkedin_search: '🔍 Start Search',
+    linkedin_howto: 'How it works:',
+    linkedin_howto_text: '① Agent generates optimized LinkedIn search queries for your leads ·② Queries open directly in LinkedIn Sales Navigator / LinkedIn Search ·③ Apollo.io API finds email + phone automatically ·④ Found contacts are saved directly to the lead DB',
+    linkedin_step1: '① Configure LinkedIn Search',
+    linkedin_jobtitle: 'Target Audience / Job Title', linkedin_keywords: 'Industry / Keywords',
+    linkedin_region: 'Region', linkedin_mode: 'Search Mode',
+    linkedin_mode_people: 'People Search (by person)', linkedin_mode_company: 'Company Search (by company)',
+    linkedin_mode_both: 'Both',
+    linkedin_step2: '② Data Enrichment',
+    stat_profiles_found: 'Profiles found', stat_emails_enriched: 'Emails enriched',
+    stat_phone_found: 'Phone found', stat_saved_leads: 'Saved to leads',
+    linkedin_step3: '③ Generated LinkedIn Searches', linkedin_open_all: 'Open all ↗',
+  }
+};
+
+const t = (key) => (I18N[cfg.lang || 'de'] || I18N.de)[key] || (I18N.de)[key] || key;
+
+const applyLang = () => {
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const key = el.getAttribute('data-t');
+    const val = t(key);
+    if (el.tagName === 'OPTION') el.textContent = val;
+    else if (el.tagName === 'INPUT' && el.type !== 'hidden') { /* skip inputs */ }
+    else el.textContent = val;
+  });
+};
+
+const switchLang = (lang) => {
+  cfg.lang = lang;
+  save();
+  applyLang();
+};
 
 // Email gen state
 let selectedCat = null;
@@ -2337,6 +2588,7 @@ const applyCfg = () => {
   if(cfg.apolloKey){$('li-apollo').value=cfg.apolloKey;setPill('li-api-status',true);$('li-api-status').textContent='● APOLLO ONLINE';}
   if(cfg.hunterKey&&!cfg.apolloKey){$('li-hunter').value=cfg.hunterKey;setPill('li-api-status',true);$('li-api-status').textContent='● HUNTER ONLINE';}
   if(cfg.hunterKey) $('li-hunter').value=cfg.hunterKey;
+  if(cfg.lang){$('c-lang').value=cfg.lang;}
   // load saved product prompt
   const raw = localStorage.getItem('los3_product');
   if(raw) { try { const d=JSON.parse(raw); if(d.saved) $('eg-saved-info').textContent='Zuletzt gespeichert: '+d.saved; } catch(e){} }
@@ -2351,6 +2603,7 @@ const saveConfig = async () => {
   if(V('li-apollo')) cfg.apolloKey=V('li-apollo');
   if(V('li-hunter')) cfg.hunterKey=V('li-hunter');
   if(V('c-backend')) cfg.backendUrl=V('c-backend').replace(/\/$/,'');
+  cfg.lang=V('c-lang')||'de';
   save();
   await apiSave('/api/settings', 'PUT', { cfg });
   if(cfg.claudeKey){setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● API';}
@@ -3373,6 +3626,7 @@ const changeOwnPassword = async () => {
   await load(); migrateLegacyLeads(); applyCfg(); ui();
   renderLeads(); renderApprove(); renderInbox(); renderLog();
   renderCatGrid(); renderLeadPicker(); renderLinkedInEnrichList();
+  applyLang();
   setInterval(tick,1000); tick();
 
   // Inbox polling (backend mode)

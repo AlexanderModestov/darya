@@ -41,18 +41,6 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', version: '2.0' });
 });
 
-// TEMPORARY: password reset — REMOVE AFTER USE
-import bcrypt from 'bcrypt';
-import { query as dbQuery } from './services/db.js';
-app.post('/api/reset-pw', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const hash = await bcrypt.hash(password, 12);
-    const { rowCount } = await dbQuery('UPDATE users SET password_hash = $1 WHERE email = $2', [hash, email.toLowerCase().trim()]);
-    res.json({ updated: rowCount });
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
 app.use('/api/auth', authRoutes);
 
 app.use('/api/leads', authMiddleware, leadsRoutes);
