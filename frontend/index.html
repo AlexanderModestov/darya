@@ -194,8 +194,8 @@ textarea.inp{resize:vertical;line-height:1.6}
   <div class="brand">LeadOS <em>AGENT</em></div>
   <div style="font-size:11px;color:var(--t3)" data-t="subtitle">Autonomer B2B Sales-Agent · Bankensektor Deutschland</div>
   <div class="top-right">
-    <div class="user-pill"><div class="user-avatar" id="user-avatar">?</div><span id="user-name-lbl" style="font-size:11px;color:var(--t2)"></span><button class="tbtn" onclick="doLogout()" style="font-size:10px;color:var(--t3);margin-left:4px" title="Ausloggen">⏻</button></div>
-    <span id="pill-agent" class="pill pill-off">● AGENT OFFLINE</span>
+    <div class="user-pill"><div class="user-avatar" id="user-avatar">?</div><span id="user-name-lbl" style="font-size:11px;color:var(--t2)"></span><button class="tbtn" id="btn-logout" onclick="doLogout()" style="font-size:10px;color:var(--t3);margin-left:4px" title="Ausloggen">⏻</button></div>
+    <span id="pill-agent" class="pill pill-off" data-t="agent_offline">● AGENT OFFLINE</span>
     <span id="pill-api" class="pill pill-off">● API</span>
     <span id="clk" style="font-size:11px;color:var(--t3)"></span>
   </div>
@@ -575,7 +575,7 @@ textarea.inp{resize:vertical;line-height:1.6}
     <input class="inp" id="ld-q" placeholder="Suchen…" data-tp="ph_search" oninput="renderLeads()" style="flex:1">
     <select class="inp" id="ld-fs" style="width:160px" onchange="renderLeads()">
       <option value="" data-t="leads_all_status">Alle Status</option>
-      <option>Neu</option><option>Kontaktiert</option><option>Warm</option><option>Geantwortet</option><option>Kalt</option>
+      <option value="Neu" data-t="status_neu">Neu</option><option value="Kontaktiert" data-t="status_kontaktiert">Kontaktiert</option><option value="Warm" data-t="status_warm">Warm</option><option value="Geantwortet" data-t="status_geantwortet">Geantwortet</option><option value="Kalt" data-t="status_kalt">Kalt</option>
     </select>
   </div>
   <div class="pn"><div class="pn-b" style="padding:0">
@@ -885,15 +885,15 @@ textarea.inp{resize:vertical;line-height:1.6}
   <div class="ph">
     <div>
       <div class="ph-t">Team &amp; Benutzer</div>
-      <div class="ph-s">Zugänge verwalten · nur für Admins sichtbar</div>
+      <div class="ph-s" data-t="team_subtitle">Zugänge verwalten · nur für Admins sichtbar</div>
     </div>
-    <button class="btn btn-g btn-sm" onclick="showAddUser()">+ Benutzer einladen</button>
+    <button class="btn btn-g btn-sm" onclick="showAddUser()" data-t="team_invite">+ Benutzer einladen</button>
   </div>
   <div id="team-alrt" style="display:none" class="alrt"></div>
 
   <!-- ADD USER FORM -->
   <div id="add-user-panel" class="pn" style="display:none">
-    <div class="pn-h"><span class="pn-ht">Neuen Benutzer anlegen</span></div>
+    <div class="pn-h"><span class="pn-ht" data-t="team_add_title">Neuen Benutzer anlegen</span></div>
     <div class="pn-b">
       <div class="fr" style="margin-bottom:12px">
         <div class="fg" style="margin-bottom:0">
@@ -913,14 +913,14 @@ textarea.inp{resize:vertical;line-height:1.6}
         <div class="fg" style="margin-bottom:0">
           <label>Rolle</label>
           <select class="inp" id="nu-role">
-            <option value="user">Mitarbeiter — kann Leads sehen und E-Mails generieren</option>
-            <option value="admin">Admin — kann Benutzer verwalten und alles konfigurieren</option>
+            <option value="user" data-t="team_role_user">Mitarbeiter — kann Leads sehen und E-Mails generieren</option>
+            <option value="admin" data-t="team_role_admin">Admin — kann Benutzer verwalten und alles konfigurieren</option>
           </select>
         </div>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="btn btn-g btn-sm" onclick="createUser()">Benutzer anlegen</button>
-        <button class="btn btn-sm" onclick="hideAddUser()">Abbrechen</button>
+        <button class="btn btn-g btn-sm" onclick="createUser()" data-t="team_create_btn">Benutzer anlegen</button>
+        <button class="btn btn-sm" onclick="hideAddUser()" data-t="team_cancel">Abbrechen</button>
       </div>
     </div>
   </div>
@@ -928,19 +928,19 @@ textarea.inp{resize:vertical;line-height:1.6}
   <!-- USER LIST -->
   <div class="pn">
     <div class="pn-h">
-      <span class="pn-ht">Alle Benutzer</span>
+      <span class="pn-ht" data-t="team_all_users">Alle Benutzer</span>
       <span id="team-count" style="font-size:11px;color:var(--t3)"></span>
     </div>
     <div class="pn-b" style="padding:0">
       <table class="tbl" style="width:100%">
         <thead>
           <tr>
-            <th>Benutzer</th>
-            <th>E-Mail</th>
-            <th style="width:120px">Rolle</th>
-            <th style="width:160px">Registriert</th>
-            <th style="width:160px">Letzter Login</th>
-            <th style="width:100px">Aktionen</th>
+            <th data-t="team_th_user">Benutzer</th>
+            <th data-t="team_th_email">E-Mail</th>
+            <th style="width:120px" data-t="team_th_role">Rolle</th>
+            <th style="width:160px" data-t="team_th_registered">Registriert</th>
+            <th style="width:160px" data-t="team_th_last_login">Letzter Login</th>
+            <th style="width:100px" data-t="team_th_actions">Aktionen</th>
           </tr>
         </thead>
         <tbody id="team-body"></tbody>
@@ -950,23 +950,23 @@ textarea.inp{resize:vertical;line-height:1.6}
 
   <!-- CHANGE PASSWORD (own account) -->
   <div class="pn">
-    <div class="pn-h"><span class="pn-ht">Eigenes Passwort ändern</span></div>
+    <div class="pn-h"><span class="pn-ht" data-t="team_change_pw">Eigenes Passwort ändern</span></div>
     <div class="pn-b">
       <div class="fr" style="margin-bottom:12px">
         <div class="fg" style="margin-bottom:0">
-          <label>Aktuelles Passwort</label>
+          <label data-t="team_current_pw">Aktuelles Passwort</label>
           <input class="inp" id="cp-old" type="password" placeholder="••••••••">
         </div>
         <div class="fg" style="margin-bottom:0">
-          <label>Neues Passwort (min. 8 Zeichen)</label>
+          <label data-t="team_new_pw">Neues Passwort (min. 8 Zeichen)</label>
           <input class="inp" id="cp-new" type="password" placeholder="••••••••">
         </div>
         <div class="fg" style="margin-bottom:0">
-          <label>Wiederholen</label>
+          <label data-t="team_repeat_pw">Wiederholen</label>
           <input class="inp" id="cp-new2" type="password" placeholder="••••••••">
         </div>
       </div>
-      <button class="btn btn-sm btn-ok" onclick="changeOwnPassword()">Passwort ändern</button>
+      <button class="btn btn-sm btn-ok" onclick="changeOwnPassword()" data-t="team_change_pw_btn">Passwort ändern</button>
     </div>
   </div>
 </div>
@@ -1188,6 +1188,48 @@ const I18N = {
     model_fast: '(schnell)',
     model_fast_cheap: '(schnell & günstig)',
     model_recommended_free: '(empfohlen · kostenlos)',
+    // Agent status
+    agent_online: '● AGENT AKTIV', agent_offline: '● AGENT OFFLINE',
+    agent_already_running: 'Agent läuft bereits.',
+    agent_saving_leads: 'Speichere Leads…', agent_stop_msg: 'Stopp…',
+    backend_not_connected_llm: 'Backend nicht verbunden – LLM-Proxy benötigt Backend.',
+    // Team page
+    team_subtitle: 'Zugänge verwalten · nur für Admins sichtbar',
+    team_add_title: 'Neuen Benutzer anlegen', team_invite: '+ Benutzer einladen',
+    team_role_user: 'Mitarbeiter — kann Leads sehen und E-Mails generieren',
+    team_role_admin: 'Admin — kann Benutzer verwalten und alles konfigurieren',
+    team_create_btn: 'Benutzer anlegen', team_cancel: 'Abbrechen',
+    team_all_users: 'Alle Benutzer',
+    team_th_user: 'Benutzer', team_th_email: 'E-Mail', team_th_role: 'Rolle',
+    team_th_registered: 'Registriert', team_th_last_login: 'Letzter Login', team_th_actions: 'Aktionen',
+    team_change_pw: 'Eigenes Passwort ändern', team_current_pw: 'Aktuelles Passwort',
+    team_new_pw: 'Neues Passwort (min. 8 Zeichen)', team_repeat_pw: 'Wiederholen',
+    team_change_pw_btn: 'Passwort ändern', team_admin_badge: '● ADMIN',
+    team_logged_in_as: 'Eingeloggt als', team_pw_change_err: 'Fehler beim Ändern.',
+    // Profile save/load
+    profile_saved_prefix: '✓ Gespeichert: ', profile_loaded_prefix: '✓ Geladen: ',
+    profile_last_saved: 'Zuletzt gespeichert: ',
+    log_profile_saved: 'Produkt-Profil gespeichert: ',
+    // LinkedIn
+    li_saved: 'Gespeichert', li_created: 'Erstellt',
+    log_lead_linkedin: 'Lead aus LinkedIn erstellt: ',
+    log_reply_sent: 'Antwort gesendet: ',
+    // Password
+    log_pw_changed: 'Eigenes Passwort geändert',
+    // Lead statuses (display)
+    status_neu: 'Neu', status_kontaktiert: 'Kontaktiert', status_warm: 'Warm',
+    status_geantwortet: 'Geantwortet', status_kalt: 'Kalt',
+    // Lead UI
+    no_leads_hint: 'Keine Leads. Erst Agent starten oder Leads manuell hinzufügen.',
+    leads_selected: 'ausgewählt',
+    no_contact: 'kein Ansprechpartner', no_phone: 'kein Telefon',
+    no_contacted_leads: 'Keine kontaktierten Leads. Erst E-Mails senden.',
+    lead_edit: 'Bearbeiten', lead_ai_fill: 'KI auto-ausfüllen', lead_delete: 'Löschen',
+    lead_add_desc: '+ Beschreibung', lead_click_edit: 'Klicken zum Bearbeiten',
+    missing: 'fehlt', lead_edit_contact: 'Kontakt bearbeiten',
+    lead_ai_fill_btn: '⚡ KI auto-ausfüllen',
+    leads_entries: 'Einträge', logout_title: 'Ausloggen', logout_confirm: 'Ausloggen?',
+    log_clear_confirm: 'Log leeren?', terminal_cleared: 'Terminal geleert.',
   },
   en: {
     // Login
@@ -1392,10 +1434,55 @@ const I18N = {
     model_fast: '(fast)',
     model_fast_cheap: '(fast & affordable)',
     model_recommended_free: '(recommended · free)',
+    // Agent status
+    agent_online: '● AGENT ACTIVE', agent_offline: '● AGENT OFFLINE',
+    agent_already_running: 'Agent is already running.',
+    agent_saving_leads: 'Saving leads…', agent_stop_msg: 'Stopping…',
+    backend_not_connected_llm: 'Backend not connected — LLM proxy requires backend.',
+    // Team page
+    team_subtitle: 'Manage access · admin only',
+    team_add_title: 'Create new user', team_invite: '+ Invite user',
+    team_role_user: 'Employee — can view leads and generate emails',
+    team_role_admin: 'Admin — can manage users and configure everything',
+    team_create_btn: 'Create user', team_cancel: 'Cancel',
+    team_all_users: 'All Users',
+    team_th_user: 'User', team_th_email: 'Email', team_th_role: 'Role',
+    team_th_registered: 'Registered', team_th_last_login: 'Last Login', team_th_actions: 'Actions',
+    team_change_pw: 'Change own password', team_current_pw: 'Current password',
+    team_new_pw: 'New password (min. 8 characters)', team_repeat_pw: 'Repeat',
+    team_change_pw_btn: 'Change password', team_admin_badge: '● ADMIN',
+    team_logged_in_as: 'Logged in as', team_pw_change_err: 'Error changing password.',
+    // Profile save/load
+    profile_saved_prefix: '✓ Saved: ', profile_loaded_prefix: '✓ Loaded: ',
+    profile_last_saved: 'Last saved: ',
+    log_profile_saved: 'Product profile saved: ',
+    // LinkedIn
+    li_saved: 'Saved', li_created: 'Created',
+    log_lead_linkedin: 'Lead created from LinkedIn: ',
+    log_reply_sent: 'Reply sent: ',
+    // Password
+    log_pw_changed: 'Own password changed',
+    // Lead statuses (display)
+    status_neu: 'New', status_kontaktiert: 'Contacted', status_warm: 'Warm',
+    status_geantwortet: 'Replied', status_kalt: 'Cold',
+    // Lead UI
+    no_leads_hint: 'No leads. Start agent or add leads manually.',
+    leads_selected: 'selected',
+    no_contact: 'no contact person', no_phone: 'no phone',
+    no_contacted_leads: 'No contacted leads. Send emails first.',
+    lead_edit: 'Edit', lead_ai_fill: 'AI auto-fill', lead_delete: 'Delete',
+    lead_add_desc: '+ Description', lead_click_edit: 'Click to edit',
+    missing: 'missing', lead_edit_contact: 'Edit contact',
+    lead_ai_fill_btn: '⚡ AI auto-fill',
+    leads_entries: 'entries', logout_title: 'Log out', logout_confirm: 'Log out?',
+    log_clear_confirm: 'Clear log?', terminal_cleared: 'Terminal cleared.',
   }
 };
 
 const t = (key) => (I18N[cfg.lang || 'de'] || I18N.de)[key] || (I18N.de)[key] || key;
+const loc = () => cfg.lang === 'en' ? 'en-US' : 'de-DE';
+const STATUS_MAP = {Neu:'status_neu', Kontaktiert:'status_kontaktiert', Warm:'status_warm', Geantwortet:'status_geantwortet', Kalt:'status_kalt'};
+const tStatus = (s) => t(STATUS_MAP[s] || s);
 
 const applyLang = () => {
   document.querySelectorAll('[data-t]').forEach(el => {
@@ -1410,6 +1497,7 @@ const applyLang = () => {
     const val = t(key);
     if (val !== key) el.placeholder = val;
   });
+  const lo = $('btn-logout'); if(lo) lo.title = t('logout_title');
 };
 
 const switchLang = (lang) => {
@@ -1608,19 +1696,19 @@ const renderLog = () => {
   const clr = {info:'var(--t2)',ok:'var(--green)',err:'var(--red)',warn:'var(--yellow)',agent:'var(--purple)'};
   $('log-body').innerHTML = logs.map(l => `
     <div style="display:flex;gap:12px;padding:6px 0;border-bottom:1px solid var(--s2)">
-      <span style="font-size:10px;color:var(--t3);white-space:nowrap">${new Date(l.time).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</span>
+      <span style="font-size:10px;color:var(--t3);white-space:nowrap">${new Date(l.time).toLocaleTimeString(loc(),{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</span>
       <span style="font-size:11px;color:${clr[l.t]||clr.info}">${esc(l.msg)}</span>
     </div>`).join('') || '<div style="font-size:12px;color:var(--t3);padding:12px 0">Leer</div>';
 };
-const clearLog = () => { if(confirm('Log leeren?')) { logs=[]; save(); renderLog(); } };
+const clearLog = () => { if(confirm(t('log_clear_confirm'))) { logs=[]; save(); renderLog(); } };
 
 const tlog = (msg, cls='ld') => {
   const t=$('term'), d=document.createElement('div');
   d.className='ln '+cls;
-  d.textContent='['+new Date().toLocaleTimeString('de-DE')+'] '+msg;
+  d.textContent='['+new Date().toLocaleTimeString(loc())+'] '+msg;
   t.appendChild(d); t.scrollTop=t.scrollHeight;
 };
-const clearTerm = () => { $('term').innerHTML='<div class="ln ld">// Terminal geleert.</div>'; };
+const clearTerm = () => { $('term').innerHTML='<div class="ln ld">// '+t('terminal_cleared')+'</div>'; };
 
 // ─── NAV ─────────────────────────────────────────────────────────────────────
 const PAGES = ['agent','linkedin','emailgen','approve','inbox','leads','log','config','team'];
@@ -1648,7 +1736,7 @@ const ui = () => {
   $('st-pen').textContent=pN;
   $('st-app').textContent=pending.filter(p=>p.status==='approved').length;
   $('st-rep').textContent=inbox.length;
-  $('ld-lbl').textContent=leads.length+' Einträge';
+  $('ld-lbl').textContent=leads.length+' '+t('leads_entries');
 };
 
 const step = (n, s) => { const e=$('s'+n); e.className='sn sn-'+s; e.textContent=s==='done'?'✓':n; };
@@ -1660,7 +1748,7 @@ const setPill = (id, on) => { const e=$(id); if(!e) return; e.className='pill '+
 // Universal LLM router — Claude / OpenAI / Gemini
 const claude = async (prompt, max=1200) => {
   if(AUTH_MODE === 'backend' && AUTH_API()) return await llmViaBackend(prompt, max);
-  throw new Error('Backend nicht verbunden – LLM-Proxy benötigt Backend.');
+  throw new Error(t('backend_not_connected_llm'));
 };
 
 const llmViaBackend = async (prompt, max) => {
@@ -1679,10 +1767,10 @@ const llmViaBackend = async (prompt, max) => {
 
 // ─── AGENT (FIRMENSUCHE) ─────────────────────────────────────────────────────
 const runAgent = async () => {
-  if(agentOn) { tlog('Agent läuft bereits.','ly'); return; }
+  if(agentOn) { tlog(t('agent_already_running'),'ly'); return; }
   agentOn=true; abort=false;
   $('btn-run').disabled=true; $('btn-stop').style.display='';
-  $('pill-agent').className='pill pill-on'; $('pill-agent').textContent='● AGENT AKTIV';
+  $('pill-agent').className='pill pill-on'; $('pill-agent').textContent=t('agent_online');
   resetSteps();
 
   const prompt = V('a-prompt');
@@ -1690,7 +1778,7 @@ const runAgent = async () => {
   const after  = V('a-after');
 
   if(AUTH_MODE !== 'backend' || !AUTH_API()) {
-    tlog('✗ Backend nicht verbunden! Bitte Backend-URL unter Konfiguration eintragen.','lr');
+    tlog('✗ ' + t('msg_no_backend'),'lr');
     endAgent(); return;
   }
   tlog('Firmensuche gestartet…','lg');
@@ -1736,11 +1824,11 @@ Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array (kein Text davor/danach)
     endAgent(); return;
   }
 
-  step(2,'act'); stepD(2,'Speichere Leads…');
+  step(2,'act'); stepD(2,t('agent_saving_leads'));
   const existing = new Set(leads.map(l=>l.name));
   const toAdd = newLeads.filter(l=>l.name&&!existing.has(l.name));
   for (const l of toAdd) {
-    l.id=uid(); l.status='Neu'; l.created=new Date().toLocaleDateString('de-DE');
+    l.id=uid(); l.status='Neu'; l.created=new Date().toLocaleDateString(loc());
     const saved = await apiSave('/api/leads', 'POST', l);
     if (saved) l.id = saved.id;
     leads.unshift(l);
@@ -1760,10 +1848,10 @@ Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array (kein Text davor/danach)
     setTimeout(() => { nav('emailgen'); renderLeadPicker(); }, 600);
   }
 };
-const stopAgent = () => { abort=true; tlog('Stopp…','ly'); };
+const stopAgent = () => { abort=true; tlog(t('agent_stop_msg'),'ly'); };
 const endAgent = () => {
   agentOn=false; $('btn-run').disabled=false; $('btn-stop').style.display='none';
-  $('pill-agent').className='pill pill-off'; $('pill-agent').textContent='● AGENT OFFLINE';
+  $('pill-agent').className='pill pill-off'; $('pill-agent').textContent=t('agent_offline');
   ui(); renderLeads();
 };
 
@@ -1809,16 +1897,16 @@ const saveProductPrompt = async () => {
     pricing:  V('eg-pricing'),
     refs:     V('eg-refs'),
     prompt:   V('eg-prompt'),
-    saved:    new Date().toLocaleString('de-DE')
+    saved:    new Date().toLocaleString(loc())
   };
   if(!data.name && !data.what && !data.prompt) {
     showAlert('eg-alrt',t('msg_fill_product'),'err'); return;
   }
   localStorage.setItem('los3_product', JSON.stringify(data));
   await apiSave('/api/settings', 'PUT', { product: data });
-  $('eg-saved-info').textContent = '✓ Gespeichert: ' + data.saved;
+  $('eg-saved-info').textContent = t('profile_saved_prefix') + data.saved;
   showAlert('eg-alrt',t('msg_profile_saved'),'ok');
-  addLog('Produkt-Profil gespeichert: ' + (data.name||data.what||'').substring(0,40), 'ok');
+  addLog(t('log_profile_saved') + (data.name||data.what||'').substring(0,40), 'ok');
 };
 
 const fillProductFields = (d) => {
@@ -1860,7 +1948,7 @@ const loadProductPrompt = async () => {
   }
 
   fillProductFields(d);
-  $('eg-saved-info').textContent = '✓ Geladen: ' + (d.saved||'');
+  $('eg-saved-info').textContent = t('profile_loaded_prefix') + (d.saved||'');
   showAlert('eg-alrt',t('msg_profile_loaded'),'ok');
 };
 
@@ -1893,7 +1981,7 @@ const buildProductContext = () => {
 const renderLeadPicker = () => {
   const q = V('eg-lead-search').toLowerCase();
   const filtered = leads.filter(l => !q || l.name.toLowerCase().includes(q) || (l.fokus||'').toLowerCase().includes(q) || (l.kontakt||'').toLowerCase().includes(q));
-  $('eg-lead-count-lbl').textContent = selectedLeadIds.size + ' ausgewählt';
+  $('eg-lead-count-lbl').textContent = selectedLeadIds.size + ' ' + t('leads_selected');
   $('lead-picker').innerHTML = filtered.map(l => `
     <label class="lead-checkbox">
       <input type="checkbox" ${selectedLeadIds.has(l.id)?'checked':''} onchange="toggleLead(${l.id},this.checked)">
@@ -1901,19 +1989,19 @@ const renderLeadPicker = () => {
         <span style="font-weight:700;color:var(--t1);font-size:12px">${esc(l.name)}</span>
         <span style="font-size:10px;color:var(--t3);margin-left:8px">${esc(l.branche||'')} · ${esc(l.ort||'')} · ${esc(l.ma||'?')} MA</span>
         <div style="display:flex;gap:12px;margin-top:2px">
-          ${(l.vorname||l.nachname)?`<span style="font-size:10px;color:var(--t1)">👤 ${esc(l.vorname||'')} ${esc(l.nachname||'')}${l.rolle?', '+esc(l.rolle):''}</span>`:'<span style="font-size:10px;color:var(--red)">⚠ kein Ansprechpartner</span>'}
-          ${l.telefon?`<span style="font-size:10px;color:var(--green)">📞 ${esc(l.telefon)}</span>`:'<span style="font-size:10px;color:var(--t3)">kein Telefon</span>'}
+          ${(l.vorname||l.nachname)?`<span style="font-size:10px;color:var(--t1)">👤 ${esc(l.vorname||'')} ${esc(l.nachname||'')}${l.rolle?', '+esc(l.rolle):''}</span>`:'<span style="font-size:10px;color:var(--red)">⚠ '+t('no_contact')+'</span>'}
+          ${l.telefon?`<span style="font-size:10px;color:var(--green)">📞 ${esc(l.telefon)}</span>`:'<span style="font-size:10px;color:var(--t3)">'+t('no_phone')+'</span>'}
           ${l.email?`<span style="font-size:10px;color:var(--blue)">✉ ${esc(l.email)}</span>`:''}
         </div>
       </div>
-      <span class="bdg bdg-${l.status==='Neu'?'new':l.status==='Kontaktiert'?'sent':l.status==='Warm'?'warm':l.status==='Geantwortet'?'rep':'cold'}">${l.status}</span>
-    </label>`).join('') || '<div style="font-size:12px;color:var(--t3);padding:12px">Keine Leads. Erst Agent starten oder Leads manuell hinzufügen.</div>';
+      <span class="bdg bdg-${l.status==='Neu'?'new':l.status==='Kontaktiert'?'sent':l.status==='Warm'?'warm':l.status==='Geantwortet'?'rep':'cold'}">${tStatus(l.status)}</span>
+    </label>`).join('') || '<div style="font-size:12px;color:var(--t3);padding:12px">'+t('no_leads_hint')+'</div>';
 };
 
 const toggleLead = (id, checked) => {
   if(checked) selectedLeadIds.add(id);
   else selectedLeadIds.delete(id);
-  $('eg-lead-count-lbl').textContent = selectedLeadIds.size + ' ausgewählt';
+  $('eg-lead-count-lbl').textContent = selectedLeadIds.size + ' ' + t('leads_selected');
 };
 
 const selectLeadsFilter = (filter) => {
@@ -2033,7 +2121,7 @@ const runEmailGen = async () => {
 
   const plog = (msg, color='var(--t2)') => {
     const el=$('eg-prog-log'), d=document.createElement('div');
-    d.style.color=color; d.textContent='['+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+'] '+msg;
+    d.style.color=color; d.textContent='['+new Date().toLocaleTimeString(loc(),{hour:'2-digit',minute:'2-digit',second:'2-digit'})+'] '+msg;
     el.appendChild(d); el.scrollTop=el.scrollHeight;
   };
 
@@ -2269,7 +2357,7 @@ const renderApprove = () => {
             ${p.contactName?`<span style="font-size:11px;color:var(--t2)">👤 ${esc(p.contactName)}${p.contactRole?' · <em style=\'font-style:normal;color:var(--t3)\'>' + esc(p.contactRole) + '</em>':''}</span>`:''}
             ${p.leadEmail?`<span style="font-size:11px;color:var(--t3)">✉ ${esc(p.leadEmail)}</span>`:''}
             ${p.contactPhone?`<span style="font-size:11px;color:var(--green)">📞 ${esc(p.contactPhone)}</span>`:''}
-            <span style="font-size:11px;color:var(--t3)">${new Date(p.created).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</span>
+            <span style="font-size:11px;color:var(--t3)">${new Date(p.created).toLocaleString(loc(),{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</span>
           </div>
         </div>
 
@@ -2376,7 +2464,7 @@ const renderInbox = () => {
         </div>
         <div style="display:flex;gap:8px;align-items:center">
           ${item.replied?'<span class="pill pill-on">BEANTWORTET</span>':'<span class="pill pill-warn">OFFEN</span>'}
-          <span style="font-size:10px;color:var(--t3)">${new Date(item.time).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>
+          <span style="font-size:10px;color:var(--t3)">${new Date(item.time).toLocaleString(loc(),{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>
         </div>
       </div>
       <div class="eml-prev" style="max-height:90px">${esc(item.body)}</div>
@@ -2468,7 +2556,7 @@ const doSendReply = async (item, text) => {
       const lead = leads.find(l => l.id === (item.leadId || item.lead_id));
       if (lead) lead.status = 'Warm';
       ui(); renderInbox(); renderLeads();
-      addLog('Antwort gesendet via Resend: ' + (item.from || item.from_name), 'ok');
+      addLog(t('log_reply_sent') + (item.from || item.from_name), 'ok');
     } catch (e) {
       addLog('Antwortfehler: ' + e.message, 'err');
     }
@@ -2481,12 +2569,12 @@ const doSendReply = async (item, text) => {
   const lead = leads.find(l => l.id === item.leadId);
   if (lead) lead.status = 'Warm';
   save(); ui(); renderInbox(); renderLeads();
-  addLog('Antwort gesendet: ' + item.from, 'ok');
+  addLog(t('log_reply_sent') + item.from, 'ok');
 };
 
 const simReply = () => {
   const cl = leads.filter(l=>l.status==='Kontaktiert');
-  if(!cl.length) { alert('Keine kontaktierten Leads. Erst E-Mails senden.'); return; }
+  if(!cl.length) { alert(t('no_contacted_leads')); return; }
   const lead = cl[Math.floor(Math.random()*cl.length)];
   const p = pending.find(x=>x.leadId===lead.id&&x.status==='approved');
   const msgs = [
@@ -2526,7 +2614,7 @@ const renderLeads = () => {
     (l.kontaktEmail||'').toLowerCase().includes(q)||
     (l.beschreibung||'').toLowerCase().includes(q)
   )&&(!fs||l.status===fs));
-  $('ld-lbl').textContent=list.length+' Einträge';
+  $('ld-lbl').textContent=list.length+' '+t('leads_entries');
 
   const incomplete = list.filter(l=>!l.vorname||!l.nachname||!l.kontaktEmail||!l.telefon);
   const hint = incomplete.length
@@ -2583,23 +2671,23 @@ const renderLeads = () => {
       <td style="padding:11px 12px;min-width:160px;max-width:200px">
         ${l.beschreibung
           ? `<div style="font-size:11px;color:var(--t2);line-height:1.5;cursor:pointer" onclick="editContact(${l.id})"
-               title="Klicken zum Bearbeiten">${esc(l.beschreibung.substring(0,80))}${l.beschreibung.length>80?'…':''}</div>`
-          : `<button class="miss-btn" style="color:var(--t3);border-color:var(--s4)" onclick="editContact(${l.id})">📝 + Beschreibung</button>`}
+               title="${t('lead_click_edit')}">${esc(l.beschreibung.substring(0,80))}${l.beschreibung.length>80?'…':''}</div>`
+          : `<button class="miss-btn" style="color:var(--t3);border-color:var(--s4)" onclick="editContact(${l.id})">📝 ${t('lead_add_desc')}</button>`}
       </td>
 
       <!-- STATUS -->
       <td style="padding:11px 12px;min-width:90px">
-        <span class="bdg ${bcls(l.status)}">${l.status}</span>
+        <span class="bdg ${bcls(l.status)}">${tStatus(l.status)}</span>
         <select class="isel" onchange="setStatus(${l.id},this.value)" style="display:block;margin-top:5px;font-size:10px">
-          ${['Neu','Kontaktiert','Warm','Geantwortet','Kalt'].map(s=>`<option${l.status===s?' selected':''}>${s}</option>`).join('')}
+          ${['Neu','Kontaktiert','Warm','Geantwortet','Kalt'].map(s=>`<option value="${s}"${l.status===s?' selected':''}>${tStatus(s)}</option>`).join('')}
         </select>
       </td>
 
       <!-- AKTIONEN -->
       <td style="padding:11px 8px;white-space:nowrap">
-        <button class="tbtn" onclick="editContact(${l.id})" title="Bearbeiten">✏</button>
-        <button class="tbtn" onclick="autoFillLead(${l.id})" title="KI auto-ausfüllen" style="color:var(--purple)">⚡</button>
-        <button class="tbtn" onclick="delLead(${l.id})" style="color:var(--red)" title="Löschen">✕</button>
+        <button class="tbtn" onclick="editContact(${l.id})" title="${t('lead_edit')}">✏</button>
+        <button class="tbtn" onclick="autoFillLead(${l.id})" title="${t('lead_ai_fill')}" style="color:var(--purple)">⚡</button>
+        <button class="tbtn" onclick="delLead(${l.id})" style="color:var(--red)" title="${t('lead_delete')}">✕</button>
       </td>
     </tr>
 
@@ -2607,8 +2695,8 @@ const renderLeads = () => {
     <tr id="lre-${l.id}" style="display:none;background:var(--s2)">
       <td colspan="7" style="padding:16px 18px">
         <div style="font-size:12px;font-weight:800;color:var(--t1);margin-bottom:12px;display:flex;align-items:center;gap:10px">
-          ✏ ${esc(l.name)} — Kontakt bearbeiten
-          <button class="btn btn-sm btn-purple" onclick="autoFillLead(${l.id})" id="af-btn-${l.id}">⚡ KI auto-ausfüllen</button>
+          ✏ ${esc(l.name)} — ${t('lead_edit_contact')}
+          <button class="btn btn-sm btn-purple" onclick="autoFillLead(${l.id})" id="af-btn-${l.id}">${t('lead_ai_fill_btn')}</button>
           <span id="af-status-${l.id}" style="font-size:11px;color:var(--t3);font-weight:400"></span>
         </div>
 
@@ -2778,7 +2866,7 @@ Antworte NUR als JSON (kein Text davor/danach):
     if(st){ st.textContent='Fehler: '+err.message; st.style.color='var(--red)'; }
     addLog('Auto-Fill Fehler '+l.name+': '+err.message, 'err');
   }
-  if(btn){ btn.disabled=false; btn.textContent='⚡ KI auto-ausfüllen'; }
+  if(btn){ btn.disabled=false; btn.textContent=t('lead_ai_fill_btn'); }
 };
 
 // KI auto-fill ALL incomplete leads
@@ -2818,7 +2906,7 @@ const applyCfg = () => {
   if(raw) {
     try {
       const d = JSON.parse(raw);
-      if(d.saved) $('eg-saved-info').textContent='Zuletzt gespeichert: '+d.saved;
+      if(d.saved) $('eg-saved-info').textContent=t('profile_last_saved')+d.saved;
       fillProductFields(d);
     } catch(e){}
   }
@@ -2974,13 +3062,13 @@ const renderUsersList = () => {
   const isAdmin = session.role === 'admin';
   const adminPill = $('p-admin');
   if(adminPill) {
-    if(isAdmin) { adminPill.style.display=''; adminPill.className='pill pill-purple'; adminPill.textContent='● ADMIN'; }
+    if(isAdmin) { adminPill.style.display=''; adminPill.className='pill pill-purple'; adminPill.textContent=t('team_admin_badge'); }
     else { adminPill.style.display='none'; }
   }
   const users = getUsers();
   const el = $('users-list'); if(!el) return;
   if(!isAdmin) {
-    el.innerHTML = `<div style="font-size:12px;color:var(--t2)">Eingeloggt als: <strong style="color:var(--t1)">${esc(session.name)}</strong> &nbsp;·&nbsp; ${esc(session.email)}</div>`;
+    el.innerHTML = `<div style="font-size:12px;color:var(--t2)">${t('team_logged_in_as')}: <strong style="color:var(--t1)">${esc(session.name)}</strong> &nbsp;·&nbsp; ${esc(session.email)}</div>`;
     return;
   }
   el.innerHTML = users.map(u => `
@@ -2993,7 +3081,7 @@ const renderUsersList = () => {
           ${u.role==='admin'?'<span class="pill pill-purple" style="font-size:9px;margin-left:6px">ADMIN</span>':''}
           ${u.id===session.userId?'<span class="pill pill-on" style="font-size:9px;margin-left:4px">ICH</span>':''}
         </div>
-        <div style="font-size:10px;color:var(--t3)">${esc(u.email)} &nbsp;·&nbsp; seit ${new Date(u.created||Date.now()).toLocaleDateString('de-DE')}</div>
+        <div style="font-size:10px;color:var(--t3)">${esc(u.email)} &nbsp;·&nbsp; seit ${new Date(u.created||Date.now()).toLocaleDateString(loc())}</div>
       </div>
       ${u.id !== session.userId ? `<button class="btn btn-sm btn-r" onclick="deleteUser('${u.id}')">Löschen</button>` : ''}
     </div>`).join('') || '<div style="font-size:12px;color:var(--t3)">' + t('team_no_other_users') + '</div>';
@@ -3010,7 +3098,7 @@ const deleteUserAccount = (userId) => {
 };
 
 // ─── CLOCK ────────────────────────────────────────────────────────────────────
-const tick = () => { $('clk').textContent=new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}); };
+const tick = () => { $('clk').textContent=new Date().toLocaleTimeString(loc(),{hour:'2-digit',minute:'2-digit'}); };
 
 
 // ─── LINKEDIN PROSPECTING ─────────────────────────────────────────────────────
@@ -3037,9 +3125,9 @@ const renderLinkedInEnrichList = () => {
           <div style="font-size:12px;font-weight:700;color:var(--t1)">${esc(l.name)}</div>
           <div style="font-size:10px;color:var(--t3)">${esc(l.branche||'')} · ${esc(l.ort||'')}</div>
           <div style="display:flex;gap:8px;margin-top:3px;flex-wrap:wrap">
-            ${(l.vorname||l.nachname)?`<span style="font-size:10px;color:var(--green)">👤 ${esc(l.vorname||'')} ${esc(l.nachname||'')}${l.rolle?', '+esc(l.rolle):''}</span>`:'<span style="font-size:10px;color:var(--red)">👤 kein Ansprechpartner</span>'}
-            ${l.email?`<span style="font-size:10px;color:var(--green)">✉ ${esc(l.email)}</span>`:'<span style="font-size:10px;color:var(--red)">✉ fehlt</span>'}
-            ${l.telefon?`<span style="font-size:10px;color:var(--green)">📞 ${esc(l.telefon)}</span>`:'<span style="font-size:10px;color:var(--yellow)">📞 fehlt</span>'}
+            ${(l.vorname||l.nachname)?`<span style="font-size:10px;color:var(--green)">👤 ${esc(l.vorname||'')} ${esc(l.nachname||'')}${l.rolle?', '+esc(l.rolle):''}</span>`:'<span style="font-size:10px;color:var(--red)">👤 '+t('no_contact')+'</span>'}
+            ${l.email?`<span style="font-size:10px;color:var(--green)">✉ ${esc(l.email)}</span>`:'<span style="font-size:10px;color:var(--red)">✉ '+t('missing')+'</span>'}
+            ${l.telefon?`<span style="font-size:10px;color:var(--green)">📞 ${esc(l.telefon)}</span>`:'<span style="font-size:10px;color:var(--yellow)">📞 '+t('missing')+'</span>'}
           </div>
         </div>
         <div style="display:flex;gap:5px;flex-shrink:0">
@@ -3345,17 +3433,17 @@ const saveManualCapture = async () => {
       kontaktEmail: V('mc-email'), firmenEmail: V('mc-email'),
       email: V('mc-email'), telefon: V('mc-tel'), branche: V('mc-branche'),
       ma: V('mc-ma'), ort: V('mc-ort'), fokus: '', web: '',
-      status: 'Neu', created: new Date().toLocaleDateString('de-DE')
+      status: 'Neu', created: new Date().toLocaleDateString(loc())
     };
     const savedLead = await apiSave('/api/leads', 'POST', lead);
     if (savedLead) lead.id = savedLead.id;
     leads.unshift(lead);
-    addLog('Lead aus LinkedIn erstellt: ' + firma + ' · ' + kontakt, 'ok');
+    addLog(t('log_lead_linkedin') + firma + ' · ' + kontakt, 'ok');
   }
 
   save(); ui(); renderLinkedInEnrichList(); renderLeads(); renderLeadPicker();
   ['mc-kontakt','mc-firma','mc-linkedin','mc-email','mc-tel','mc-branche','mc-ma','mc-ort'].forEach(id => { const e=$(id); if(e) e.value=''; });
-  showAlert('li-alrt', (lead ? 'Gespeichert' : 'Erstellt') + ': ' + firma, 'ok');
+  showAlert('li-alrt', (lead ? t('li_saved') : t('li_created')) + ': ' + firma, 'ok');
 };
 
 
@@ -3598,7 +3686,7 @@ const onLoginSuccess = (user) => {
 
 // ── LOGOUT ───────────────────────────────────────────────────────────────────
 const doLogout = async () => {
-  if(!confirm('Ausloggen?')) return;
+  if(!confirm(t('logout_confirm'))) return;
   if(AUTH_MODE === 'backend' && AUTH_API()) {
     try { await authFetch('/api/auth/logout', {method:'POST'}); } catch(e) {}
   }
@@ -3640,14 +3728,14 @@ const renderTeam = async () => {
       <td style="padding:10px 12px;font-size:12px;color:var(--t2)">${esc(u.email)}</td>
       <td style="padding:10px 12px">
         <span class="pill ${u.role==='admin'?'pill-purple':'pill-info'}" style="font-size:10px">
-          ${u.role==='admin'?'● ADMIN':t('team_employee')}
+          ${u.role==='admin'?t('team_admin_badge'):t('team_employee')}
         </span>
       </td>
       <td style="padding:10px 12px;font-size:11px;color:var(--t3)">
-        ${(u.created||u.created_at) ? new Date(u.created||u.created_at).toLocaleDateString('de-DE') : '—'}
+        ${(u.created||u.created_at) ? new Date(u.created||u.created_at).toLocaleDateString(loc()) : '—'}
       </td>
       <td style="padding:10px 12px;font-size:11px;color:var(--t3)">
-        ${(u.lastLogin||u.last_login) ? new Date(u.lastLogin||u.last_login).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—'}
+        ${(u.lastLogin||u.last_login) ? new Date(u.lastLogin||u.last_login).toLocaleString(loc(),{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—'}
       </td>
       <td style="padding:10px 12px;white-space:nowrap">
         ${u.id !== session?.userId ? `
@@ -3768,10 +3856,10 @@ const changeOwnPassword = async () => {
 
   if (AUTH_MODE === 'backend' && AUTH_API()) {
     const res = await authFetch('/api/auth/password', { method: 'PUT', body: JSON.stringify({ oldPassword: oldPass, newPassword: newPass }) });
-    if (!res.ok) { const d = await res.json().catch(()=>({})); showAlert('team-alrt', d.error || 'Fehler beim Ändern.', 'err'); return; }
+    if (!res.ok) { const d = await res.json().catch(()=>({})); showAlert('team-alrt', d.error || t('team_pw_change_err'), 'err'); return; }
     $('cp-old').value=''; $('cp-new').value=''; $('cp-new2').value='';
     showAlert('team-alrt',t('msg_pass_changed'),'ok');
-    addLog('Eigenes Passwort geändert','ok');
+    addLog(t('log_pw_changed'),'ok');
     return;
   }
 
@@ -3786,7 +3874,7 @@ const changeOwnPassword = async () => {
   saveUsers(users);
   $('cp-old').value=''; $('cp-new').value=''; $('cp-new2').value='';
   showAlert('team-alrt',t('msg_pass_changed'),'ok');
-  addLog('Eigenes Passwort geändert: '+u.name,'ok');
+  addLog(t('log_pw_changed')+': '+u.name,'ok');
 };
 
 // ─── BOOT ────────────────────────────────────────────────────────────────────
