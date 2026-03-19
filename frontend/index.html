@@ -2804,7 +2804,7 @@ const testOpenAI = async () => {
   try {
     const r=await authFetch('/api/llm/test',{method:'POST',body:JSON.stringify({provider:'openai',key})});
     const d=await r.json();
-    if(d.ok){cfg.openaiKey=key;save();setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● OPENAI';showAlert('cfg-alrt',t('msg_openai_ok'),'ok');addLog('OpenAI API: OK','ok');}
+    if(d.ok){cfg.openaiKey=key;save();apiSave('/api/settings','PUT',{cfg});setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● OPENAI';showAlert('cfg-alrt',t('msg_openai_ok'),'ok');addLog('OpenAI API: OK','ok');}
     else showAlert('cfg-alrt','OpenAI: '+t('msg_invalid_key')+(d.status||'?')+')','err');
   } catch(e){showAlert('cfg-alrt','Fehler: '+e.message,'err');}
 };
@@ -2814,7 +2814,7 @@ const testGemini = async () => {
   try {
     const r=await authFetch('/api/llm/test',{method:'POST',body:JSON.stringify({provider:'gemini',key})});
     const d=await r.json();
-    if(d.ok){cfg.geminiKey=key;save();setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● GEMINI';showAlert('cfg-alrt',t('msg_gemini_ok'),'ok');addLog('Gemini API: OK','ok');}
+    if(d.ok){cfg.geminiKey=key;save();apiSave('/api/settings','PUT',{cfg});setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● GEMINI';showAlert('cfg-alrt',t('msg_gemini_ok'),'ok');addLog('Gemini API: OK','ok');}
     else showAlert('cfg-alrt','Gemini: '+t('msg_invalid_key')+(d.status||'?')+')','err');
   } catch(e){showAlert('cfg-alrt','Fehler: '+e.message,'err');}
 };
@@ -2828,7 +2828,7 @@ const testClaude = async () => {
     if(!r.ok){showAlert('cfg-alrt',t('msg_server_error')+r.status+'): '+txt,'err');return;}
     if(!txt){showAlert('cfg-alrt',t('msg_empty_response')+r.status+')','err');return;}
     const d=JSON.parse(txt);
-    if(d.ok){cfg.claudeKey=key;save();setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● API';showAlert('cfg-alrt',t('msg_claude_ok'),'ok');addLog('Claude API OK','ok');}
+    if(d.ok){cfg.claudeKey=key;save();apiSave('/api/settings','PUT',{cfg});setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● API';showAlert('cfg-alrt',t('msg_claude_ok'),'ok');addLog('Claude API OK','ok');}
     else showAlert('cfg-alrt',t('msg_invalid_key')+(d.status||'?')+')' + (d.error ? ': '+d.error : ''),'err');
   } catch(e){showAlert('cfg-alrt',t('msg_conn_error')+e.message,'err');}
 };
