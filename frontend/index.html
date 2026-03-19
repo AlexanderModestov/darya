@@ -1806,7 +1806,7 @@ Für jedes Unternehmen recherchiere:
 
 Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array (kein Text davor/danach):
 [{"name":"Firmenname GmbH","branche":"IT-Dienstleister","fokus":"konkrete Banken-Referenz","ma":"~100","ort":"Berlin","web":"firma.de","email":"info@firma.de","vorname":"Max","nachname":"Müller","rolle":"CIO","kontaktEmail":"max.mueller@firma.de","firmenEmail":"info@firma.de","telefon":"+49 30 12345678","linkedin":"linkedin.com/in/maxmueller","beschreibung":"Was macht die Firma, welche Kunden, welche Produkte"}]`;
-    const raw = await claude(p, 2500);
+    const raw = await claude(p, 8000);
     if(abort) { endAgent(); return; }
     // Strip markdown code fences if present
     const cleaned = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
