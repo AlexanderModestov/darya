@@ -23,6 +23,8 @@ const FIELD_MAP = {
   web: 'web',
   fokus: 'fokus',
   status: 'status',
+  apolloData: 'apollo_data',
+  apollo_data: 'apollo_data',
 };
 
 /**
@@ -47,7 +49,7 @@ router.get('/export', async (req, res) => {
     const userId = req.user.id;
     const { rows } = await query(
       `SELECT name, branche, ma, ort, vorname, nachname, rolle, telefon,
-              kontakt_email, firmen_email, linkedin, beschreibung, fokus, web, status
+              kontakt_email, firmen_email, linkedin, beschreibung, fokus, web, status, apollo_data
        FROM leads
        WHERE user_id = $1 AND deleted_at IS NULL
        ORDER BY created_at DESC`,

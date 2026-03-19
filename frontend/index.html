@@ -3186,6 +3186,7 @@ const enrichOneLead = async (id) => {
         if(result.email    && !lead.kontaktEmail) { lead.kontaktEmail = result.email; lead.email = result.email; }
         if(result.telefon  && !lead.telefon)  lead.telefon  = result.telefon;
         if(result.linkedin && !lead.linkedin) lead.linkedin = result.linkedin;
+        if(result.apolloData) lead.apolloData = result.apolloData;
         if(result.kontakt && !lead.vorname) {
           const parts = result.kontakt.split(' ');
           lead.vorname  = parts[0]||'';
@@ -3222,6 +3223,7 @@ const enrichOneLead = async (id) => {
   }
 
   save(); renderLinkedInEnrichList(); renderLeads(); renderLeadPicker();
+  if(enriched) await apiSave('/api/leads/' + lead.id, 'PUT', lead);
   if(btn) { btn.disabled = false; btn.textContent = enriched ? '✓' : '⚡'; }
 };
 
@@ -3275,7 +3277,8 @@ const apolloSearch = async (company, name, city) => {
     kontakt: [person.first_name, person.last_name].filter(Boolean).join(' ') + (person.title ? ', ' + person.title : ''),
     email:   person.email || '',
     telefon: person.phone_numbers?.[0]?.sanitized_number || person.organization?.phone || '',
-    linkedin: person.linkedin_url || ''
+    linkedin: person.linkedin_url || '',
+    apolloData: person
   };
 };
 
