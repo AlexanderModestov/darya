@@ -598,7 +598,7 @@ textarea.inp{resize:vertical;line-height:1.6}
 <!-- ═══ CONFIG ═══ -->
 <div id="pg-config" class="pg">
   <div class="ph">
-    <div><div class="ph-t" data-t="config_title">Konfiguration</div><div class="ph-s" data-t="config_subtitle">API-Keys, Absender-Profil, Webhook</div></div>
+    <div><div class="ph-t" data-t="config_title">Konfiguration</div><div class="ph-s" data-t="config_subtitle">API-Keys, Apollo.io, Absender-Profil, Webhook</div></div>
     <button class="btn btn-g" onclick="saveConfig()" data-t="save">Speichern</button>
   </div>
   <div class="pn">
@@ -660,6 +660,19 @@ textarea.inp{resize:vertical;line-height:1.6}
           <button class="btn btn-sm" onclick="testGemini()" data-t="test">Testen</button>
         </div>
         <div style="font-size:10px;color:var(--t3);margin-top:4px">aistudio.google.com → Get API Key · Kostenlos</div>
+      </div>
+    </div>
+  </div>
+  <div class="pn">
+    <div class="pn-h"><span class="pn-ht" data-t="apollo_title">Apollo.io (Kontaktsuche)</span><span id="p-apollo" class="pill pill-off">● OFFLINE</span></div>
+    <div class="pn-b">
+      <div class="fg" style="margin-bottom:0">
+        <label>Apollo.io API Key</label>
+        <div style="display:flex;gap:10px">
+          <input class="inp" id="c-apollo" type="password" placeholder="apollo_api_key_...">
+          <button class="btn btn-sm" onclick="testApollo()" data-t="test">Testen</button>
+        </div>
+        <div style="font-size:10px;color:var(--t3);margin-top:4px">apollo.io → Settings → API Keys · Free: 50 Anfragen/Tag</div>
       </div>
     </div>
   </div>
@@ -737,7 +750,7 @@ textarea.inp{resize:vertical;line-height:1.6}
   <div class="ph">
     <div>
       <div class="ph-t" data-t="linkedin_title">LinkedIn Prospecting</div>
-      <div class="ph-s" data-t="linkedin_subtitle">Ansprechpartner recherchieren · Profile öffnen · Kontaktdaten via Apollo.io / Hunter.io anreichern</div>
+      <div class="ph-s" data-t="linkedin_subtitle">Ansprechpartner recherchieren · Profile öffnen · Kontaktdaten via Apollo.io anreichern</div>
     </div>
     <div style="display:flex;gap:8px">
       <button class="btn btn-sm btn-purple" id="li-enrich-btn" onclick="enrichAllLeads()" data-t="linkedin_enrich_all">⚡ Alle anreichern</button>
@@ -794,29 +807,14 @@ textarea.inp{resize:vertical;line-height:1.6}
         </div>
       </div>
 
-      <!-- APIS -->
+      <!-- API STATUS -->
       <div class="pn">
         <div class="pn-h">
           <span class="pn-ht" data-t="linkedin_step2">② Daten-Anreicherung</span>
           <span id="li-api-status" class="pill pill-off">KEIN API</span>
         </div>
         <div class="pn-b">
-          <div class="fg">
-            <label>Apollo.io API Key (empfohlen)</label>
-            <div style="display:flex;gap:8px">
-              <input class="inp" id="li-apollo" type="password" placeholder="apollo_api_key_...">
-              <button class="btn btn-sm" onclick="testApollo()">Testen</button>
-            </div>
-            <div style="font-size:10px;color:var(--t3);margin-top:4px">apollo.io → Settings → API Keys · Free: 50 Anfragen/Tag</div>
-          </div>
-          <div class="fg" style="margin-bottom:0">
-            <label>Hunter.io API Key (Backup)</label>
-            <div style="display:flex;gap:8px">
-              <input class="inp" id="li-hunter" type="password" placeholder="hunter_api_key_...">
-              <button class="btn btn-sm" onclick="testHunter()">Testen</button>
-            </div>
-            <div style="font-size:10px;color:var(--t3);margin-top:4px">hunter.io → API → Kostenlos 25/Monat</div>
-          </div>
+          <div style="font-size:11px;color:var(--t3)" data-t="apollo_config_hint">Apollo.io API Key wird unter Konfiguration eingestellt.</div>
         </div>
       </div>
 
@@ -846,7 +844,7 @@ textarea.inp{resize:vertical;line-height:1.6}
       <!-- ENRICHMENT QUEUE -->
       <div class="pn">
         <div class="pn-h">
-          <span class="pn-ht">④ Leads anreichern via Apollo / Hunter</span>
+          <span class="pn-ht">④ Leads anreichern via Apollo</span>
           <div style="display:flex;gap:6px">
             <button class="btn btn-sm" onclick="enrichSelected()" id="li-enrich-sel-btn">Auswahl anreichern</button>
           </div>
@@ -982,7 +980,7 @@ let leads   = [];
 let pending = [];
 let inbox   = [];
 let logs    = [];
-let cfg = { provider:'claude', claudeKey:'', openaiKey:'', geminiKey:'', model:'claude-sonnet-4-20250514', name:'Daria', role:'Lead AI Architect', co:'', sig:'Beste Grüße', gFrom:'', gName:'', whUrl:'', apolloKey:'', hunterKey:'', backendUrl:'https://darya-production.up.railway.app', lang:'de' };
+let cfg = { provider:'claude', claudeKey:'', openaiKey:'', geminiKey:'', model:'claude-sonnet-4-20250514', name:'Daria', role:'Lead AI Architect', co:'', sig:'Beste Grüße', gFrom:'', gName:'', whUrl:'', apolloKey:'', backendUrl:'https://darya-production.up.railway.app', lang:'de' };
 let agentOn = false, abort = false;
 
 // ─── I18N ────────────────────────────────────────────────────────────────────
@@ -1069,7 +1067,7 @@ const I18N = {
     // Log
     log_title: 'Aktivitätslog', log_clear: 'Log leeren',
     // Config
-    config_title: 'Konfiguration', config_subtitle: 'API-Keys, Absender-Profil, Webhook',
+    config_title: 'Konfiguration', config_subtitle: 'API-Keys, Apollo.io, Absender-Profil, Webhook',
     save: 'Speichern', ai_provider: 'KI-Anbieter', choose_provider: 'Anbieter wählen',
     model: 'Modell', test: 'Testen', backend_url: 'Backend URL',
     backend_hint: 'Leer lassen = lokaler Modus (Daten im Browser). Mit Backend-URL = Server-Modus (Daten in PostgreSQL).',
@@ -1082,7 +1080,7 @@ const I18N = {
     lang_title: 'Sprache / Language',
     // LinkedIn
     linkedin_title: 'LinkedIn Prospecting',
-    linkedin_subtitle: 'Ansprechpartner recherchieren · Profile öffnen · Kontaktdaten via Apollo.io / Hunter.io anreichern',
+    linkedin_subtitle: 'Ansprechpartner recherchieren · Profile öffnen · Kontaktdaten via Apollo.io anreichern',
     linkedin_enrich_all: '⚡ Alle anreichern', linkedin_search: '🔍 Suche starten',
     linkedin_howto: 'Wie es funktioniert:',
     linkedin_howto_text: '① Agent generiert optimierte LinkedIn-Suchanfragen für deine Leads ·② Suchanfragen öffnen sich direkt in LinkedIn Sales Navigator / LinkedIn Search ·③ Apollo.io API findet E-Mail + Telefon automatisch ·④ Gefundene Kontakte werden direkt in die Lead-DB gespeichert',
@@ -1154,8 +1152,8 @@ const I18N = {
     msg_li_enter_data: 'Firma oder Name eingeben.',
     msg_apollo_enter: 'Apollo API-Key eingeben.',
     msg_apollo_ok: 'Apollo API verbunden!',
-    msg_hunter_enter: 'Hunter API-Key eingeben.',
-    msg_hunter_ok: 'Hunter API verbunden!',
+    apollo_title: 'Apollo.io (Kontaktsuche)',
+    apollo_config_hint: 'Apollo.io API Key wird unter Konfiguration eingestellt.',
     // Alerts — Team
     msg_enter_name: 'Name eingeben.',
     msg_enter_email: 'Gültige E-Mail eingeben.',
@@ -1273,7 +1271,7 @@ const I18N = {
     // Log
     log_title: 'Activity Log', log_clear: 'Clear Log',
     // Config
-    config_title: 'Configuration', config_subtitle: 'API Keys, Sender Profile, Webhook',
+    config_title: 'Configuration', config_subtitle: 'API Keys, Apollo.io, Sender Profile, Webhook',
     save: 'Save', ai_provider: 'AI Provider', choose_provider: 'Choose Provider',
     model: 'Model', test: 'Test', backend_url: 'Backend URL',
     backend_hint: 'Leave empty = local mode (data in browser). With backend URL = server mode (data in PostgreSQL).',
@@ -1286,7 +1284,7 @@ const I18N = {
     lang_title: 'Language',
     // LinkedIn
     linkedin_title: 'LinkedIn Prospecting',
-    linkedin_subtitle: 'Research contacts · Open profiles · Enrich contact data via Apollo.io / Hunter.io',
+    linkedin_subtitle: 'Research contacts · Open profiles · Enrich contact data via Apollo.io',
     linkedin_enrich_all: '⚡ Enrich All', linkedin_search: '🔍 Start Search',
     linkedin_howto: 'How it works:',
     linkedin_howto_text: '① Agent generates optimized LinkedIn search queries for your leads ·② Queries open directly in LinkedIn Sales Navigator / LinkedIn Search ·③ Apollo.io API finds email + phone automatically ·④ Found contacts are saved directly to the lead DB',
@@ -1358,8 +1356,8 @@ const I18N = {
     msg_li_enter_data: 'Enter company or name.',
     msg_apollo_enter: 'Enter Apollo API key.',
     msg_apollo_ok: 'Apollo API connected!',
-    msg_hunter_enter: 'Enter Hunter API key.',
-    msg_hunter_ok: 'Hunter API connected!',
+    apollo_title: 'Apollo.io (Contact Search)',
+    apollo_config_hint: 'Apollo.io API key is configured under Settings.',
     // Alerts — Team
     msg_enter_name: 'Enter name.',
     msg_enter_email: 'Enter a valid email.',
@@ -2785,9 +2783,7 @@ const applyCfg = () => {
   if(cfg.gName) $('c-gname').value=cfg.gName;
   if(cfg.whUrl){$('c-wh').value=cfg.whUrl;setPill('p-wh',true);}
   if(cfg.backendUrl){$('c-backend').value=cfg.backendUrl;setPill('p-backend',true);}
-  if(cfg.apolloKey){$('li-apollo').value=cfg.apolloKey;setPill('li-api-status',true);$('li-api-status').textContent='● APOLLO ONLINE';}
-  if(cfg.hunterKey&&!cfg.apolloKey){$('li-hunter').value=cfg.hunterKey;setPill('li-api-status',true);$('li-api-status').textContent='● HUNTER ONLINE';}
-  if(cfg.hunterKey) $('li-hunter').value=cfg.hunterKey;
+  if(cfg.apolloKey){$('c-apollo').value=cfg.apolloKey;setPill('p-apollo',true);setPill('li-api-status',true);$('li-api-status').textContent='● APOLLO ONLINE';}
   if(cfg.lang){$('c-lang').value=cfg.lang;}
   // load saved product prompt
   const raw = localStorage.getItem('los3_product');
@@ -2800,13 +2796,13 @@ const saveConfig = async () => {
   const gkey=V('c-gemini-key'); if(gkey) cfg.geminiKey=gkey;
   cfg.model=V('c-model'); cfg.name=V('c-name'); cfg.role=V('c-role');
   cfg.co=V('c-co'); cfg.sig=V('c-sig'); cfg.gFrom=V('c-gfrom'); cfg.gName=V('c-gname'); cfg.whUrl=V('c-wh');
-  if(V('li-apollo')) cfg.apolloKey=V('li-apollo');
-  if(V('li-hunter')) cfg.hunterKey=V('li-hunter');
+  if(V('c-apollo')) cfg.apolloKey=V('c-apollo');
   if(V('c-backend')) cfg.backendUrl=V('c-backend').replace(/\/$/,'');
   cfg.lang=V('c-lang')||'de';
   save();
   await apiSave('/api/settings', 'PUT', { cfg });
   if(cfg.claudeKey){setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● API';}
+  if(cfg.apolloKey){setPill('p-apollo',true);setPill('li-api-status',true);$('li-api-status').textContent='● APOLLO ONLINE';}
   if(cfg.gFrom) setPill('p-gmail',true);
   if(cfg.whUrl) setPill('p-wh',true);
   showAlert('cfg-alrt',t('msg_config_saved'),'ok');
@@ -3202,26 +3198,6 @@ const enrichOneLead = async (id) => {
     } catch(e) { addLog('Apollo-Fehler: ' + e.message, 'err'); }
   }
 
-  // Fallback: Hunter.io for email
-  if(!enriched && cfg.hunterKey && lead.web) {
-    try {
-      const result = await hunterSearch(lead.web, lead.kontakt);
-      if(result?.email) {
-        lead.email = result.email;
-        enriched = true;
-        addLog('Hunter: ' + lead.name + ' → ' + result.email, 'ok');
-      }
-    } catch(e) { addLog('Hunter-Fehler: ' + e.message, 'err'); }
-  }
-
-  // Fallback: Claude guesses common email patterns
-  if(!enriched && lead.web && lead.kontakt) {
-    try {
-      const guessed = await claudeGuessEmail(lead);
-      if(guessed) { lead.email = guessed; enriched = true; addLog('E-Mail-Muster: ' + lead.name + ' → ' + guessed, 'warn'); }
-    } catch(e) {}
-  }
-
   save(); renderLinkedInEnrichList(); renderLeads(); renderLeadPicker();
   if(enriched) await apiSave('/api/leads/' + lead.id, 'PUT', lead);
   if(btn) { btn.disabled = false; btn.textContent = enriched ? '✓' : '⚡'; }
@@ -3282,70 +3258,28 @@ const apolloSearch = async (company, name, city) => {
   };
 };
 
-// Hunter.io Domain Search
-const hunterSearch = async (domain, name) => {
-  const cleanDomain = domain.replace(/https?:\/\//,'').replace(/\/.*/,'');
-  const nameParts = (name||'').split(',')[0].trim().split(' ');
-  const firstName = nameParts[0]||'', lastName = nameParts.slice(1).join(' ')||'';
-  let url = `https://api.hunter.io/v2/email-finder?domain=${encodeURIComponent(cleanDomain)}&api_key=${cfg.hunterKey}`;
-  if(firstName) url += `&first_name=${encodeURIComponent(firstName)}&last_name=${encodeURIComponent(lastName)}`;
-  const res = await fetch(url);
-  if(!res.ok) throw new Error('Hunter HTTP ' + res.status);
-  const data = await res.json();
-  return data.data?.email ? { email: data.data.email } : null;
-};
-
-// Claude guesses email pattern from website + name
-const claudeGuessEmail = async (lead) => {
-  if(!lead.web || !lead.kontakt) return null;
-  const prompt = `Leite die wahrscheinlichste geschäftliche E-Mail-Adresse ab.
-
-Person: ${lead.kontakt.split(',')[0].trim()}
-Firma: ${lead.name}
-Domain: ${lead.web.replace(/https?:\/\//,'').replace(/\/.*/,'')}
-
-Häufige Muster: vorname.nachname@domain, v.nachname@domain, vorname@domain, info@domain
-Antworte NUR mit der E-Mail-Adresse (nichts sonst). Wenn nicht ableitbar: leer lassen.`;
-  const result = await claude(prompt, 50);
-  const email = result.trim().toLowerCase();
-  return /^[^@]+@[^@]+\.[^@]+$/.test(email) ? email : null;
-};
 
 // Apollo test
 const testApollo = async () => {
-  const key = V('li-apollo');
-  if(!key) { showAlert('li-alrt', t('msg_apollo_enter'), 'warn'); return; }
+  const key = V('c-apollo');
+  if(!key) { showAlert('cfg-alrt', t('msg_apollo_enter'), 'warn'); return; }
   try {
     const res = await fetch('https://api.apollo.io/v1/auth/health', {
       method: 'GET', headers: { 'X-Api-Key': key }
     });
     if(res.ok) {
       cfg.apolloKey = key; save();
+      setPill('p-apollo', true);
       setPill('li-api-status', true); $('li-api-status').textContent = '● APOLLO ONLINE';
-      showAlert('li-alrt', t('msg_apollo_ok'), 'ok');
+      showAlert('cfg-alrt', t('msg_apollo_ok'), 'ok');
       addLog('Apollo API: OK', 'ok');
+      await apiSave('/api/settings', 'PUT', { cfg });
     } else {
-      showAlert('li-alrt', 'Apollo: ' + t('msg_invalid_key') + res.status + ')', 'err');
+      showAlert('cfg-alrt', 'Apollo: ' + t('msg_invalid_key') + res.status + ')', 'err');
     }
-  } catch(e) { showAlert('li-alrt', 'Apollo-Fehler: ' + e.message, 'err'); }
+  } catch(e) { showAlert('cfg-alrt', 'Apollo-Fehler: ' + e.message, 'err'); }
 };
 
-// Hunter test
-const testHunter = async () => {
-  const key = V('li-hunter');
-  if(!key) { showAlert('li-alrt', t('msg_hunter_enter'), 'warn'); return; }
-  try {
-    const res = await fetch(`https://api.hunter.io/v2/account?api_key=${key}`);
-    if(res.ok) {
-      cfg.hunterKey = key; save();
-      if(!cfg.apolloKey) { setPill('li-api-status', true); $('li-api-status').textContent = '● HUNTER ONLINE'; }
-      showAlert('li-alrt', t('msg_hunter_ok'), 'ok');
-      addLog('Hunter API: OK', 'ok');
-    } else {
-      showAlert('li-alrt', 'Hunter: ' + t('msg_invalid_key') + res.status + ')', 'err');
-    }
-  } catch(e) { showAlert('li-alrt', 'Hunter-Fehler: ' + e.message, 'err'); }
-};
 
 // Manual capture from LinkedIn
 const saveManualCapture = async () => {
