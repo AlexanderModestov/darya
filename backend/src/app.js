@@ -12,6 +12,7 @@ import usersRoutes from './routes/users.js';
 import settingsRoutes from './routes/settings.js';
 import logsRoutes from './routes/logs.js';
 import llmRoutes from './routes/llm.js';
+import apolloRoutes from './routes/apollo.js';
 import { authMiddleware } from './middleware/auth.js';
 import { apiLimiter, authLimiter } from './middleware/rateLimit.js';
 
@@ -49,6 +50,21 @@ app.use('/api/inbox', authMiddleware, inboxRoutes);
 app.use('/api/users', authMiddleware, usersRoutes);
 app.use('/api/settings', authMiddleware, settingsRoutes);
 app.use('/api/logs', authMiddleware, logsRoutes);
+// Apollo proxy — search requires auth, test is public
+app.post('/api/apollo/test', async (req, res) => {
+  const { key } = req.body;
+  if (!key) return res.status(400).json({ ok: false, error: 'No key provided' });
+  try {
+    const r = await fetch('https://api.apollo.io/v1/auth/health', {
+      method: 'GET', headers: { 'X-Api-Key': key }
+    });
+    return res.json({ ok: r.ok, status: r.status });
+  } catch (e) {
+    return res.json({ ok: false, error: e.message });
+  }
+});
+app.use('/api/apollo', authMiddleware, apolloRoutes);
+
 // LLM test endpoint — no auth needed (just validates external API keys)
 app.post('/api/llm/test', async (req, res) => {
   const { provider, key } = req.body;

@@ -3228,22 +3228,17 @@ const enrichAllLeads = async () => {
   showAlert('li-alrt', t('msg_li_enrich_done'), 'ok');
 };
 
-// Apollo.io People Search API
+// Apollo.io People Search API (via backend proxy)
 const apolloSearch = async (company, name, city) => {
   const nameParts = (name||'').split(',')[0].trim().split(' ');
   const firstName = nameParts[0] || '';
   const lastName  = nameParts.slice(1).join(' ') || '';
 
-  // Apollo People Search endpoint
-  const res = await fetch('https://api.apollo.io/v1/people/search', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Api-Key': cfg.apolloKey },
-    body: JSON.stringify({
-      q_organization_domains: company ? [company.toLowerCase().replace(/gmbh|ag|kg|ug|se|inc|llc/gi,'').trim().replace(/\s+/g,'')+'.de'] : undefined,
-      q_keywords: [company, firstName, lastName].filter(Boolean).join(' '),
-      person_titles: ['CIO','IT-Leiter','CTO','CEO','Geschäftsführer','Compliance','Head of IT'],
-      page: 1, per_page: 1
-    })
+  const res = await authFetch('/api/apollo/search', 'POST', {
+    q_organization_domains: company ? [company.toLowerCase().replace(/gmbh|ag|kg|ug|se|inc|llc/gi,'').trim().replace(/\s+/g,'')+'.de'] : undefined,
+    q_keywords: [company, firstName, lastName].filter(Boolean).join(' '),
+    person_titles: ['CIO','IT-Leiter','CTO','CEO','Geschäftsführer','Compliance','Head of IT'],
+    page: 1, per_page: 1
   });
   if(!res.ok) throw new Error('Apollo HTTP ' + res.status);
   const data = await res.json();
@@ -3259,15 +3254,17 @@ const apolloSearch = async (company, name, city) => {
 };
 
 
-// Apollo test
+// Apollo test (via backend proxy)
 const testApollo = async () => {
   const key = V('c-apollo');
   if(!key) { showAlert('cfg-alrt', t('msg_apollo_enter'), 'warn'); return; }
   try {
-    const res = await fetch('https://api.apollo.io/v1/auth/health', {
-      method: 'GET', headers: { 'X-Api-Key': key }
+    const res = await fetch((cfg.backendUrl||'')+'/api/apollo/test', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key })
     });
-    if(res.ok) {
+    const data = await res.json();
+    if(data.ok) {
       cfg.apolloKey = key; save();
       setPill('p-apollo', true);
       setPill('li-api-status', true); $('li-api-status').textContent = '● APOLLO ONLINE';
@@ -3275,7 +3272,7 @@ const testApollo = async () => {
       addLog('Apollo API: OK', 'ok');
       await apiSave('/api/settings', 'PUT', { cfg });
     } else {
-      showAlert('cfg-alrt', 'Apollo: ' + t('msg_invalid_key') + res.status + ')', 'err');
+      showAlert('cfg-alrt', 'Apollo: ' + t('msg_invalid_key') + ' (' + (data.status||data.error) + ')', 'err');
     }
   } catch(e) { showAlert('cfg-alrt', 'Apollo-Fehler: ' + e.message, 'err'); }
 };
