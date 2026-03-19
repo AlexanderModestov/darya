@@ -156,7 +156,7 @@ textarea.inp{resize:vertical;line-height:1.6}
     <div id="login-view">
       <div id="login-err" class="login-err"></div>
       <div class="login-lbl" data-t="email">E-Mail</div>
-      <input class="login-inp" id="li-email" type="email" placeholder="daria@firma.de" autocomplete="username">
+      <input class="login-inp" id="li-email" type="email" placeholder="daria@firma.de" data-tp="ph_email_login" autocomplete="username">
       <div class="login-lbl" data-t="password">Passwort</div>
       <input class="login-inp" id="li-pass" type="password" placeholder="••••••••" autocomplete="current-password"
         onkeydown="if(event.key==='Enter') doLogin()">
@@ -169,9 +169,9 @@ textarea.inp{resize:vertical;line-height:1.6}
     <div id="register-view" style="display:none">
       <div id="reg-err" class="login-err"></div>
       <div class="login-lbl" data-t="name">Name</div>
-      <input class="login-inp" id="reg-name" type="text" placeholder="Max Müller">
+      <input class="login-inp" id="reg-name" type="text" placeholder="Max Müller" data-tp="ph_reg_name">
       <div class="login-lbl" data-t="email">E-Mail</div>
-      <input class="login-inp" id="reg-email" type="email" placeholder="max@firma.de">
+      <input class="login-inp" id="reg-email" type="email" placeholder="max@firma.de" data-tp="ph_reg_email">
       <div class="login-lbl" data-t="password_min8">Passwort (min. 8 Zeichen)</div>
       <input class="login-inp" id="reg-pass" type="password" placeholder="••••••••"
         onkeydown="if(event.key==='Enter') doRegister()">
@@ -322,11 +322,11 @@ textarea.inp{resize:vertical;line-height:1.6}
       <div class="fr" style="margin-bottom:12px">
         <div class="fg" style="margin-bottom:0">
           <label data-t="eg_product_name">Produktname / Angebotsbezeichnung</label>
-          <input class="inp" id="eg-prodname" placeholder="z.B. AI-Prozessautomatisierung für Banken">
+          <input class="inp" id="eg-prodname" placeholder="z.B. AI-Prozessautomatisierung für Banken" data-tp="ph_prodname">
         </div>
         <div class="fg" style="margin-bottom:0">
           <label data-t="eg_target">Zielgruppe / Ansprechpartner</label>
-          <input class="inp" id="eg-target" placeholder="z.B. CIO, IT-Leiter, Compliance-Chef">
+          <input class="inp" id="eg-target" placeholder="z.B. CIO, IT-Leiter, Compliance-Chef" data-tp="ph_target">
         </div>
       </div>
 
@@ -334,11 +334,11 @@ textarea.inp{resize:vertical;line-height:1.6}
       <div class="fr" style="margin-bottom:12px">
         <div class="fg" style="margin-bottom:0">
           <label data-t="eg_what">Was wir machen (2-3 Sätze)</label>
-          <textarea class="inp" id="eg-what" style="min-height:72px;line-height:1.6" placeholder="Wir entwickeln KI-Agenten die Vertriebsprozesse automatisieren — von der Lead-Recherche bis zur E-Mail-Generierung. Unsere Lösung reduziert den manuellen Aufwand im B2B-Vertrieb um 60%."></textarea>
+          <textarea class="inp" id="eg-what" style="min-height:72px;line-height:1.6" placeholder="Wir entwickeln KI-Agenten die Vertriebsprozesse automatisieren — von der Lead-Recherche bis zur E-Mail-Generierung. Unsere Lösung reduziert den manuellen Aufwand im B2B-Vertrieb um 60%." data-tp="ph_what"></textarea>
         </div>
         <div class="fg" style="margin-bottom:0">
           <label data-t="eg_problems">Welche Probleme lösen wir?</label>
-          <textarea class="inp" id="eg-problems" style="min-height:72px;line-height:1.6" placeholder="Vertriebsteams verlieren zu viel Zeit mit manueller Recherche und copy-paste E-Mails. CRM-Daten sind unvollständig. Follow-ups werden vergessen."></textarea>
+          <textarea class="inp" id="eg-problems" style="min-height:72px;line-height:1.6" placeholder="Vertriebsteams verlieren zu viel Zeit mit manueller Recherche und copy-paste E-Mails. CRM-Daten sind unvollständig. Follow-ups werden vergessen." data-tp="ph_problems"></textarea>
         </div>
       </div>
 
@@ -346,11 +346,11 @@ textarea.inp{resize:vertical;line-height:1.6}
       <div class="fr" style="margin-bottom:12px">
         <div class="fg" style="margin-bottom:0">
           <label data-t="eg_usp">USP — Was macht uns einzigartig?</label>
-          <input class="inp" id="eg-usp" placeholder="z.B. Setup in 2 Wochen, kein IT-Team nötig, nachweisbar 40% Zeitersparnis">
+          <input class="inp" id="eg-usp" placeholder="z.B. Setup in 2 Wochen, kein IT-Team nötig, nachweisbar 40% Zeitersparnis" data-tp="ph_usp">
         </div>
         <div class="fg" style="margin-bottom:0">
           <label data-t="eg_roi">ROI / konkrete Kennzahlen</label>
-          <input class="inp" id="eg-roi" placeholder="z.B. ROI nach 8 Monaten, 15h/Woche gespart, +23% Conversion">
+          <input class="inp" id="eg-roi" placeholder="z.B. ROI nach 8 Monaten, 15h/Woche gespart, +23% Conversion" data-tp="ph_roi">
         </div>
       </div>
 
@@ -358,18 +358,18 @@ textarea.inp{resize:vertical;line-height:1.6}
       <div class="fr" style="margin-bottom:12px">
         <div class="fg" style="margin-bottom:0">
           <label data-t="eg_pricing">Preise / Pakete (optional)</label>
-          <input class="inp" id="eg-pricing" placeholder="z.B. ab 2.900 €/Monat, Setup einmalig 5.000 €, kostenlose Pilotphase">
+          <input class="inp" id="eg-pricing" placeholder="z.B. ab 2.900 €/Monat, Setup einmalig 5.000 €, kostenlose Pilotphase" data-tp="ph_pricing">
         </div>
         <div class="fg" style="margin-bottom:0">
           <label data-t="eg_refs">Referenzen / Kunden-Beispiele</label>
-          <input class="inp" id="eg-refs" placeholder="z.B. 3 Sparkassen in Bayern, FinTech-Startup Berlin, 200-MA IT-Dienstleister">
+          <input class="inp" id="eg-refs" placeholder="z.B. 3 Sparkassen in Bayern, FinTech-Startup Berlin, 200-MA IT-Dienstleister" data-tp="ph_refs">
         </div>
       </div>
 
       <!-- ROW 5: Freier Zusatz-Prompt -->
       <div class="fg" style="margin-bottom:12px">
         <label data-t="eg_context">Zusätzlicher Kontext (optional) — Besonderheiten, aktuelle Aktionen, Sprache</label>
-        <textarea class="inp" id="eg-prompt" style="min-height:60px;line-height:1.6" placeholder="z.B. Wir haben gerade eine Case Study mit Commerzbank veröffentlicht. Aktuell bieten wir bis Ende Q1 eine kostenlose Pilotphase an. Schreib immer auf Deutsch, Sie-Form."></textarea>
+        <textarea class="inp" id="eg-prompt" style="min-height:60px;line-height:1.6" placeholder="z.B. Wir haben gerade eine Case Study mit Commerzbank veröffentlicht. Aktuell bieten wir bis Ende Q1 eine kostenlose Pilotphase an. Schreib immer auf Deutsch, Sie-Form." data-tp="ph_context"></textarea>
       </div>
 
       <!-- Preview & Save -->
@@ -431,7 +431,7 @@ textarea.inp{resize:vertical;line-height:1.6}
         </div>
         <div class="fg" style="margin-top:12px;margin-bottom:0">
           <label data-t="eg_extra">Zusätzliche Anweisungen (optional)</label>
-          <input class="inp" id="eg-extra" placeholder="z.B. Erwähne DORA-Regulierung. Vermeide das Wort 'revolutionär'. Beziehe dich auf aktuelle BaFin-Anforderungen.">
+          <input class="inp" id="eg-extra" placeholder="z.B. Erwähne DORA-Regulierung. Vermeide das Wort 'revolutionär'. Beziehe dich auf aktuelle BaFin-Anforderungen." data-tp="ph_extra">
         </div>
       </div>
     </div>
@@ -451,7 +451,7 @@ textarea.inp{resize:vertical;line-height:1.6}
           <button class="btn btn-sm" onclick="selectLeadsFilter('all')" data-t="eg_all">Alle</button>
           <button class="btn btn-sm btn-r" onclick="selectLeadsFilter('none')" data-t="eg_none">Keine</button>
         </div>
-        <input class="inp" id="eg-lead-search" placeholder="Leads filtern…" oninput="renderLeadPicker()">
+        <input class="inp" id="eg-lead-search" placeholder="Leads filtern…" data-tp="ph_lead_filter" oninput="renderLeadPicker()">
       </div>
       <div id="lead-picker" style="max-height:220px;overflow-y:auto;border:var(--bd);border-radius:3px;padding:4px"></div>
     </div>
@@ -474,7 +474,7 @@ textarea.inp{resize:vertical;line-height:1.6}
         <div class="fg" style="margin-bottom:0">
           <label data-t="eg_test_email">Test-E-Mail (optional)</label>
           <div style="display:flex;gap:8px">
-            <input class="inp" id="eg-test-lead" placeholder="Lead-Name für Test…" style="flex:1">
+            <input class="inp" id="eg-test-lead" placeholder="Lead-Name für Test…" data-tp="ph_test_lead" style="flex:1">
             <button class="btn btn-sm btn-purple" onclick="runTestEmail()"><span id="eg-test-sp" style="display:none" class="sp"></span>Test</button>
           </div>
         </div>
@@ -571,7 +571,7 @@ textarea.inp{resize:vertical;line-height:1.6}
     </div>
   </div>
   <div style="display:flex;gap:10px;margin-bottom:14px">
-    <input class="inp" id="ld-q" placeholder="Suchen…" oninput="renderLeads()" style="flex:1">
+    <input class="inp" id="ld-q" placeholder="Suchen…" data-tp="ph_search" oninput="renderLeads()" style="flex:1">
     <select class="inp" id="ld-fs" style="width:160px" onchange="renderLeads()">
       <option value="" data-t="leads_all_status">Alle Status</option>
       <option>Neu</option><option>Kontaktiert</option><option>Warm</option><option>Geantwortet</option><option>Kalt</option>
@@ -668,7 +668,7 @@ textarea.inp{resize:vertical;line-height:1.6}
       <div class="fg" style="margin-bottom:0">
         <label data-t="backend_url">Backend URL</label>
         <div style="display:flex;gap:10px">
-          <input class="inp" id="c-backend" placeholder="http://localhost:3000 oder https://your-app.railway.app">
+          <input class="inp" id="c-backend" placeholder="http://localhost:3000 oder https://your-app.railway.app" data-tp="ph_backend">
           <button class="btn btn-sm" onclick="testBackend()" data-t="test">Testen</button>
         </div>
         <div style="font-size:10px;color:var(--t3);margin-top:5px" data-t="backend_hint">
@@ -686,8 +686,8 @@ textarea.inp{resize:vertical;line-height:1.6}
         <div class="fg"><label data-t="role">Rolle</label><input class="inp" id="c-role" placeholder="Lead AI Architect"></div>
       </div>
       <div class="fr" style="margin-bottom:0">
-        <div class="fg" style="margin-bottom:0"><label data-t="company">Unternehmen</label><input class="inp" id="c-co" placeholder="Meine GmbH"></div>
-        <div class="fg" style="margin-bottom:0"><label data-t="signature">Signatur</label><input class="inp" id="c-sig" placeholder="Beste Grüße, Daria"></div>
+        <div class="fg" style="margin-bottom:0"><label data-t="company">Unternehmen</label><input class="inp" id="c-co" placeholder="Meine GmbH" data-tp="ph_company"></div>
+        <div class="fg" style="margin-bottom:0"><label data-t="signature">Signatur</label><input class="inp" id="c-sig" placeholder="Beste Grüße, Daria" data-tp="ph_sig"></div>
       </div>
     </div>
   </div>
@@ -763,11 +763,11 @@ textarea.inp{resize:vertical;line-height:1.6}
         <div class="pn-b">
           <div class="fg">
             <label data-t="linkedin_jobtitle">Zielgruppe / Jobtitel</label>
-            <input class="inp" id="li-jobtitle" placeholder="z.B. CIO, IT-Leiter, Head of Compliance, CTO">
+            <input class="inp" id="li-jobtitle" placeholder="z.B. CIO, IT-Leiter, Head of Compliance, CTO" data-tp="ph_li_jobtitle">
           </div>
           <div class="fg">
             <label data-t="linkedin_keywords">Branche / Keywords</label>
-            <input class="inp" id="li-keywords" placeholder="z.B. Bankensektor, Sparkasse, Volksbank, RegTech">
+            <input class="inp" id="li-keywords" placeholder="z.B. Bankensektor, Sparkasse, Volksbank, RegTech" data-tp="ph_li_keywords">
           </div>
           <div class="fg">
             <label data-t="linkedin_region">Region</label>
@@ -865,16 +865,16 @@ textarea.inp{resize:vertical;line-height:1.6}
     </div>
     <div class="pn-b">
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px">
-        <div class="fg" style="margin-bottom:0"><label>Name + Rolle</label><input class="inp" id="mc-kontakt" placeholder="Max Müller, CIO"></div>
-        <div class="fg" style="margin-bottom:0"><label>Firma</label><input class="inp" id="mc-firma" placeholder="Sparkasse XY GmbH"></div>
+        <div class="fg" style="margin-bottom:0"><label>Name + Rolle</label><input class="inp" id="mc-kontakt" placeholder="Max Müller, CIO" data-tp="ph_mc_kontakt"></div>
+        <div class="fg" style="margin-bottom:0"><label>Firma</label><input class="inp" id="mc-firma" placeholder="Sparkasse XY GmbH" data-tp="ph_mc_firma"></div>
         <div class="fg" style="margin-bottom:0"><label>LinkedIn URL</label><input class="inp" id="mc-linkedin" placeholder="linkedin.com/in/..."></div>
         <div class="fg" style="margin-bottom:0"><label>E-Mail (optional)</label><input class="inp" id="mc-email" placeholder="m.mueller@firma.de" type="email"></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px">
         <div class="fg" style="margin-bottom:0"><label>Telefon</label><input class="inp" id="mc-tel" placeholder="+49 30 ..."></div>
-        <div class="fg" style="margin-bottom:0"><label>Branche</label><input class="inp" id="mc-branche" placeholder="IT-Dienstleister"></div>
+        <div class="fg" style="margin-bottom:0"><label>Branche</label><input class="inp" id="mc-branche" placeholder="IT-Dienstleister" data-tp="ph_mc_branche"></div>
         <div class="fg" style="margin-bottom:0"><label>Mitarbeiter</label><input class="inp" id="mc-ma" placeholder="~100"></div>
-        <div class="fg" style="margin-bottom:0"><label>Standort</label><input class="inp" id="mc-ort" placeholder="Berlin"></div>
+        <div class="fg" style="margin-bottom:0"><label>Standort</label><input class="inp" id="mc-ort" placeholder="Berlin" data-tp="ph_mc_ort"></div>
       </div>
       <button class="btn btn-g btn-sm" onclick="saveManualCapture()">+ In Lead-DB speichern</button>
     </div>
@@ -899,7 +899,7 @@ textarea.inp{resize:vertical;line-height:1.6}
       <div class="fr" style="margin-bottom:12px">
         <div class="fg" style="margin-bottom:0">
           <label>Name</label>
-          <input class="inp" id="nu-name" placeholder="Max Müller">
+          <input class="inp" id="nu-name" placeholder="Max Müller" data-tp="ph_nu_name">
         </div>
         <div class="fg" style="margin-bottom:0">
           <label>E-Mail</label>
@@ -909,7 +909,7 @@ textarea.inp{resize:vertical;line-height:1.6}
       <div class="fr" style="margin-bottom:12px">
         <div class="fg" style="margin-bottom:0">
           <label>Passwort (min. 8 Zeichen)</label>
-          <input class="inp" id="nu-pass" type="password" placeholder="Temporäres Passwort">
+          <input class="inp" id="nu-pass" type="password" placeholder="Temporäres Passwort" data-tp="ph_nu_pass">
         </div>
         <div class="fg" style="margin-bottom:0">
           <label>Rolle</label>
@@ -1094,6 +1094,29 @@ const I18N = {
     stat_profiles_found: 'Profile gefunden', stat_emails_enriched: 'E-Mails angereichert',
     stat_phone_found: 'Telefon gefunden', stat_saved_leads: 'Gespeichert in Leads',
     linkedin_step3: '③ Generierte LinkedIn-Suchen', linkedin_open_all: 'Alle öffnen ↗',
+    // Placeholders
+    ph_email_login: 'daria@firma.de', ph_reg_name: 'Max Müller', ph_reg_email: 'max@firma.de',
+    ph_prodname: 'z.B. AI-Prozessautomatisierung für Banken',
+    ph_target: 'z.B. CIO, IT-Leiter, Compliance-Chef',
+    ph_what: 'Wir entwickeln KI-Agenten die Vertriebsprozesse automatisieren — von der Lead-Recherche bis zur E-Mail-Generierung. Unsere Lösung reduziert den manuellen Aufwand im B2B-Vertrieb um 60%.',
+    ph_problems: 'Vertriebsteams verlieren zu viel Zeit mit manueller Recherche und copy-paste E-Mails. CRM-Daten sind unvollständig. Follow-ups werden vergessen.',
+    ph_usp: 'z.B. Setup in 2 Wochen, kein IT-Team nötig, nachweisbar 40% Zeitersparnis',
+    ph_roi: 'z.B. ROI nach 8 Monaten, 15h/Woche gespart, +23% Conversion',
+    ph_pricing: 'z.B. ab 2.900 €/Monat, Setup einmalig 5.000 €, kostenlose Pilotphase',
+    ph_refs: 'z.B. 3 Sparkassen in Bayern, FinTech-Startup Berlin, 200-MA IT-Dienstleister',
+    ph_context: 'z.B. Wir haben gerade eine Case Study mit Commerzbank veröffentlicht. Aktuell bieten wir bis Ende Q1 eine kostenlose Pilotphase an. Schreib immer auf Deutsch, Sie-Form.',
+    ph_extra: 'z.B. Erwähne DORA-Regulierung. Vermeide das Wort \'revolutionär\'. Beziehe dich auf aktuelle BaFin-Anforderungen.',
+    ph_lead_filter: 'Leads filtern…', ph_test_lead: 'Lead-Name für Test…',
+    ph_search: 'Suchen…',
+    ph_backend: 'http://localhost:3000 oder https://your-app.railway.app',
+    ph_company: 'Meine GmbH', ph_sig: 'Beste Grüße, Daria',
+    ph_li_jobtitle: 'z.B. CIO, IT-Leiter, Head of Compliance, CTO',
+    ph_li_keywords: 'z.B. Bankensektor, Sparkasse, Volksbank, RegTech',
+    ph_mc_kontakt: 'Max Müller, CIO', ph_mc_firma: 'Sparkasse XY GmbH',
+    ph_mc_branche: 'IT-Dienstleister', ph_mc_ort: 'Berlin',
+    ph_nu_name: 'Max Müller', ph_nu_pass: 'Temporäres Passwort',
+    ph_subject: 'Betreff', ph_reply: 'Deine Antwort…',
+    ph_lead_desc: 'Was macht die Firma? Spezialisierung, Kunden, Produkte…',
   },
   en: {
     // Login
@@ -1203,6 +1226,29 @@ const I18N = {
     stat_profiles_found: 'Profiles found', stat_emails_enriched: 'Emails enriched',
     stat_phone_found: 'Phone found', stat_saved_leads: 'Saved to leads',
     linkedin_step3: '③ Generated LinkedIn Searches', linkedin_open_all: 'Open all ↗',
+    // Placeholders
+    ph_email_login: 'daria@company.com', ph_reg_name: 'John Smith', ph_reg_email: 'john@company.com',
+    ph_prodname: 'e.g. AI Process Automation for Banks',
+    ph_target: 'e.g. CIO, IT Director, Compliance Head',
+    ph_what: 'We develop AI agents that automate sales processes — from lead research to email generation. Our solution reduces manual effort in B2B sales by 60%.',
+    ph_problems: 'Sales teams spend too much time on manual research and copy-paste emails. CRM data is incomplete. Follow-ups are forgotten.',
+    ph_usp: 'e.g. Setup in 2 weeks, no IT team needed, proven 40% time savings',
+    ph_roi: 'e.g. ROI after 8 months, 15h/week saved, +23% conversion',
+    ph_pricing: 'e.g. from €2,900/month, one-time setup €5,000, free pilot phase',
+    ph_refs: 'e.g. 3 savings banks in Bavaria, FinTech startup Berlin, 200-employee IT provider',
+    ph_context: 'e.g. We just published a case study with Commerzbank. Currently offering a free pilot phase until end of Q1. Always write in German, formal tone.',
+    ph_extra: 'e.g. Mention DORA regulation. Avoid the word \'revolutionary\'. Refer to current BaFin requirements.',
+    ph_lead_filter: 'Filter leads…', ph_test_lead: 'Lead name for test…',
+    ph_search: 'Search…',
+    ph_backend: 'http://localhost:3000 or https://your-app.railway.app',
+    ph_company: 'My Company Ltd', ph_sig: 'Best regards, Daria',
+    ph_li_jobtitle: 'e.g. CIO, IT Director, Head of Compliance, CTO',
+    ph_li_keywords: 'e.g. Banking sector, Savings bank, RegTech',
+    ph_mc_kontakt: 'John Smith, CIO', ph_mc_firma: 'Acme Corp Ltd',
+    ph_mc_branche: 'IT Services', ph_mc_ort: 'Berlin',
+    ph_nu_name: 'John Smith', ph_nu_pass: 'Temporary password',
+    ph_subject: 'Subject', ph_reply: 'Your reply…',
+    ph_lead_desc: 'What does the company do? Specialization, clients, products…',
   }
 };
 
@@ -1215,6 +1261,11 @@ const applyLang = () => {
     if (el.tagName === 'OPTION') el.textContent = val;
     else if (el.tagName === 'INPUT' && el.type !== 'hidden') { /* skip inputs */ }
     else el.textContent = val;
+  });
+  document.querySelectorAll('[data-tp]').forEach(el => {
+    const key = el.getAttribute('data-tp');
+    const val = t(key);
+    if (val !== key) el.placeholder = val;
   });
 };
 
