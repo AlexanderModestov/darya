@@ -1965,7 +1965,7 @@ BETREFF: [Betreff hier]
 // ─── TEST EMAIL ───────────────────────────────────────────────────────────────
 const runTestEmail = async () => {
   if(!selectedCat) { showAlert('eg-alrt',t('msg_choose_cat_test'),'warn'); return; }
-  if(!V('eg-prompt')) { showAlert('eg-alrt',t('msg_fill_prompt'),'warn'); return; }
+  if(!V('eg-prodname') && !V('eg-what') && !V('eg-prompt')) { showAlert('eg-alrt',t('msg_fill_prompt'),'warn'); return; }
 
   const testName = V('eg-test-lead').trim();
   const testLead = testName
@@ -1993,7 +1993,7 @@ const runTestEmail = async () => {
 // ─── HAUPTGENERIERUNG ────────────────────────────────────────────────────────
 const runEmailGen = async () => {
   if(!selectedCat) { showAlert('eg-alrt',t('msg_choose_cat'),'warn'); return; }
-  if(!V('eg-prompt')) { showAlert('eg-alrt',t('msg_fill_prompt'),'warn'); return; }
+  if(!V('eg-prodname') && !V('eg-what') && !V('eg-prompt')) { showAlert('eg-alrt',t('msg_fill_prompt'),'warn'); return; }
   if(selectedLeadIds.size === 0) { showAlert('eg-alrt',t('msg_select_leads'),'warn'); return; }
 
   if(AUTH_MODE !== 'backend' || !AUTH_API()) { showAlert('eg-alrt',t('msg_no_backend'),'err'); return; }
