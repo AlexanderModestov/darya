@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
 <title>LeadOS — Autonomer Sales Agent</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -1171,6 +1172,24 @@ const I18N = {
     msg_error: 'Fehler',
     msg_error_prefix: 'Fehler: ',
     msg_load_error: 'Fehler beim Laden: ',
+    // Team render
+    team_no_other_users: 'Keine weiteren Nutzer.',
+    team_no_users: 'Keine Benutzer.',
+    team_count_suffix: ' Benutzer',
+    team_you: '(du)',
+    team_employee: '● MITARBEITER',
+    team_demote: 'Zu Mitarbeiter machen',
+    team_promote: 'Zu Admin machen',
+    team_demote_btn: '↓ User',
+    team_promote_btn: '↑ Admin',
+    team_reset_pw: 'Passwort zurücksetzen',
+    team_delete: 'Löschen',
+    team_confirm_delete: 'Nutzer löschen?',
+    // Model labels
+    model_recommended: '(empfohlen)',
+    model_fast: '(schnell)',
+    model_fast_cheap: '(schnell & günstig)',
+    model_recommended_free: '(empfohlen · kostenlos)',
   },
   en: {
     // Login
@@ -1357,6 +1376,24 @@ const I18N = {
     msg_error: 'Error',
     msg_error_prefix: 'Error: ',
     msg_load_error: 'Load error: ',
+    // Team render
+    team_no_other_users: 'No other users.',
+    team_no_users: 'No users.',
+    team_count_suffix: ' Users',
+    team_you: '(you)',
+    team_employee: '● EMPLOYEE',
+    team_demote: 'Demote to employee',
+    team_promote: 'Promote to admin',
+    team_demote_btn: '↓ User',
+    team_promote_btn: '↑ Admin',
+    team_reset_pw: 'Reset password',
+    team_delete: 'Delete',
+    team_confirm_delete: 'Delete user?',
+    // Model labels
+    model_recommended: '(recommended)',
+    model_fast: '(fast)',
+    model_fast_cheap: '(fast & affordable)',
+    model_recommended_free: '(recommended · free)',
   }
 };
 
@@ -1381,6 +1418,10 @@ const switchLang = (lang) => {
   cfg.lang = lang;
   save();
   applyLang();
+  // Re-render dynamic elements that use t()
+  if(typeof switchProvider === 'function') switchProvider(cfg.provider || 'claude');
+  if(typeof renderUsersList === 'function') renderUsersList();
+  if(typeof renderTeam === 'function') renderTeam();
 };
 
 // Email gen state
@@ -2779,17 +2820,17 @@ const switchProvider = (prov) => {
   if(!modelSel) return;
   const models = {
     claude: [
-      {v:'claude-sonnet-4-20250514', l:'Claude Sonnet 4 (empfohlen)'},
+      {v:'claude-sonnet-4-20250514', l:'Claude Sonnet 4 ' + t('model_recommended')},
       {v:'claude-opus-4-20250514',   l:'Claude Opus 4'},
-      {v:'claude-haiku-4-5-20251001',l:'Claude Haiku 4.5 (schnell)'},
+      {v:'claude-haiku-4-5-20251001',l:'Claude Haiku 4.5 ' + t('model_fast')},
     ],
     openai: [
-      {v:'gpt-4o',       l:'GPT-4o (empfohlen)'},
-      {v:'gpt-4o-mini',  l:'GPT-4o Mini (schnell & günstig)'},
+      {v:'gpt-4o',       l:'GPT-4o ' + t('model_recommended')},
+      {v:'gpt-4o-mini',  l:'GPT-4o Mini ' + t('model_fast_cheap')},
       {v:'gpt-4-turbo',  l:'GPT-4 Turbo'},
     ],
     gemini: [
-      {v:'gemini-1.5-flash', l:'Gemini 1.5 Flash (empfohlen · kostenlos)'},
+      {v:'gemini-1.5-flash', l:'Gemini 1.5 Flash ' + t('model_recommended_free')},
       {v:'gemini-1.5-pro',   l:'Gemini 1.5 Pro'},
       {v:'gemini-2.0-flash', l:'Gemini 2.0 Flash'},
     ],
@@ -2925,7 +2966,7 @@ const renderUsersList = () => {
         <div style="font-size:10px;color:var(--t3)">${esc(u.email)} &nbsp;·&nbsp; seit ${new Date(u.created||Date.now()).toLocaleDateString('de-DE')}</div>
       </div>
       ${u.id !== session.userId ? `<button class="btn btn-sm btn-r" onclick="deleteUser('${u.id}')">Löschen</button>` : ''}
-    </div>`).join('') || '<div style="font-size:12px;color:var(--t3)">Keine weiteren Nutzer.</div>';
+    </div>`).join('') || '<div style="font-size:12px;color:var(--t3)">' + t('team_no_other_users') + '</div>';
 };
 
 const deleteUserAccount = (userId) => {
@@ -3324,11 +3365,14 @@ const saveManualCapture = async () => {
     addLog('Lead aktualisiert: ' + firma + ' · ' + kontakt, 'ok');
   } else {
     // Create new lead
-    const nameParts = kontakt.split(' ');
+    // Split "Hans Schmidt, CTO" into name and role parts
+    const [nameStr, ...roleParts] = kontakt.split(',').map(s => s.trim());
+    const rolle = roleParts.join(', ').trim();
+    const nameParts = nameStr.split(' ');
     lead = {
       id: uid(), name: firma,
-      vorname: nameParts[0]||'', nachname: nameParts.slice(1,-1).join(' ')||nameParts[1]||'',
-      rolle: nameParts[nameParts.length-1]!==nameParts[0]&&nameParts.length>2?'':'',
+      vorname: nameParts[0]||'', nachname: nameParts.slice(1).join(' ')||'',
+      rolle,
       kontakt, linkedin: V('mc-linkedin'),
       kontaktEmail: V('mc-email'), firmenEmail: V('mc-email'),
       email: V('mc-email'), telefon: V('mc-tel'), branche: V('mc-branche'),
@@ -3609,7 +3653,7 @@ const renderTeam = async () => {
     users = getUsers();
   }
   const session = getSession();
-  $('team-count').textContent = users.length + ' Benutzer';
+  $('team-count').textContent = users.length + t('team_count_suffix');
 
   $('team-body').innerHTML = users.map(u => `
     <tr>
@@ -3620,7 +3664,7 @@ const renderTeam = async () => {
           </div>
           <div>
             <div style="font-size:12px;font-weight:700;color:var(--t1)">${esc(u.name)}
-              ${u.id === session?.userId ? '<span style="font-size:10px;color:var(--t3);font-weight:400;margin-left:4px">(du)</span>' : ''}
+              ${u.id === session?.userId ? '<span style="font-size:10px;color:var(--t3);font-weight:400;margin-left:4px">' + t('team_you') + '</span>' : ''}
             </div>
           </div>
         </div>
@@ -3628,25 +3672,25 @@ const renderTeam = async () => {
       <td style="padding:10px 12px;font-size:12px;color:var(--t2)">${esc(u.email)}</td>
       <td style="padding:10px 12px">
         <span class="pill ${u.role==='admin'?'pill-purple':'pill-info'}" style="font-size:10px">
-          ${u.role==='admin'?'● ADMIN':'● MITARBEITER'}
+          ${u.role==='admin'?'● ADMIN':t('team_employee')}
         </span>
       </td>
       <td style="padding:10px 12px;font-size:11px;color:var(--t3)">
-        ${u.created ? new Date(u.created).toLocaleDateString('de-DE') : '—'}
+        ${(u.created||u.created_at) ? new Date(u.created||u.created_at).toLocaleDateString('de-DE') : '—'}
       </td>
       <td style="padding:10px 12px;font-size:11px;color:var(--t3)">
-        ${u.lastLogin ? new Date(u.lastLogin).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—'}
+        ${(u.lastLogin||u.last_login) ? new Date(u.lastLogin||u.last_login).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—'}
       </td>
       <td style="padding:10px 12px;white-space:nowrap">
         ${u.id !== session?.userId ? `
-          <button class="tbtn" onclick="toggleRole('${u.id}')" title="${u.role==='admin'?'Zu Mitarbeiter machen':'Zu Admin machen'}" style="font-size:11px">
-            ${u.role==='admin'?'↓ User':'↑ Admin'}
+          <button class="tbtn" onclick="toggleRole('${u.id}')" title="${u.role==='admin'?t('team_demote'):t('team_promote')}" style="font-size:11px">
+            ${u.role==='admin'?t('team_demote_btn'):t('team_promote_btn')}
           </button>
-          <button class="tbtn" onclick="resetPassword('${u.id}')" title="Passwort zurücksetzen" style="font-size:11px;color:var(--yellow)">🔑</button>
-          <button class="tbtn" onclick="deleteUser('${u.id}')" title="Löschen" style="font-size:11px;color:var(--red)">✕</button>
+          <button class="tbtn" onclick="resetPassword('${u.id}')" title="${t('team_reset_pw')}" style="font-size:11px;color:var(--yellow)">🔑</button>
+          <button class="tbtn" onclick="deleteUser('${u.id}')" title="${t('team_delete')}" style="font-size:11px;color:var(--red)">✕</button>
         ` : '<span style="font-size:10px;color:var(--t3)">—</span>'}
       </td>
-    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;padding:28px;color:var(--t3)">Keine Benutzer.</td></tr>';
+    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;padding:28px;color:var(--t3)">' + t('team_no_users') + '</td></tr>';
 };
 
 const showAddUser = () => { $('add-user-panel').style.display=''; };
