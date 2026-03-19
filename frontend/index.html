@@ -1415,6 +1415,7 @@ const applyLang = () => {
 const switchLang = (lang) => {
   cfg.lang = lang;
   save();
+  apiSave('/api/settings', 'PUT', { cfg });
   applyLang();
   // Re-render dynamic elements that use t()
   if(typeof switchProvider === 'function') switchProvider(cfg.provider || 'claude');
