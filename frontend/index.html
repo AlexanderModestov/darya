@@ -1708,9 +1708,36 @@ const load = async () => {
         authFetch('/api/settings'),
         authFetch('/api/logs?limit=200')
       ]);
-      if (leadsRes.ok) leads = await leadsRes.json();
-      if (emailsRes.ok) pending = await emailsRes.json();
-      if (inboxRes.ok) inbox = await inboxRes.json();
+      if (leadsRes.ok) leads = (await leadsRes.json()).map(l => ({
+        ...l,
+        kontaktEmail: l.kontaktEmail || l.kontakt_email,
+        firmenEmail: l.firmenEmail || l.firmen_email,
+        email: l.email || l.kontakt_email || l.firmen_email,
+        created: l.created || l.created_at
+      }));
+      if (emailsRes.ok) pending = (await emailsRes.json()).map(e => ({
+        ...e,
+        leadId: e.leadId || e.lead_id,
+        leadName: e.leadName || e.lead_name,
+        leadEmail: e.leadEmail || e.lead_email,
+        contactName: e.contactName || e.contact_name,
+        contactRole: e.contactRole || e.contact_role,
+        contactPhone: e.contactPhone || e.contact_phone,
+        catId: e.catId || e.cat_id,
+        catName: e.catName || e.cat_name,
+        resendId: e.resendId || e.resend_id,
+        created: e.created || e.created_at
+      }));
+      if (inboxRes.ok) inbox = (await inboxRes.json()).map(i => ({
+        ...i,
+        leadId: i.leadId || i.lead_id,
+        from: i.from || i.from_name,
+        fromEmail: i.fromEmail || i.from_email,
+        catName: i.catName || i.cat_name,
+        origBody: i.origBody || i.orig_body,
+        replyBody: i.replyBody || i.reply_body,
+        time: i.time || i.received_at
+      }));
       if (settingsRes.ok) {
         const s = await settingsRes.json();
         if (s.cfg) cfg = { ...cfg, ...s.cfg, ...localOnly };
@@ -2325,7 +2352,7 @@ const renderApprove = () => {
         </tr></thead>
         <tbody>
           ${list.map(p => `
-            <tr id="trow-${p.id}" style="vertical-align:top;cursor:pointer" onclick="expandTableRow(${p.id})">
+            <tr id="trow-${p.id}" style="vertical-align:top;cursor:pointer" onclick="expandTableRow('${p.id}')">
               <td style="padding:10px 12px">
                 <div style="font-weight:700;font-size:12px;color:var(--t1)">${esc(p.leadName)}</div>
                 ${p.leadEmail?`<div style="font-size:10px;color:var(--t3)">${esc(p.leadEmail)}</div>`:''}
@@ -2346,12 +2373,12 @@ const renderApprove = () => {
               <td style="padding:10px 12px">${statusBadge(p.status)}</td>
               <td style="padding:8px 10px;white-space:nowrap">
                 ${p.status==='pending' ? `
-                  <button class="btn btn-sm btn-ok" style="margin-bottom:4px;display:block;width:100%" onclick="event.stopPropagation();approveOne(${p.id})">✓ Senden</button>
-                  <button class="btn btn-sm btn-rej" style="display:block;width:100%" onclick="event.stopPropagation();rejectOne(${p.id})">✕ Ablehnen</button>
+                  <button class="btn btn-sm btn-ok" style="margin-bottom:4px;display:block;width:100%" onclick="event.stopPropagation();approveOne('${p.id}')">✓ Senden</button>
+                  <button class="btn btn-sm btn-rej" style="display:block;width:100%" onclick="event.stopPropagation();rejectOne('${p.id}')">✕ Ablehnen</button>
                 ` : p.status==='rejected' ? `
-                  <button class="btn btn-sm" onclick="event.stopPropagation();resetTopending(${p.id})">↩ Zurück</button>
+                  <button class="btn btn-sm" onclick="event.stopPropagation();resetTopending('${p.id}')">↩ Zurück</button>
                 ` : `
-                  <button class="btn btn-sm" style="color:var(--t3)" onclick="event.stopPropagation();openGmail(${p.id})">Gmail ↗</button>
+                  <button class="btn btn-sm" style="color:var(--t3)" onclick="event.stopPropagation();openGmail('${p.id}')">Gmail ↗</button>
                 `}
               </td>
             </tr>
@@ -2363,17 +2390,17 @@ const renderApprove = () => {
                     <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Betreff</div>
                     <input class="inp" id="ed-subj-${p.id}" value="${esc(p.subject)}"
                       style="font-size:12px;font-weight:700;padding:7px 10px;margin-bottom:10px"
-                      oninput="livePreview(${p.id})" ${p.status!=='pending'?'disabled':''}>
+                      oninput="livePreview('${p.id}')" ${p.status!=='pending'?'disabled':''}>
                     <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">E-Mail Text</div>
                     <textarea class="inp" id="ed-${p.id}"
                       style="min-height:200px;font-size:12px;line-height:1.7;padding:10px 12px"
-                      oninput="livePreview(${p.id})" ${p.status!=='pending'?'disabled':''}>${esc(p.body)}</textarea>
+                      oninput="livePreview('${p.id}')" ${p.status!=='pending'?'disabled':''}>${esc(p.body)}</textarea>
                     ${p.status==='pending'?`
                       <div style="display:flex;gap:8px;margin-top:8px">
-                        <button class="btn btn-ok" onclick="approveOne(${p.id})">✓ Freigeben & Senden</button>
-                        <button class="btn btn-sm btn-rej" onclick="rejectOne(${p.id})">✕ Ablehnen</button>
-                        <button class="btn btn-sm" onclick="expandTableRow(${p.id})">Schließen</button>
-                      </div>`:'<div style="margin-top:8px"><button class="btn btn-sm" onclick="expandTableRow('+p.id+')">Schließen</button></div>'}
+                        <button class="btn btn-ok" onclick="approveOne('${p.id}')">✓ Freigeben & Senden</button>
+                        <button class="btn btn-sm btn-rej" onclick="rejectOne('${p.id}')">✕ Ablehnen</button>
+                        <button class="btn btn-sm" onclick="expandTableRow('${p.id}')">Schließen</button>
+                      </div>`:'<div style="margin-top:8px"><button class="btn btn-sm" onclick="expandTableRow(\''+p.id+'\')">Schließen</button></div>'}
                   </div>
                   <div>
                     <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Kontaktdaten</div>
@@ -2418,9 +2445,9 @@ const renderApprove = () => {
         <!-- ACTION BUTTONS top-right -->
         <div style="display:flex;gap:6px;align-items:flex-start;flex-shrink:0">
           ${p.status==='rejected' ? `
-            <button class="btn btn-sm" onclick="resetTopending(${p.id})">↩ Zurück</button>
+            <button class="btn btn-sm" onclick="resetTopending('${p.id}')">↩ Zurück</button>
           ` : p.status==='approved' ? `
-            <button class="btn btn-sm" style="color:var(--t3)" onclick="openGmail(${p.id})">Gmail ↗</button>
+            <button class="btn btn-sm" style="color:var(--t3)" onclick="openGmail('${p.id}')">Gmail ↗</button>
           ` : ''}
         </div>
       </div>
@@ -2442,19 +2469,24 @@ const renderApprove = () => {
           </div>
           <input class="inp" id="ed-subj-${p.id}" value="${esc(p.subject)}"
             style="font-size:12px;padding:8px 12px;margin-bottom:8px;font-weight:700"
-            placeholder="Betreff" oninput="livePreview(${p.id})">
+            placeholder="Betreff" oninput="livePreview('${p.id}')">
           <textarea class="inp" id="ed-${p.id}"
             style="min-height:180px;font-size:12px;line-height:1.75;padding:10px 12px"
-            oninput="livePreview(${p.id})">${esc(p.body)}</textarea>
+            oninput="livePreview('${p.id}')">${esc(p.body)}</textarea>
           <div style="display:flex;gap:8px;margin-top:10px">
-            <button class="btn btn-ok" onclick="approveOne(${p.id})">✓ Freigeben &amp; Senden</button>
-            <button class="btn btn-rej btn-sm" onclick="rejectOne(${p.id})">✕ Ablehnen</button>
+            <button class="btn btn-ok" onclick="approveOne('${p.id}')">✓ Freigeben &amp; Senden</button>
+            <button class="btn btn-rej btn-sm" onclick="rejectOne('${p.id}')">✕ Ablehnen</button>
           </div>
         </div>
       ` : ''}
     </div>`).join('') || (total > 0 ? `<div style="text-align:center;padding:40px;color:var(--t3)">Keine E-Mails in dieser Ansicht.</div>` : '');
 
   ui();
+};
+
+const expandTableRow = id => {
+  const row = $('texp-'+id);
+  if(row) row.style.display = row.style.display === 'none' ? '' : 'none';
 };
 
 const livePreview = id => {
@@ -2524,21 +2556,21 @@ const renderInbox = () => {
       <div class="eml-prev" style="max-height:90px">${esc(item.body)}</div>
       ${!item.replied?`
         <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-sm btn-purple" onclick="genReply(${item.id})">⚡ KI-Antwort generieren</button>
-          <button class="btn btn-sm" onclick="toggleBox(${item.id})">Manuell schreiben</button>
+          <button class="btn btn-sm btn-purple" onclick="genReply('${item.id}')">⚡ KI-Antwort generieren</button>
+          <button class="btn btn-sm" onclick="toggleBox('${item.id}')">Manuell schreiben</button>
         </div>
         <div id="rbox-${item.id}" style="display:none;margin-top:10px">
           <textarea class="inp" id="rt-${item.id}" style="min-height:80px" placeholder="Deine Antwort…"></textarea>
-          <div style="margin-top:6px"><button class="btn btn-sm btn-ok" onclick="sendManualReply(${item.id})">Senden</button></div>
+          <div style="margin-top:6px"><button class="btn btn-sm btn-ok" onclick="sendManualReply('${item.id}')">Senden</button></div>
         </div>
         ${item.aiDraft?`
           <div style="margin-top:12px">
             <div style="font-size:10px;color:var(--purple);margin-bottom:5px;text-transform:uppercase;letter-spacing:.08em">⚡ KI-Entwurf — bitte prüfen</div>
             <div class="eml-prev" style="border-color:rgba(168,85,247,.3)">${esc(item.aiDraft)}</div>
             <div style="display:flex;gap:8px;margin-top:6px">
-              <button class="btn btn-sm btn-ok" onclick="approveReply(${item.id})">✓ Genehmigen & Senden</button>
-              <button class="btn btn-sm" onclick="editDraft(${item.id})">Bearbeiten</button>
-              <button class="btn btn-sm btn-rej" onclick="discardDraft(${item.id})">Verwerfen</button>
+              <button class="btn btn-sm btn-ok" onclick="approveReply('${item.id}')">✓ Genehmigen & Senden</button>
+              <button class="btn btn-sm" onclick="editDraft('${item.id}')">Bearbeiten</button>
+              <button class="btn btn-sm btn-rej" onclick="discardDraft('${item.id}')">Verwerfen</button>
             </div>
           </div>`:''}
       `:item.replyBody?`
