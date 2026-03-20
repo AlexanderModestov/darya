@@ -1862,65 +1862,110 @@ const runAgent = async () => {
     tlog('✗ ' + t('msg_no_backend'),'lr');
     endAgent(); return;
   }
-  tlog('Firmensuche gestartet…','lg');
-  addLog('Agent-Suche: '+prompt.substring(0,60)+'…','agent');
+  if(!cfg.apolloKey) {
+    tlog('✗ Apollo API-Key fehlt. Bitte unter Konfiguration einstellen.','lr');
+    endAgent(); return;
+  }
+  tlog('Firmensuche via Apollo gestartet…','lg');
+  addLog('Agent-Suche (Apollo): '+prompt.substring(0,60)+'…','agent');
 
-  step(1,'act'); stepD(1,'Recherchiert via Claude…');
-  let newLeads = [];
+  // ── Step 1: Apollo Organization Search ──────────────────────────────────────
+  step(1,'act'); stepD(1,'Suche Firmen via Apollo…');
+  let orgs = [];
   try {
-    const excl = leads.map(l=>l.name).slice(0,30).join(', ');
-    const p = `Du bist ein B2B-Lead-Recherche-Agent für den deutschen Markt.
+    // Extract keywords from prompt for Apollo search
+    const existing = new Set(leads.map(l=>l.name.toLowerCase()));
 
-Suchauftrag: "${prompt}"
-Bereits vorhanden (NICHT wiederholen): ${excl||'keine'}
+    const res = await authFetch('/api/apollo/organizations', {
+      method: 'POST',
+      body: JSON.stringify({
+        q_keywords: prompt,
+        page: 1,
+        per_page: Math.min(count * 2, 25) // fetch extra to compensate for duplicates
+      })
+    });
+    if (!res.ok) throw new Error('Apollo HTTP ' + res.status);
+    const data = await res.json();
+    orgs = (data.organizations || data.accounts || [])
+      .filter(o => o.name && !existing.has(o.name.toLowerCase()))
+      .slice(0, count);
 
-Aufgabe: Identifiziere exakt ${count} REALE deutsche Unternehmen die zum Suchauftrag passen.
-
-Für jedes Unternehmen recherchiere:
-1. Firmendaten (Name, Branche, Mitarbeiter, Ort, Website)
-2. Company Beschreibung: 2-3 präzise Sätze was die Firma macht, welche Kunden/Partner sie hat, welche Produkte/Services
-3. Konkreter Ansprechpartner: Vorname + Nachname + genaue Rolle (z.B. "CIO", "Geschäftsführer") — passend zur Zielgruppe im Prompt
-4. E-Mail Ansprechpartner: direkte E-Mail (Format: vorname.nachname@domain)
-5. Firmen-E-Mail: info@domain oder kontakt@domain
-6. Telefon: Direkte Durchwahl oder Zentrale (+49 Format)
-
-Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array (kein Text davor/danach):
-[{"name":"Firmenname GmbH","branche":"IT-Dienstleister","fokus":"konkrete Banken-Referenz","ma":"~100","ort":"Berlin","web":"firma.de","email":"info@firma.de","vorname":"Max","nachname":"Müller","rolle":"CIO","kontaktEmail":"max.mueller@firma.de","firmenEmail":"info@firma.de","telefon":"+49 30 12345678","beschreibung":"Was macht die Firma, welche Kunden, welche Produkte"}]`;
-    const raw = await claude(p, 8000);
-    if(abort) { endAgent(); return; }
-    // Strip markdown code fences if present
-    const cleaned = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
-    const s=cleaned.indexOf('['), e=cleaned.lastIndexOf(']');
-    if(s<0||e<0) throw new Error('Claude hat kein JSON zurückgegeben. Antwort: '+cleaned.substring(0,120));
-    try {
-      newLeads = JSON.parse(cleaned.substring(s,e+1));
-    } catch(parseErr) {
-      throw new Error('JSON-Fehler: '+parseErr.message+' — Rohtext: '+cleaned.substring(s,s+200));
+    if(!orgs.length) {
+      tlog('Apollo hat keine Firmen gefunden. Versuche andere Keywords.','ly');
+      endAgent(); return;
     }
-    step(1,'done'); stepD(1, newLeads.length+' Firmen gefunden');
-    tlog(newLeads.length+' Firmen gefunden','lg');
+    step(1,'done'); stepD(1, orgs.length+' Firmen gefunden');
+    tlog(orgs.length+' Firmen von Apollo gefunden','lg');
   } catch(e) {
-    tlog('✗ Fehler: '+e.message,'lr'); addLog('Agent-Fehler: '+e.message,'err'); tlog('→ Bitte API-Key in Konfiguration prüfen.','ly');
+    tlog('✗ Apollo-Fehler: '+e.message,'lr'); addLog('Apollo Org-Suche Fehler: '+e.message,'err');
     endAgent(); return;
   }
 
-  step(2,'act'); stepD(2,t('agent_saving_leads'));
-  const existing = new Set(leads.map(l=>l.name));
-  const toAdd = newLeads.filter(l=>l.name&&!existing.has(l.name));
-  for (const l of toAdd) {
+  // ── Step 2: Enrich each org with People Search ─────────────────────────────
+  step(2,'act'); stepD(2,'Kontakte suchen via Apollo…');
+  const newLeads = [];
+  for (const org of orgs) {
+    if(abort) { endAgent(); return; }
+    const lead = {
+      name: org.name || '',
+      branche: org.industry || '',
+      ort: [org.city, org.state, org.country].filter(Boolean).join(', '),
+      ma: org.estimated_num_employees ? '~'+org.estimated_num_employees : '',
+      web: org.primary_domain || org.website_url || '',
+      beschreibung: org.short_description || '',
+      firmenEmail: '',
+      kontaktEmail: '',
+      vorname: '', nachname: '', rolle: '', telefon: '', linkedin: '',
+      fokus: '', apolloData: org
+    };
+
+    // Try to find a contact person via People Search
+    const domain = extractDomain(lead.web);
+    if(domain) {
+      try {
+        const pRes = await authFetch('/api/apollo/search', {
+          method: 'POST',
+          body: JSON.stringify({
+            q_organization_domains: [domain],
+            person_titles: ['CIO','IT-Leiter','CTO','CEO','Geschäftsführer','Head of IT','Managing Director'],
+            page: 1, per_page: 1
+          })
+        });
+        if(pRes.ok) {
+          const pData = await pRes.json();
+          const person = (pData.people || [])[0];
+          if(person) {
+            lead.vorname = person.first_name || '';
+            lead.nachname = person.last_name || '';
+            lead.rolle = person.title || '';
+            lead.kontaktEmail = person.email || '';
+            lead.telefon = person.phone_numbers?.[0]?.sanitized_number || person.organization?.phone || '';
+            lead.linkedin = isValidLinkedIn(person.linkedin_url) ? person.linkedin_url : '';
+          }
+        }
+        await slp(300);
+      } catch(e) { addLog('People-Suche Fehler für '+lead.name+': '+e.message, 'err'); }
+    }
+
+    newLeads.push(lead);
+    tlog('  + '+lead.name + (lead.vorname ? ' · '+lead.vorname+' '+lead.nachname : ''),'lw');
+  }
+  step(2,'done'); stepD(2, newLeads.length+' Kontakte gesucht');
+
+  // ── Step 3: Save leads ─────────────────────────────────────────────────────
+  step(3,'act'); stepD(3,t('agent_saving_leads'));
+  for (const l of newLeads) {
     l.id=uid(); l.status='Neu'; l.created=new Date().toLocaleDateString(loc());
     const saved = await apiSave('/api/leads', 'POST', l);
     if (saved) l.id = saved.id;
     leads.unshift(l);
-    tlog('  + '+l.name,'lw');
     if(cfg.whUrl) sendWH(l);
   }
   save(); ui();
-  step(2,'done'); stepD(2, toAdd.length+' Leads gespeichert');
-  addLog(toAdd.length+' Leads gespeichert','ok');
+  step(3,'done'); stepD(3, newLeads.length+' Leads gespeichert');
+  addLog(newLeads.length+' Leads gespeichert (Apollo)','ok');
 
-  step(3,'done'); stepD(3,'Fertig');
-  tlog('Suche abgeschlossen. '+toAdd.length+' neue Leads.','lg');
+  tlog('Suche abgeschlossen. '+newLeads.length+' neue Leads mit echten Daten.','lg');
   endAgent();
 
   if(after==='emailgen') {
