@@ -3552,7 +3552,7 @@ const saveManualCapture = async () => {
   if(lead) {
     // Update existing lead
     if(kontakt)     lead.kontakt  = kontakt;
-    if(V('mc-linkedin')) lead.linkedin = V('mc-linkedin');
+    if(V('mc-linkedin') && isValidLinkedIn(V('mc-linkedin'))) lead.linkedin = V('mc-linkedin');
     if(V('mc-email'))    lead.email    = V('mc-email');
     if(V('mc-tel'))      lead.telefon  = V('mc-tel');
     if(V('mc-branche'))  lead.branche  = V('mc-branche');
@@ -3570,7 +3570,7 @@ const saveManualCapture = async () => {
       id: uid(), name: firma,
       vorname: nameParts[0]||'', nachname: nameParts.slice(1).join(' ')||'',
       rolle,
-      kontakt, linkedin: V('mc-linkedin'),
+      kontakt, linkedin: isValidLinkedIn(V('mc-linkedin')) ? V('mc-linkedin') : '',
       kontaktEmail: V('mc-email'), firmenEmail: V('mc-email'),
       email: V('mc-email'), telefon: V('mc-tel'), branche: V('mc-branche'),
       ma: V('mc-ma'), ort: V('mc-ort'), fokus: '', web: '',
