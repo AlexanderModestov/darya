@@ -49,7 +49,7 @@ CREATE INDEX IF NOT EXISTS idx_leads_deleted ON leads(deleted_at);
 CREATE TABLE IF NOT EXISTS emails (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  lead_id UUID REFERENCES leads(id) ON DELETE SET NULL,
+  lead_id UUID REFERENCES leads(id) ON DELETE CASCADE,
   lead_name VARCHAR(255),
   lead_email VARCHAR(255),
   contact_name VARCHAR(200),
@@ -72,7 +72,7 @@ CREATE INDEX IF NOT EXISTS idx_emails_lead ON emails(lead_id);
 CREATE TABLE IF NOT EXISTS inbox (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  lead_id UUID REFERENCES leads(id) ON DELETE SET NULL,
+  lead_id UUID REFERENCES leads(id) ON DELETE CASCADE,
   from_name VARCHAR(200),
   from_email VARCHAR(255),
   subject VARCHAR(500),

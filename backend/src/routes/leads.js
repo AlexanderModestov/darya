@@ -204,6 +204,10 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Lead not found' });
     }
 
+    // Delete associated emails and inbox entries
+    await query('DELETE FROM emails WHERE lead_id = $1', [id]);
+    await query('DELETE FROM inbox WHERE lead_id = $1', [id]);
+
     await logActivity(userId, 'lead_deleted', 'lead', id, null);
     res.json({ success: true });
   } catch (err) {
