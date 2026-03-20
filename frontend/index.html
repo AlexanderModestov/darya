@@ -3410,7 +3410,7 @@ const enrichOneLead = async (id) => {
         if (first.vorname && !lead.vorname) lead.vorname = first.vorname;
         if (first.nachname && !lead.nachname) lead.nachname = first.nachname;
         if (first.rolle && !lead.rolle) lead.rolle = first.rolle;
-        if (first.kontakt) lead.kontakt = first.kontakt;
+        if (first.kontakt && !lead.kontakt) lead.kontakt = first.kontakt;
         enriched = true;
         addLog('Apollo: ' + lead.name + ' → ' + (first.email || '') + ' · ' + (first.telefon || ''), 'ok');
         await apiSave('/api/leads/' + lead.id, 'PUT', lead);
