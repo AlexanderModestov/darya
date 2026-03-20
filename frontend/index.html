@@ -1230,6 +1230,33 @@ const I18N = {
     lead_ai_fill_btn: '⚡ KI auto-ausfüllen',
     leads_entries: 'Einträge', logout_title: 'Ausloggen', logout_confirm: 'Ausloggen?',
     log_clear_confirm: 'Log leeren?', terminal_cleared: 'Terminal geleert.',
+    // Email categories
+    cat_erstansprache: 'Erstansprache', cat_erstansprache_desc: 'Erste Kontaktaufnahme — präzise, nicht aufdringlich',
+    cat_followup: 'Follow-Up', cat_followup_desc: 'Nachfassen nach keiner Antwort — freundlich, nicht nervig',
+    cat_reaktivierung: 'Reaktivierung', cat_reaktivierung_desc: 'Kalt gewordene Leads wieder aktivieren',
+    cat_demo: 'Demo-Anfrage', cat_demo_desc: 'Einladung zu einer konkreten Produktdemo',
+    cat_roi: 'ROI & Zahlen', cat_roi_desc: 'Konkrete Zahlen und Business Case im Vordergrund',
+    cat_event: 'Event / Webinar', cat_event_desc: 'Einladung zu einem Event, Webinar oder Roundtable',
+    cat_referenz: 'Referenz & Case Study', cat_referenz_desc: 'Konkrete Erfolgsgeschichte aus der Branche teilen',
+    cat_breakup: 'Break-Up E-Mail', cat_breakup_desc: 'Letzte E-Mail — schafft oft überraschend viel Response',
+    cat_custom: 'Eigener Prompt', cat_custom_desc: 'Schreibe deine eigenen E-Mail-Anweisungen',
+    // Approval
+    emails_total: 'E-Mails gesamt',
+    // LinkedIn extra
+    li_enrich_title: '④ Leads anreichern via Apollo', li_enrich_btn: 'Auswahl anreichern',
+    li_no_leads_enrich: 'Keine Leads. Agent starten um Firmen zu finden.',
+    li_manual_title: '⑤ Manueller LinkedIn-Import', li_manual_hint: 'Profil-Daten von LinkedIn kopieren & einfügen',
+    li_label_name_role: 'Name + Rolle', li_label_firma: 'Firma', li_label_linkedin_url: 'LinkedIn URL',
+    li_label_email_opt: 'E-Mail (optional)', li_label_telefon: 'Telefon', li_label_branche: 'Branche',
+    li_label_mitarbeiter: 'Mitarbeiter', li_label_standort: 'Standort',
+    li_save_btn: '+ In Lead-DB speichern', li_no_api: 'KEIN API',
+    // Config extra
+    apollo_hint_free: 'Free: 50 Anfragen/Tag',
+    user_badge_me: 'ICH', user_since: 'seit',
+    // Leads table empty
+    leads_empty_table: 'Keine Leads. Agent starten oder Leads importieren.',
+    // Team page title
+    team_page_title: 'Team & Benutzer',
   },
   en: {
     // Login
@@ -1476,6 +1503,33 @@ const I18N = {
     lead_ai_fill_btn: '⚡ AI auto-fill',
     leads_entries: 'entries', logout_title: 'Log out', logout_confirm: 'Log out?',
     log_clear_confirm: 'Clear log?', terminal_cleared: 'Terminal cleared.',
+    // Email categories
+    cat_erstansprache: 'Cold Outreach', cat_erstansprache_desc: 'First contact — precise, not pushy',
+    cat_followup: 'Follow-Up', cat_followup_desc: 'Follow up after no reply — friendly, not annoying',
+    cat_reaktivierung: 'Re-engagement', cat_reaktivierung_desc: 'Re-activate cold leads',
+    cat_demo: 'Demo Request', cat_demo_desc: 'Invitation to a concrete product demo',
+    cat_roi: 'ROI & Numbers', cat_roi_desc: 'Concrete numbers and business case up front',
+    cat_event: 'Event / Webinar', cat_event_desc: 'Invitation to an event, webinar or roundtable',
+    cat_referenz: 'Reference & Case Study', cat_referenz_desc: 'Share a concrete success story from the industry',
+    cat_breakup: 'Break-Up Email', cat_breakup_desc: 'Last email — often generates surprising response',
+    cat_custom: 'Custom Prompt', cat_custom_desc: 'Write your own email instructions',
+    // Approval
+    emails_total: 'emails total',
+    // LinkedIn extra
+    li_enrich_title: '④ Enrich leads via Apollo', li_enrich_btn: 'Enrich selected',
+    li_no_leads_enrich: 'No leads. Start agent to find companies.',
+    li_manual_title: '⑤ Manual LinkedIn Import', li_manual_hint: 'Copy & paste profile data from LinkedIn',
+    li_label_name_role: 'Name + Role', li_label_firma: 'Company', li_label_linkedin_url: 'LinkedIn URL',
+    li_label_email_opt: 'Email (optional)', li_label_telefon: 'Phone', li_label_branche: 'Industry',
+    li_label_mitarbeiter: 'Employees', li_label_standort: 'Location',
+    li_save_btn: '+ Save to Lead DB', li_no_api: 'NO API',
+    // Config extra
+    apollo_hint_free: 'Free: 50 requests/day',
+    user_badge_me: 'ME', user_since: 'since',
+    // Leads table empty
+    leads_empty_table: 'No leads. Start agent or import leads.',
+    // Team page title
+    team_page_title: 'Team & Users',
   }
 };
 
@@ -1860,8 +1914,8 @@ const renderCatGrid = () => {
   $('cat-grid').innerHTML = EMAIL_CATS.map(c => `
     <div class="cat-card${selectedCat===c.id?' sel':''}" onclick="selectCat('${c.id}')">
       <span class="cat-icon">${c.icon}</span>
-      <div class="cat-name">${esc(c.name)}</div>
-      <div class="cat-desc">${esc(c.desc)}</div>
+      <div class="cat-name">${esc(t('cat_'+c.id))}</div>
+      <div class="cat-desc">${esc(t('cat_'+c.id+'_desc'))}</div>
     </div>`).join('');
 };
 
@@ -1984,7 +2038,7 @@ const renderLeadPicker = () => {
   $('eg-lead-count-lbl').textContent = selectedLeadIds.size + ' ' + t('leads_selected');
   $('lead-picker').innerHTML = filtered.map(l => `
     <label class="lead-checkbox">
-      <input type="checkbox" ${selectedLeadIds.has(l.id)?'checked':''} onchange="toggleLead(${l.id},this.checked)">
+      <input type="checkbox" ${selectedLeadIds.has(l.id)?'checked':''} onchange="toggleLead('${l.id}',this.checked)">
       <div style="flex:1">
         <span style="font-weight:700;color:var(--t1);font-size:12px">${esc(l.name)}</span>
         <span style="font-size:10px;color:var(--t3);margin-left:8px">${esc(l.branche||'')} · ${esc(l.ort||'')} · ${esc(l.ma||'?')} MA</span>
