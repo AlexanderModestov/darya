@@ -3252,6 +3252,21 @@ const toggleLiSel = (id, checked) => {
   else liSelectedIds.delete(id);
 };
 
+// ── LinkedIn URL validation ─────────────────────────────────────────────────
+const isValidLinkedIn = (url) =>
+  typeof url === 'string' && /^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9._%-]+/.test(url.trim());
+
+// ── Extract domain from web field ───────────────────────────────────────────
+const extractDomain = (web) => {
+  if (!web) return null;
+  try {
+    let u = web.trim();
+    if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+    const h = new URL(u).hostname.replace(/^www\./, '');
+    return h || null;
+  } catch { return null; }
+};
+
 // Build LinkedIn People Search URL
 const buildLinkedInURL = (name, role, company, region) => {
   const q = [name, role, company].filter(Boolean).join(' ');
