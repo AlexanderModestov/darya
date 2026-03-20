@@ -3390,40 +3390,64 @@ const openLinkedInSearch = (company, kontakt, ort) => {
 // ── APOLLO.IO ENRICHMENT ────────────────────────────────────────────────────
 const enrichOneLead = async (id) => {
   const lead = leads.find(l => l.id === id);
-  if(!lead) return;
+  if (!lead) return;
 
   const btn = $('liq-' + id)?.querySelector('.btn-purple');
-  if(btn) { btn.disabled = true; btn.innerHTML = '<span class="sp"></span>'; }
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="sp"></span>'; }
 
   let enriched = false;
 
-  // Try Apollo.io first
-  if(cfg.apolloKey) {
+  if (cfg.apolloKey) {
     try {
-      const result = await apolloSearch(lead.name, lead.kontakt, lead.ort);
-      if(result) {
-        if(result.email    && !lead.kontaktEmail) { lead.kontaktEmail = result.email; lead.email = result.email; }
-        if(result.telefon  && !lead.telefon)  lead.telefon  = result.telefon;
-        if(result.linkedin && !lead.linkedin) lead.linkedin = result.linkedin;
-        if(result.apolloData) lead.apolloData = result.apolloData;
-        if(result.kontakt && !lead.vorname) {
-          const parts = result.kontakt.split(' ');
-          lead.vorname  = parts[0]||'';
-          const rolePart= parts[parts.length-1];
-          const lastIdx = result.kontakt.indexOf(',');
-          if(lastIdx>0){ lead.nachname=result.kontakt.substring(parts[0].length+1,lastIdx).trim(); lead.rolle=result.kontakt.substring(lastIdx+1).trim(); }
-          else { lead.nachname=parts.slice(1).join(' ')||''; }
-          lead.kontakt = result.kontakt;
-        }
+      const results = await apolloSearch(lead);
+      if (results.length > 0) {
+        // First result updates the existing lead
+        const first = results[0];
+        if (first.email && !lead.kontaktEmail) { lead.kontaktEmail = first.email; lead.email = first.email; }
+        if (first.telefon && !lead.telefon) lead.telefon = first.telefon;
+        if (first.linkedin && !lead.linkedin) lead.linkedin = first.linkedin;
+        if (first.apolloData) lead.apolloData = first.apolloData;
+        if (first.vorname && !lead.vorname) lead.vorname = first.vorname;
+        if (first.nachname && !lead.nachname) lead.nachname = first.nachname;
+        if (first.rolle && !lead.rolle) lead.rolle = first.rolle;
+        if (first.kontakt) lead.kontakt = first.kontakt;
         enriched = true;
-        addLog('Apollo: ' + lead.name + ' → ' + (result.email||'') + ' · ' + (result.telefon||''), 'ok');
+        addLog('Apollo: ' + lead.name + ' → ' + (first.email || '') + ' · ' + (first.telefon || ''), 'ok');
+        await apiSave('/api/leads/' + lead.id, 'PUT', lead);
+
+        // Additional results → create new leads under same company
+        for (let i = 1; i < results.length; i++) {
+          const p = results[i];
+          if (!p.email && !p.linkedin) continue; // skip empty results
+
+          // Deduplicate by linkedin URL or email
+          const isDuplicate = leads.some(l =>
+            (p.linkedin && l.linkedin === p.linkedin) ||
+            (p.email && (l.kontaktEmail === p.email || l.email === p.email))
+          );
+          if (isDuplicate) continue;
+
+          const newLead = {
+            id: uid(), name: lead.name,
+            vorname: p.vorname, nachname: p.nachname, rolle: p.rolle,
+            kontakt: p.kontakt, kontaktEmail: p.email, email: p.email,
+            firmenEmail: '', telefon: p.telefon, linkedin: p.linkedin,
+            branche: lead.branche, ort: lead.ort, ma: lead.ma,
+            web: lead.web, fokus: lead.fokus,
+            status: 'Neu', apolloData: p.apolloData,
+            created: new Date().toLocaleDateString(loc())
+          };
+          const savedLead = await apiSave('/api/leads', 'POST', newLead);
+          if (savedLead) newLead.id = savedLead.id;
+          leads.unshift(newLead);
+          addLog('Apollo+: ' + lead.name + ' → ' + p.kontakt + ' · ' + (p.email || ''), 'ok');
+        }
       }
-    } catch(e) { addLog('Apollo-Fehler: ' + e.message, 'err'); }
+    } catch (e) { addLog('Apollo-Fehler: ' + e.message, 'err'); }
   }
 
   save(); renderLinkedInEnrichList(); renderLeads(); renderLeadPicker();
-  if(enriched) await apiSave('/api/leads/' + lead.id, 'PUT', lead);
-  if(btn) { btn.disabled = false; btn.textContent = enriched ? '✓' : '⚡'; }
+  if (btn) { btn.disabled = false; btn.textContent = enriched ? '✓' : '⚡'; }
 };
 
 const enrichSelected = async () => {
