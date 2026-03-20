@@ -1883,10 +1883,9 @@ Für jedes Unternehmen recherchiere:
 4. E-Mail Ansprechpartner: direkte E-Mail (Format: vorname.nachname@domain)
 5. Firmen-E-Mail: info@domain oder kontakt@domain
 6. Telefon: Direkte Durchwahl oder Zentrale (+49 Format)
-7. LinkedIn-Profil URL des Ansprechpartners
 
 Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array (kein Text davor/danach):
-[{"name":"Firmenname GmbH","branche":"IT-Dienstleister","fokus":"konkrete Banken-Referenz","ma":"~100","ort":"Berlin","web":"firma.de","email":"info@firma.de","vorname":"Max","nachname":"Müller","rolle":"CIO","kontaktEmail":"max.mueller@firma.de","firmenEmail":"info@firma.de","telefon":"+49 30 12345678","linkedin":"linkedin.com/in/maxmueller","beschreibung":"Was macht die Firma, welche Kunden, welche Produkte"}]`;
+[{"name":"Firmenname GmbH","branche":"IT-Dienstleister","fokus":"konkrete Banken-Referenz","ma":"~100","ort":"Berlin","web":"firma.de","email":"info@firma.de","vorname":"Max","nachname":"Müller","rolle":"CIO","kontaktEmail":"max.mueller@firma.de","firmenEmail":"info@firma.de","telefon":"+49 30 12345678","beschreibung":"Was macht die Firma, welche Kunden, welche Produkte"}]`;
     const raw = await claude(p, 8000);
     if(abort) { endAgent(); return; }
     // Strip markdown code fences if present
