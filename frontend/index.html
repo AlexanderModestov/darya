@@ -3280,95 +3280,93 @@ const buildLinkedInCompanyURL = (company) => {
   return 'https://www.linkedin.com/search/results/companies/?keywords=' + encodeURIComponent(company);
 };
 
-// Run main LinkedIn search — generates search URLs for all leads
+// Run LinkedIn search — find real profiles via Apollo API
 const runLinkedInSearch = async () => {
   const jobtitle = V('li-jobtitle');
   const keywords = V('li-keywords');
   const region   = V('li-region');
-  const mode     = V('li-mode');
 
   if(!leads.length && !jobtitle) {
     showAlert('li-alrt', t('msg_li_load_leads'), 'warn');
     return;
   }
 
-  const btn = $('li-search-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="sp"></span>Generiere…';
-
-  const urls = [];
-
-  // For each lead without a contact, build a search URL
-  const targets = leads.filter(l => !l.kontakt || !l.linkedin);
-
-  if(targets.length > 0) {
-    // Use Claude to generate optimized search queries
-    const prompt = `Erstelle optimierte LinkedIn-Suchanfragen für folgende Firmen.
-Zielposition: ${jobtitle || 'CIO, IT-Leiter, CTO, Head of Operations'}
-Branche: ${keywords || 'Bankensektor, IT-Dienstleister'}
-Region: ${region}
-
-Firmen:
-${targets.slice(0,15).map((l,i) => (i+1)+'. '+l.name+' ('+( l.branche||'IT')+', '+( l.ort||'')+')').join('\n')}
-
-Antworte NUR mit JSON-Array:
-[{"firmId": 0, "firm": "Name", "searchQuery": "Max Muster CIO Sparkasse Berlin", "linkedinUrl": "https://www.linkedin.com/search/results/people/?keywords=...", "companyUrl": "https://www.linkedin.com/search/results/companies/?keywords=..."}]`;
-
-    try {
-      const raw = await claude(prompt, 2000);
-      const cleanedLi = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
-      const s = cleanedLi.indexOf('['), e = cleanedLi.lastIndexOf(']');
-      if(s >= 0 && e > s) {
-        const parsed = JSON.parse(cleanedLi.substring(s, e+1));
-        parsed.forEach((item, i) => {
-          const lead = targets[i];
-          if(!lead) return;
-          urls.push({
-            leadId: lead.id,
-            leadName: lead.name,
-            searchQuery: item.searchQuery || (jobtitle + ' ' + lead.name),
-            linkedinUrl: item.linkedinUrl || buildLinkedInURL(jobtitle, '', lead.name, region),
-            companyUrl: item.companyUrl || buildLinkedInCompanyURL(lead.name)
-          });
-        });
-      }
-    } catch(e) {
-      // Fallback: build URLs manually
-      targets.forEach(l => {
-        urls.push({
-          leadId: l.id, leadName: l.name,
-          searchQuery: (jobtitle || 'IT-Leiter') + ' ' + l.name,
-          linkedinUrl: buildLinkedInURL(jobtitle || 'IT-Leiter', '', l.name, region),
-          companyUrl: buildLinkedInCompanyURL(l.name)
-        });
-      });
-    }
-  } else if(jobtitle || keywords) {
-    // Generic search without specific companies
-    urls.push({
-      leadId: null, leadName: 'Allgemeine Suche',
-      searchQuery: [jobtitle, keywords, region].filter(Boolean).join(' '),
-      linkedinUrl: buildLinkedInURL(jobtitle, '', keywords, region),
-      companyUrl: 'https://www.linkedin.com/search/results/companies/?keywords=' + encodeURIComponent(keywords)
-    });
+  if(!cfg.apolloKey) {
+    showAlert('li-alrt', 'Apollo API-Key fehlt. Bitte unter Konfiguration einstellen.', 'warn');
+    return;
   }
 
-  // Show URLs
+  const btn = $('li-search-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="sp"></span>Suche läuft…';
+
+  const results = [];
+  const targets = leads.filter(l => !l.kontakt || !l.linkedin).slice(0, 15);
+
+  for(const lead of targets) {
+    try {
+      const people = await apolloSearch(lead);
+      for(const p of people) {
+        results.push({
+          leadId: lead.id,
+          leadName: lead.name,
+          kontakt: p.kontakt,
+          email: p.email,
+          telefon: p.telefon,
+          linkedin: p.linkedin,
+          apolloData: p.apolloData
+        });
+      }
+      if(!people.length) {
+        results.push({
+          leadId: lead.id,
+          leadName: lead.name,
+          kontakt: '',
+          email: '',
+          telefon: '',
+          linkedin: '',
+          fallbackUrl: buildLinkedInURL(jobtitle || 'IT-Leiter', '', lead.name, region)
+        });
+      }
+      await slp(300);
+    } catch(e) {
+      addLog('Apollo-Fehler für ' + lead.name + ': ' + e.message, 'err');
+      results.push({
+        leadId: lead.id,
+        leadName: lead.name,
+        kontakt: '',
+        email: '',
+        telefon: '',
+        linkedin: '',
+        fallbackUrl: buildLinkedInURL(jobtitle || 'IT-Leiter', '', lead.name, region)
+      });
+    }
+  }
+
+  // Show results
   $('li-url-panel').style.display = '';
-  $('li-url-list').innerHTML = urls.map(u => `
+  const found = results.filter(r => r.linkedin);
+  $('li-url-list').innerHTML = results.map(r => `
     <div style="padding:10px 14px;border-bottom:1px solid var(--s2);display:flex;align-items:center;gap:10px">
       <div style="flex:1">
-        <div style="font-size:12px;font-weight:700;color:var(--t1)">${esc(u.leadName)}</div>
-        <div style="font-size:10px;color:var(--t3)">🔍 ${esc(u.searchQuery)}</div>
+        <div style="font-size:12px;font-weight:700;color:var(--t1)">${esc(r.leadName)}</div>
+        <div style="font-size:11px;color:var(--t2)">${esc(r.kontakt)}${r.email ? ' · ' + esc(r.email) : ''}${r.telefon ? ' · ' + esc(r.telefon) : ''}</div>
       </div>
       <div style="display:flex;gap:6px">
-        ${u.linkedinUrl?`<a href="${esc(u.linkedinUrl)}" target="_blank" class="btn btn-sm" style="text-decoration:none">👥 Personen ↗</a>`:''}
-        ${u.companyUrl?`<a href="${esc(u.companyUrl)}" target="_blank" class="btn btn-sm" style="text-decoration:none">🏢 Firma ↗</a>`:''}
+        ${r.linkedin
+          ? `<a href="${esc(r.linkedin)}" target="_blank" class="btn btn-sm btn-purple" style="text-decoration:none">👤 Profil ↗</a>`
+          : r.fallbackUrl
+            ? `<a href="${esc(r.fallbackUrl)}" target="_blank" class="btn btn-sm" style="text-decoration:none;opacity:.6">🔍 Suche ↗</a>`
+            : '<span style="font-size:10px;color:var(--t3)">Kein Profil</span>'}
       </div>
-    </div>`).join('') || '<div style="padding:16px;color:var(--t3);font-size:12px">Keine URLs generiert.</div>';
+    </div>`).join('') || '<div style="padding:16px;color:var(--t3);font-size:12px">Keine Ergebnisse.</div>';
 
-  addLog('LinkedIn-Suchen generiert: ' + urls.length + ' URLs', 'agent');
-  showAlert('li-alrt', urls.length + t('msg_li_queries'), 'ok');
+  $('li-st-found').textContent = results.length;
+  $('li-st-email').textContent = results.filter(r => r.email).length;
+  $('li-st-phone').textContent = results.filter(r => r.telefon).length;
+
+  addLog('Apollo LinkedIn-Suche: ' + found.length + ' Profile, ' + results.length + ' Ergebnisse', 'agent');
+  showAlert('li-alrt', found.length + ' LinkedIn-Profile gefunden, ' + results.length + ' Ergebnisse gesamt.', 'ok');
 
   btn.disabled = false;
   btn.textContent = '🔍 Suche starten';
