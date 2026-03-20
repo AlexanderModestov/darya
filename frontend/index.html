@@ -3452,28 +3452,44 @@ const enrichAllLeads = async () => {
 };
 
 // Apollo.io People Search API (via backend proxy)
-const apolloSearch = async (company, name, city) => {
-  const nameParts = (name||'').split(',')[0].trim().split(' ');
-  const firstName = nameParts[0] || '';
-  const lastName  = nameParts.slice(1).join(' ') || '';
+const apolloSearch = async (lead) => {
+  const jobtitel = V('li-jobtitle');
+  const titles = jobtitel
+    ? jobtitel.split(',').map(s => s.trim()).filter(Boolean)
+    : ['CIO','IT-Leiter','CTO','CEO','Geschäftsführer','Compliance','Head of IT'];
 
-  const res = await authFetch('/api/apollo/search', 'POST', {
-    q_organization_domains: company ? [company.toLowerCase().replace(/gmbh|ag|kg|ug|se|inc|llc/gi,'').trim().replace(/\s+/g,'')+'.de'] : undefined,
-    q_keywords: [company, firstName, lastName].filter(Boolean).join(' '),
-    person_titles: ['CIO','IT-Leiter','CTO','CEO','Geschäftsführer','Compliance','Head of IT'],
-    page: 1, per_page: 1
+  // Use real domain from web field, fallback to generated domain
+  const realDomain = extractDomain(lead.web);
+  const fallbackDomain = lead.name
+    ? lead.name.toLowerCase().replace(/gmbh|ag|kg|ug|se|inc|llc/gi,'').trim().replace(/\s+/g,'') + '.de'
+    : undefined;
+  const domain = realDomain || fallbackDomain;
+
+  const res = await authFetch('/api/apollo/search', {
+    method: 'POST',
+    body: JSON.stringify({
+      q_organization_domains: domain ? [domain] : undefined,
+      q_keywords: lead.name || '',
+      person_titles: titles,
+      page: 1,
+      per_page: 5
+    })
   });
-  if(!res.ok) throw new Error('Apollo HTTP ' + res.status);
+  if (!res.ok) throw new Error('Apollo HTTP ' + res.status);
   const data = await res.json();
-  const person = data.people?.[0];
-  if(!person) return null;
-  return {
+  const people = data.people || [];
+  if (!people.length) return [];
+
+  return people.map(person => ({
     kontakt: [person.first_name, person.last_name].filter(Boolean).join(' ') + (person.title ? ', ' + person.title : ''),
-    email:   person.email || '',
+    vorname: person.first_name || '',
+    nachname: person.last_name || '',
+    rolle: person.title || '',
+    email: person.email || '',
     telefon: person.phone_numbers?.[0]?.sanitized_number || person.organization?.phone || '',
-    linkedin: person.linkedin_url || '',
+    linkedin: isValidLinkedIn(person.linkedin_url) ? person.linkedin_url : '',
     apolloData: person
-  };
+  }));
 };
 
 
