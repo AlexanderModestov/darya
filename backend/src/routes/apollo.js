@@ -28,11 +28,12 @@ router.post('/search', async (req, res) => {
       body: JSON.stringify(req.body),
     });
 
+    const data = await r.json().catch(() => ({}));
     if (!r.ok) {
-      return res.status(r.status).json({ error: `Apollo HTTP ${r.status}` });
+      console.error('Apollo people search error:', r.status, JSON.stringify(data));
+      return res.status(r.status).json({ error: `Apollo HTTP ${r.status}`, details: data });
     }
 
-    const data = await r.json();
     return res.json(data);
   } catch (e) {
     console.error('Apollo search error:', e.message);

@@ -195,8 +195,8 @@ textarea.inp{resize:vertical;line-height:1.6}
   <div style="font-size:11px;color:var(--t3)" data-t="subtitle">Autonomer B2B Sales-Agent · Bankensektor Deutschland</div>
   <div class="top-right">
     <div class="user-pill"><div class="user-avatar" id="user-avatar">?</div><span id="user-name-lbl" style="font-size:11px;color:var(--t2)"></span><button class="tbtn" id="btn-logout" onclick="doLogout()" style="font-size:10px;color:var(--t3);margin-left:4px" title="Ausloggen">⏻</button></div>
-    <span id="pill-agent" class="pill pill-off" data-t="agent_offline">● AGENT OFFLINE</span>
-    <span id="pill-api" class="pill pill-off">● API</span>
+    <span id="pill-agent" style="display:none" class="pill pill-off" data-t="agent_offline">● AGENT OFFLINE</span>
+    <span id="pill-api" style="display:none" class="pill pill-off">● API</span>
     <span id="clk" style="font-size:11px;color:var(--t3)"></span>
   </div>
 </div>
@@ -1774,7 +1774,7 @@ const runAgent = async () => {
   if(agentOn) { tlog(t('agent_already_running'),'ly'); return; }
   agentOn=true; abort=false;
   $('btn-run').disabled=true; $('btn-stop').style.display='';
-  $('pill-agent').className='pill pill-on'; $('pill-agent').textContent=t('agent_online');
+  $('pill-agent').style.display=''; $('pill-agent').className='pill pill-on'; $('pill-agent').textContent=t('agent_online');
   resetSteps();
 
   const prompt = V('a-prompt');
@@ -1948,7 +1948,7 @@ Antworte AUSSCHLIESSLICH mit einem JSON-Array, KEIN anderer Text:
 const stopAgent = () => { abort=true; tlog(t('agent_stop_msg'),'ly'); };
 const endAgent = () => {
   agentOn=false; $('btn-run').disabled=false; $('btn-stop').style.display='none';
-  $('pill-agent').className='pill pill-off'; $('pill-agent').textContent=t('agent_offline');
+  $('pill-agent').style.display='none'; $('pill-agent').className='pill pill-off'; $('pill-agent').textContent=t('agent_offline');
   ui(); renderLeads();
 };
 
@@ -3400,6 +3400,11 @@ const searchSelectedContacts = async () => {
       await slp(300);
     } catch(e) {
       addLog('Apollo-Fehler: ' + lead.name + ' — ' + e.message, 'err');
+      // Stop on auth/limit errors — no point retrying
+      if(e.message.includes('403')) {
+        showAlert('li-alrt', e.message, 'err');
+        break;
+      }
     }
     renderCompanyList();
   }
@@ -3511,8 +3516,12 @@ const apolloSearch = async (lead) => {
     method: 'POST',
     body: JSON.stringify(body)
   });
-  if (!res.ok) throw new Error('Apollo HTTP ' + res.status);
   const data = await res.json();
+  if (!res.ok) {
+    const detail = data.details?.message || data.error || ('HTTP ' + res.status);
+    if (res.status === 403) throw new Error('Apollo 403: API-Key ungültig oder Limit erreicht. ' + detail);
+    throw new Error('Apollo: ' + detail);
+  }
   const people = data.people || [];
   if (!people.length) return [];
 
