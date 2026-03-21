@@ -9,7 +9,7 @@ const ENV_MAP = {
   openaiKey:  'OPENAI_API_KEY',
   geminiKey:  'GEMINI_API_KEY',
   apolloKey:  'APOLLO_API_KEY',
-  serperKey:  'SERPER_API_KEY',
+  perplexityKey: 'PERPLEXITY_API_KEY',
 };
 
 /**

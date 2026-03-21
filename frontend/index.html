@@ -677,15 +677,15 @@ textarea.inp{resize:vertical;line-height:1.6}
     </div>
   </div>
   <div class="pn">
-    <div class="pn-h"><span class="pn-ht">Serper.dev (Google-Suche)</span><span id="p-serper" class="pill pill-off">● OFFLINE</span></div>
+    <div class="pn-h"><span class="pn-ht">Perplexity (AI-Suche)</span><span id="p-perplexity" class="pill pill-off">● OFFLINE</span></div>
     <div class="pn-b">
       <div class="fg" style="margin-bottom:0">
-        <label>Serper API Key</label>
+        <label>Perplexity API Key</label>
         <div style="display:flex;gap:10px">
-          <input class="inp" id="c-serper" type="password" placeholder="serper_api_key_...">
-          <button class="btn btn-sm" onclick="testSerper()" data-t="test">Testen</button>
+          <input class="inp" id="c-perplexity" type="password" placeholder="pplx-...">
+          <button class="btn btn-sm" onclick="testPerplexity()" data-t="test">Testen</button>
         </div>
-        <div style="font-size:10px;color:var(--t3);margin-top:4px">serper.dev → Dashboard → API Key · 2500 kostenlose Anfragen</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:4px">perplexity.ai → API Settings → API Keys</div>
       </div>
     </div>
   </div>
@@ -993,7 +993,7 @@ let leads   = [];
 let pending = [];
 let inbox   = [];
 let logs    = [];
-let cfg = { provider:'claude', claudeKey:'', openaiKey:'', geminiKey:'', model:'claude-sonnet-4-20250514', name:'Daria', role:'Lead AI Architect', co:'', sig:'Beste Grüße', gFrom:'', gName:'', whUrl:'', apolloKey:'', serperKey:'', backendUrl:'https://darya-production.up.railway.app', lang:'de' };
+let cfg = { provider:'claude', claudeKey:'', openaiKey:'', geminiKey:'', model:'claude-sonnet-4-20250514', name:'Daria', role:'Lead AI Architect', co:'', sig:'Beste Grüße', gFrom:'', gName:'', whUrl:'', apolloKey:'', perplexityKey:'', backendUrl:'https://darya-production.up.railway.app', lang:'de' };
 let envDefaults = {}; // which API keys have server-side env defaults
 let agentOn = false, abort = false;
 
@@ -1880,8 +1880,8 @@ const runAgent = async () => {
     tlog('✗ ' + t('msg_no_backend'),'lr');
     endAgent(); return;
   }
-  if(!cfg.apolloKey && !envDefaults.apolloKey && !cfg.serperKey && !envDefaults.serperKey) {
-    tlog('✗ Apollo oder Serper API-Key fehlt. Bitte unter Konfiguration einstellen.','lr');
+  if(!cfg.apolloKey && !envDefaults.apolloKey && !cfg.perplexityKey && !envDefaults.perplexityKey) {
+    tlog('✗ Apollo oder Perplexity API-Key fehlt. Bitte unter Konfiguration einstellen.','lr');
     endAgent(); return;
   }
   tlog('Firmensuche gestartet…','lg');
@@ -1892,54 +1892,46 @@ const runAgent = async () => {
   const existing = new Set(leads.map(l=>l.name.toLowerCase()));
   let orgs = []; // [{name, industry, city, employees, domain, description}]
 
-  // Try Serper Google Search + Claude structuring first
-  if(cfg.serperKey || envDefaults.serperKey) {
+  // Try Perplexity AI Search (replaces Serper+Claude two-step)
+  if(cfg.perplexityKey || envDefaults.perplexityKey) {
     try {
-      stepD(1,'Google-Suche via Serper…');
-      const serperRes = await authFetch('/api/serper/search', {
-        method: 'POST',
-        body: JSON.stringify({ q: prompt, num: Math.min(count * 3, 100), gl: 'de', hl: 'de' })
-      });
-      const serperData = await serperRes.json();
-      if(!serperRes.ok) throw new Error('Serper HTTP ' + serperRes.status);
+      stepD(1,'Firmensuche via Perplexity AI…');
+      tlog('Perplexity-Suche gestartet…','lg');
 
-      const snippets = (serperData.organic || []).map(r => r.title + ' — ' + r.snippet + ' (' + (r.link||'') + ')').join('\n');
-      if(!snippets) { addLog('Google-Suche hat keine Ergebnisse geliefert — fallback auf Apollo','warn'); }
+      const excl = leads.map(l=>l.name).slice(0,30).join(', ');
+      const searchPrompt = `Finde GENAU ${count} reale deutsche Unternehmen passend zu dieser Suchanfrage:
 
-      if(snippets) {
-        tlog('Google-Ergebnisse gefunden, Claude strukturiert…','lg');
-        stepD(1,'Claude strukturiert Ergebnisse…');
+"${prompt}"
 
-        const excl = leads.map(l=>l.name).slice(0,30).join(', ');
-        const structurePrompt = `Du bist ein B2B-Lead-Recherche-Agent. Analysiere diese Google-Suchergebnisse und extrahiere REALE Unternehmen.
+${excl ? 'Diese Firmen NICHT nennen (bereits vorhanden): ' + excl : ''}
 
-Suchauftrag: "${prompt}"
-Bereits vorhanden (NICHT wiederholen): ${excl||'keine'}
+Für jede Firma gib an: Firmenname (mit Rechtsform), Branche, Stadt, ungefähre Mitarbeiterzahl, Website-Domain, und eine kurze Beschreibung was die Firma macht.
 
-Google-Ergebnisse:
-${snippets}
-
-Extrahiere bis zu ${count} REALE Unternehmen. Nur Firmen die in den Suchergebnissen vorkommen — NICHTS erfinden!
-
-Antworte AUSSCHLIESSLICH mit einem JSON-Array:
+Antworte AUSSCHLIESSLICH mit einem JSON-Array, KEIN anderer Text:
 [{"name":"Firmenname GmbH","branche":"IT-Dienstleister","ort":"Berlin","ma":"~100","web":"firma.de","beschreibung":"Was macht die Firma"}]`;
 
-        const raw = await claude(structurePrompt, 4000);
-        if(abort) { endAgent(); return; }
-        const cleaned = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
-        const s=cleaned.indexOf('['), e=cleaned.lastIndexOf(']');
-        if(s<0||e<0) throw new Error('Claude hat kein JSON zurückgegeben');
-        const parsed = JSON.parse(cleaned.substring(s,e+1));
+      const pplxRes = await authFetch('/api/perplexity/search', {
+        method: 'POST',
+        body: JSON.stringify({ prompt: searchPrompt, count })
+      });
+      const pplxData = await pplxRes.json();
+      if(!pplxRes.ok) throw new Error('Perplexity HTTP ' + pplxRes.status);
+      if(abort) { endAgent(); return; }
 
-        orgs = parsed
-          .filter(o => o.name && !existing.has(o.name.toLowerCase()))
-          .slice(0, count)
-          .map(o => ({ name: o.name, industry: o.branche||'', city: o.ort||'', employees: o.ma||'', domain: o.web||'', description: o.beschreibung||'', raw: null }));
+      const raw = pplxData.choices?.[0]?.message?.content || '';
+      const cleaned = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+      const s=cleaned.indexOf('['), e=cleaned.lastIndexOf(']');
+      if(s<0||e<0) throw new Error('Perplexity hat kein JSON zurückgegeben');
+      const parsed = JSON.parse(cleaned.substring(s,e+1));
 
-        if(orgs.length) tlog(orgs.length+' Firmen aus Google-Suche extrahiert','lg');
-      }
+      orgs = parsed
+        .filter(o => o.name && !existing.has(o.name.toLowerCase()))
+        .slice(0, count)
+        .map(o => ({ name: o.name, industry: o.branche||'', city: o.ort||'', employees: o.ma||'', domain: o.web||'', description: o.beschreibung||'', raw: null }));
+
+      if(orgs.length) tlog(orgs.length+' Firmen via Perplexity gefunden','lg');
     } catch(e) {
-      tlog('✗ Serper/Claude-Fehler: '+e.message,'lr'); addLog('Serper-Fehler: '+e.message,'err');
+      tlog('✗ Perplexity-Fehler: '+e.message,'lr'); addLog('Perplexity-Fehler: '+e.message,'err');
     }
   }
 
@@ -3109,8 +3101,8 @@ const applyCfg = () => {
   if(cfg.backendUrl){$('c-backend').value=cfg.backendUrl;setPill('p-backend',true);}
   if(cfg.apolloKey){$('c-apollo').value=cfg.apolloKey;setPill('p-apollo',true);setPill('li-api-status',true);$('li-api-status').textContent='● APOLLO ONLINE';}
   else if(envDefaults.apolloKey){setPill('p-apollo',true);setPill('li-api-status',true);$('li-api-status').textContent='● APOLLO ENV';$('c-apollo').placeholder='Server-Key gesetzt';}
-  if(cfg.serperKey){$('c-serper').value=cfg.serperKey;setPill('p-serper',true);}
-  else if(envDefaults.serperKey){setPill('p-serper',true);$('c-serper').placeholder='Server-Key gesetzt';}
+  if(cfg.perplexityKey){$('c-perplexity').value=cfg.perplexityKey;setPill('p-perplexity',true);}
+  else if(envDefaults.perplexityKey){setPill('p-perplexity',true);$('c-perplexity').placeholder='Server-Key gesetzt';}
   if(cfg.lang){$('c-lang').value=cfg.lang;}
   // load saved product prompt and fill fields
   const raw = localStorage.getItem('los3_product');
@@ -3130,14 +3122,14 @@ const saveConfig = async () => {
   cfg.model=V('c-model'); cfg.name=V('c-name'); cfg.role=V('c-role');
   cfg.co=V('c-co'); cfg.sig=V('c-sig'); cfg.gFrom=V('c-gfrom'); cfg.gName=V('c-gname'); cfg.whUrl=V('c-wh');
   if(V('c-apollo')) cfg.apolloKey=V('c-apollo');
-  if(V('c-serper')) cfg.serperKey=V('c-serper');
+  if(V('c-perplexity')) cfg.perplexityKey=V('c-perplexity');
   if(V('c-backend')) cfg.backendUrl=V('c-backend').replace(/\/$/,'');
   cfg.lang=V('c-lang')||'de';
   save();
   await apiSave('/api/settings', 'PUT', { cfg });
   if(cfg.claudeKey||envDefaults.claudeKey){setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent=cfg.claudeKey?'● API':'● ENV';}
   if(cfg.apolloKey||envDefaults.apolloKey){setPill('p-apollo',true);setPill('li-api-status',true);$('li-api-status').textContent=cfg.apolloKey?'● APOLLO ONLINE':'● APOLLO ENV';}
-  if(cfg.serperKey||envDefaults.serperKey) setPill('p-serper',true);
+  if(cfg.perplexityKey||envDefaults.perplexityKey) setPill('p-perplexity',true);
   if(cfg.gFrom) setPill('p-gmail',true);
   if(cfg.whUrl) setPill('p-wh',true);
   showAlert('cfg-alrt',t('msg_config_saved'),'ok');
@@ -3667,26 +3659,26 @@ const testApollo = async () => {
   } catch(e) { showAlert('cfg-alrt', 'Apollo-Fehler: ' + e.message, 'err'); }
 };
 
-// Serper test (via backend proxy)
-const testSerper = async () => {
-  const key = V('c-serper');
-  if(!key) { showAlert('cfg-alrt', 'Serper API-Key eingeben.', 'warn'); return; }
+// Perplexity test (via backend proxy)
+const testPerplexity = async () => {
+  const key = V('c-perplexity');
+  if(!key) { showAlert('cfg-alrt', 'Perplexity API-Key eingeben.', 'warn'); return; }
   try {
-    const res = await fetch((cfg.backendUrl||'')+'/api/serper/test', {
+    const res = await fetch((cfg.backendUrl||'')+'/api/perplexity/test', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ key })
     });
     const data = await res.json();
     if(data.ok) {
-      cfg.serperKey = key; save();
-      setPill('p-serper', true);
-      showAlert('cfg-alrt', 'Serper API verbunden!', 'ok');
-      addLog('Serper API: OK', 'ok');
+      cfg.perplexityKey = key; save();
+      setPill('p-perplexity', true);
+      showAlert('cfg-alrt', 'Perplexity API verbunden!', 'ok');
+      addLog('Perplexity API: OK', 'ok');
       await apiSave('/api/settings', 'PUT', { cfg });
     } else {
-      showAlert('cfg-alrt', 'Serper: Ungültiger Key (' + (data.status||data.error) + ')', 'err');
+      showAlert('cfg-alrt', 'Perplexity: Ungültiger Key (' + (data.status||data.error) + ')', 'err');
     }
-  } catch(e) { showAlert('cfg-alrt', 'Serper-Fehler: ' + e.message, 'err'); }
+  } catch(e) { showAlert('cfg-alrt', 'Perplexity-Fehler: ' + e.message, 'err'); }
 };
 
 // Manual capture from LinkedIn

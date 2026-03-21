@@ -67,31 +67,44 @@ app.post('/api/apollo/test', async (req, res) => {
 app.use('/api/apollo', authMiddleware, apolloRoutes);
 
 // Serper.dev Google Search proxy — requires auth, key from user settings or env
-app.post('/api/serper/search', authMiddleware, async (req, res) => {
-  const serperKey = await getApiKey(req.user.id, 'serperKey');
-  if (!serperKey) return res.status(400).json({ error: 'Serper API key not configured' });
+app.post('/api/perplexity/search', authMiddleware, async (req, res) => {
+  const pplxKey = await getApiKey(req.user.id, 'perplexityKey');
+  if (!pplxKey) return res.status(400).json({ error: 'Perplexity API key not configured' });
   try {
-    const r = await fetch('https://google.serper.dev/search', {
+    const { prompt, count } = req.body;
+    const r = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-API-KEY': serperKey },
-      body: JSON.stringify(req.body),
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + pplxKey },
+      body: JSON.stringify({
+        model: 'sonar',
+        messages: [
+          { role: 'system', content: 'Du bist ein B2B-Lead-Recherche-Agent für den deutschen Markt. Antworte AUSSCHLIESSLICH mit einem JSON-Array, kein anderer Text.' },
+          { role: 'user', content: prompt }
+        ],
+        max_tokens: 4000,
+        temperature: 0.1
+      }),
     });
     const data = await r.json().catch(() => ({}));
-    if (!r.ok) return res.status(r.status).json({ error: `Serper HTTP ${r.status}`, details: data });
+    if (!r.ok) return res.status(r.status).json({ error: `Perplexity HTTP ${r.status}`, details: data });
     return res.json(data);
   } catch (e) {
-    console.error('Serper search error:', e.message);
+    console.error('Perplexity search error:', e.message);
     return res.status(500).json({ error: e.message });
   }
 });
-app.post('/api/serper/test', async (req, res) => {
+app.post('/api/perplexity/test', async (req, res) => {
   const { key } = req.body;
   if (!key) return res.status(400).json({ ok: false, error: 'No key provided' });
   try {
-    const r = await fetch('https://google.serper.dev/search', {
+    const r = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-API-KEY': key },
-      body: JSON.stringify({ q: 'test', num: 1 }),
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({
+        model: 'sonar',
+        messages: [{ role: 'user', content: 'test' }],
+        max_tokens: 10
+      }),
     });
     return res.json({ ok: r.ok, status: r.status });
   } catch (e) {
