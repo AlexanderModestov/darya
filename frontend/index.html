@@ -1887,51 +1887,31 @@ const runAgent = async () => {
   tlog('Firmensuche gestartet…','lg');
   addLog('Agent-Suche: '+prompt.substring(0,60)+'…','agent');
 
-  // ── Step 1: Find companies (Apollo → fallback Serper+Claude) ───────────────
+  // ── Step 1: Find companies (Serper+Claude → fallback Apollo) ───────────────
   step(1,'act'); stepD(1,'Suche Firmen…');
   const existing = new Set(leads.map(l=>l.name.toLowerCase()));
   let orgs = []; // [{name, industry, city, employees, domain, description}]
 
-  // Try Apollo Organization Search first
-  if(cfg.apolloKey || envDefaults.apolloKey) {
-    try {
-      stepD(1,'Suche Firmen via Apollo…');
-      const res = await authFetch('/api/apollo/organizations', {
-        method: 'POST',
-        body: JSON.stringify({ q_keywords: prompt, page: 1, per_page: Math.min(count * 2, 25) })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        orgs = (data.organizations || data.accounts || [])
-          .filter(o => o.name && !existing.has(o.name.toLowerCase()))
-          .slice(0, count)
-          .map(o => ({ name: o.name, industry: o.industry||'', city: [o.city,o.state,o.country].filter(Boolean).join(', '), employees: o.estimated_num_employees ? '~'+o.estimated_num_employees : '', domain: o.primary_domain||o.website_url||'', description: o.short_description||'', raw: o }));
-        if(orgs.length) tlog(orgs.length+' Firmen von Apollo gefunden','lg');
-      } else {
-        addLog('Apollo Org-Suche: HTTP '+res.status+' — fallback auf Serper','warn');
-      }
-    } catch(e) { addLog('Apollo Org-Suche Fehler: '+e.message+' — fallback','warn'); }
-  }
-
-  // Fallback: Serper Google Search + Claude structuring
-  if(!orgs.length && (cfg.serperKey || envDefaults.serperKey)) {
+  // Try Serper Google Search + Claude structuring first
+  if(cfg.serperKey || envDefaults.serperKey) {
     try {
       stepD(1,'Google-Suche via Serper…');
       const serperRes = await authFetch('/api/serper/search', {
         method: 'POST',
-        body: JSON.stringify({ q: prompt + ' deutsche Unternehmen', num: Math.min(count * 3, 30), gl: 'de', hl: 'de' })
+        body: JSON.stringify({ q: prompt, num: Math.min(count * 3, 100), gl: 'de', hl: 'de' })
       });
       const serperData = await serperRes.json();
       if(!serperRes.ok) throw new Error('Serper HTTP ' + serperRes.status);
 
       const snippets = (serperData.organic || []).map(r => r.title + ' — ' + r.snippet + ' (' + (r.link||'') + ')').join('\n');
-      if(!snippets) { tlog('Google-Suche hat keine Ergebnisse geliefert.','ly'); endAgent(); return; }
+      if(!snippets) { addLog('Google-Suche hat keine Ergebnisse geliefert — fallback auf Apollo','warn'); }
 
-      tlog('Google-Ergebnisse gefunden, Claude strukturiert…','lg');
-      stepD(1,'Claude strukturiert Ergebnisse…');
+      if(snippets) {
+        tlog('Google-Ergebnisse gefunden, Claude strukturiert…','lg');
+        stepD(1,'Claude strukturiert Ergebnisse…');
 
-      const excl = leads.map(l=>l.name).slice(0,30).join(', ');
-      const structurePrompt = `Du bist ein B2B-Lead-Recherche-Agent. Analysiere diese Google-Suchergebnisse und extrahiere REALE deutsche Unternehmen.
+        const excl = leads.map(l=>l.name).slice(0,30).join(', ');
+        const structurePrompt = `Du bist ein B2B-Lead-Recherche-Agent. Analysiere diese Google-Suchergebnisse und extrahiere REALE Unternehmen.
 
 Suchauftrag: "${prompt}"
 Bereits vorhanden (NICHT wiederholen): ${excl||'keine'}
@@ -1944,22 +1924,50 @@ Extrahiere bis zu ${count} REALE Unternehmen. Nur Firmen die in den Suchergebnis
 Antworte AUSSCHLIESSLICH mit einem JSON-Array:
 [{"name":"Firmenname GmbH","branche":"IT-Dienstleister","ort":"Berlin","ma":"~100","web":"firma.de","beschreibung":"Was macht die Firma"}]`;
 
-      const raw = await claude(structurePrompt, 4000);
-      if(abort) { endAgent(); return; }
-      const cleaned = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
-      const s=cleaned.indexOf('['), e=cleaned.lastIndexOf(']');
-      if(s<0||e<0) throw new Error('Claude hat kein JSON zurückgegeben');
-      const parsed = JSON.parse(cleaned.substring(s,e+1));
+        const raw = await claude(structurePrompt, 4000);
+        if(abort) { endAgent(); return; }
+        const cleaned = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+        const s=cleaned.indexOf('['), e=cleaned.lastIndexOf(']');
+        if(s<0||e<0) throw new Error('Claude hat kein JSON zurückgegeben');
+        const parsed = JSON.parse(cleaned.substring(s,e+1));
 
-      orgs = parsed
-        .filter(o => o.name && !existing.has(o.name.toLowerCase()))
-        .slice(0, count)
-        .map(o => ({ name: o.name, industry: o.branche||'', city: o.ort||'', employees: o.ma||'', domain: o.web||'', description: o.beschreibung||'', raw: null }));
+        orgs = parsed
+          .filter(o => o.name && !existing.has(o.name.toLowerCase()))
+          .slice(0, count)
+          .map(o => ({ name: o.name, industry: o.branche||'', city: o.ort||'', employees: o.ma||'', domain: o.web||'', description: o.beschreibung||'', raw: null }));
 
-      if(orgs.length) tlog(orgs.length+' Firmen aus Google-Suche extrahiert','lg');
+        if(orgs.length) tlog(orgs.length+' Firmen aus Google-Suche extrahiert','lg');
+      }
     } catch(e) {
       tlog('✗ Serper/Claude-Fehler: '+e.message,'lr'); addLog('Serper-Fehler: '+e.message,'err');
     }
+  }
+
+  // Fallback: Apollo Organization Search (with pagination)
+  if(!orgs.length && (cfg.apolloKey || envDefaults.apolloKey)) {
+    try {
+      stepD(1,'Suche Firmen via Apollo…');
+      const perPage = 25;
+      const maxPages = Math.ceil((count * 2) / perPage) + 1;
+      for(let pg = 1; pg <= maxPages && orgs.length < count; pg++) {
+        if(pg > 1) { stepD(1,`Suche Firmen via Apollo (Seite ${pg})…`); await new Promise(r=>setTimeout(r,300)); }
+        const res = await authFetch('/api/apollo/organizations', {
+          method: 'POST',
+          body: JSON.stringify({ q_keywords: prompt, page: pg, per_page: perPage })
+        });
+        const data = await res.json();
+        if (!res.ok) { addLog('Apollo Org-Suche: HTTP '+res.status,'warn'); break; }
+        const items = (data.organizations || data.accounts || []);
+        if(!items.length) break;
+        const mapped = items
+          .filter(o => o.name && !existing.has(o.name.toLowerCase()))
+          .map(o => ({ name: o.name, industry: o.industry||'', city: [o.city,o.state,o.country].filter(Boolean).join(', '), employees: o.estimated_num_employees ? '~'+o.estimated_num_employees : '', domain: o.primary_domain||o.website_url||'', description: o.short_description||'', raw: o }));
+        for(const m of mapped) { if(orgs.length >= count) break; existing.add(m.name.toLowerCase()); orgs.push(m); }
+        const pagination = data.pagination || {};
+        if(pg >= (pagination.total_pages || pg)) break;
+      }
+      if(orgs.length) tlog(orgs.length+' Firmen von Apollo gefunden','lg');
+    } catch(e) { addLog('Apollo Org-Suche Fehler: '+e.message,'warn'); }
   }
 
   if(!orgs.length) {
