@@ -1,14 +1,13 @@
 import { Router } from 'express';
-import { query } from '../services/db.js';
+import { getCfgWithDefaults } from '../services/apiKeys.js';
 
 const router = Router();
 
 // POST /api/llm — Proxy LLM requests (Claude, OpenAI, Gemini)
 router.post('/', async (req, res, next) => {
   try {
-    // Get user's settings to retrieve API keys
-    const { rows } = await query('SELECT cfg FROM settings WHERE user_id = $1', [req.user.id]);
-    const cfg = rows[0]?.cfg || {};
+    // Get user's settings with env fallbacks
+    const cfg = await getCfgWithDefaults(req.user.id);
 
     const { provider, model, prompt, max_tokens } = req.body;
     const prov = provider || cfg.provider || 'claude';

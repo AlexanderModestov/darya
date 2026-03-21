@@ -1,7 +1,13 @@
 import { Router } from 'express';
 import { query } from '../services/db.js';
+import { getEnvDefaults } from '../services/apiKeys.js';
 
 const router = Router();
+
+// GET /api/settings/defaults — Which API keys have env defaults (no values exposed)
+router.get('/defaults', async (req, res) => {
+  res.json(getEnvDefaults());
+});
 
 // GET /api/settings — Get current user's settings
 router.get('/', async (req, res, next) => {

@@ -1,14 +1,13 @@
 import { Router } from 'express';
-import { query } from '../services/db.js';
+import { getApiKey } from '../services/apiKeys.js';
 
 const router = Router();
 
 /**
- * Helper: get Apollo API key from user's settings
+ * Helper: get Apollo API key (user setting → env fallback)
  */
 async function getApolloKey(userId) {
-  const { rows } = await query('SELECT cfg FROM settings WHERE user_id = $1', [userId]);
-  return rows[0]?.cfg?.apolloKey || null;
+  return getApiKey(userId, 'apolloKey');
 }
 
 // ─── Apollo People Search (proxy) ───────────────────────────────────────────
@@ -59,11 +58,12 @@ router.post('/organizations', async (req, res) => {
       body: JSON.stringify(req.body),
     });
 
+    const data = await r.json().catch(() => ({}));
     if (!r.ok) {
-      return res.status(r.status).json({ error: `Apollo HTTP ${r.status}` });
+      console.error('Apollo org search error:', r.status, JSON.stringify(data));
+      return res.status(r.status).json({ error: `Apollo HTTP ${r.status}`, details: data });
     }
 
-    const data = await r.json();
     return res.json(data);
   } catch (e) {
     console.error('Apollo org search error:', e.message);
