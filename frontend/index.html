@@ -3248,40 +3248,43 @@ const renderCompanyList = () => {
 
 const renderCompanyCard = (l, isComplete) => {
   const hasContact = l.vorname || l.nachname;
-  const contactLine = hasContact
-    ? `<span style="color:var(--green)">&#x1f464; ${esc(l.vorname||'')} ${esc(l.nachname||'')}${l.rolle?', '+esc(l.rolle):''}</span>`
-    : `<span style="color:var(--t3)">&#x1f464; ${t('no_contact')}</span>`;
-  const emailLine = l.kontaktEmail
-    ? `<span style="color:var(--green)">&#x2709; ${esc(l.kontaktEmail)}</span>`
-    : `<span style="color:var(--red)">&#x2709; ${t('missing')}</span>`;
-  const phoneLine = l.telefon
-    ? `<span style="color:var(--green)">&#x260e; ${esc(l.telefon)}</span>`
-    : '';
-  const linkedinLine = l.linkedin
-    ? `<a href="${esc(l.linkedin)}" target="_blank" style="color:var(--blue);text-decoration:none">LinkedIn &#x2197;</a>`
-    : '';
 
-  return `<div style="padding:10px 14px;border-bottom:1px solid var(--s2);${isComplete?'opacity:.7':''}" id="liq-${l.id}">
+  // Company header line
+  let html = `<div style="padding:10px 14px;border-bottom:1px solid var(--s2)" id="liq-${l.id}">
     <div style="display:flex;align-items:flex-start;gap:10px">
       <input type="checkbox" style="width:14px;height:14px;accent-color:var(--green);flex-shrink:0;margin-top:2px" ${liSelectedIds.has(l.id)?'checked':''} onchange="toggleLiSel(${l.id},this.checked)">
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:12px;font-weight:700;color:var(--t1)">${esc(l.name)}</span>
           ${l.web?`<span style="font-size:10px;color:var(--t3)">${esc(l.web)}</span>`:''}
-          ${isComplete?'<span class="pill pill-on" style="font-size:9px">OK</span>':''}
         </div>
-        <div style="font-size:10px;color:var(--t3);margin-top:2px">${[l.branche,l.ort].filter(Boolean).map(esc).join(' · ')}</div>
-        <div style="display:flex;gap:10px;margin-top:4px;flex-wrap:wrap;font-size:10px">
-          ${contactLine}${emailLine}${phoneLine}${linkedinLine}
-        </div>
-        ${!isComplete?`<div style="display:flex;gap:6px;margin-top:6px;align-items:center">
-          <input class="inp" id="li-url-${l.id}" placeholder="linkedin.com/in/..." style="font-size:11px;padding:4px 8px;flex:1;max-width:300px">
-          <button class="btn btn-sm" onclick="saveLinkedInUrl(${l.id})" title="${t('linkedin_save_url')}">&#x1f517; ${t('save')}</button>
-          <button class="btn btn-sm btn-purple" onclick="enrichOneLead(${l.id})" title="Apollo">&#x26a1;</button>
-        </div>`:''}
+        <div style="font-size:10px;color:var(--t3);margin-top:2px">${[l.branche,l.ort,l.ma].filter(Boolean).map(esc).join(' · ')}</div>`;
+
+  // Contact person block
+  if(hasContact) {
+    html += `<div style="margin-top:6px;padding:6px 10px;background:rgba(75,200,130,.08);border:1px solid rgba(75,200,130,.2);border-radius:3px">
+      <div style="font-size:11px;font-weight:600;color:var(--t1)">&#x1f464; ${esc(l.vorname||'')} ${esc(l.nachname||'')}${l.rolle?'<span style="color:var(--t3);font-weight:400"> — '+esc(l.rolle)+'</span>':''}</div>
+      <div style="display:flex;gap:12px;margin-top:3px;flex-wrap:wrap;font-size:10px">
+        ${l.kontaktEmail?`<span style="color:var(--green)">&#x2709; ${esc(l.kontaktEmail)}</span>`:`<span style="color:var(--red)">&#x2709; ${t('missing')}</span>`}
+        ${l.telefon?`<span style="color:var(--green)">&#x260e; ${esc(l.telefon)}</span>`:''}
+        ${l.linkedin?`<a href="${esc(l.linkedin)}" target="_blank" style="color:var(--blue);text-decoration:none">LinkedIn &#x2197;</a>`:''}
       </div>
-    </div>
-  </div>`;
+    </div>`;
+  } else {
+    html += `<div style="margin-top:4px;font-size:10px;color:var(--t3)">&#x1f464; ${t('no_contact')}</div>`;
+  }
+
+  // Actions for incomplete cards
+  if(!isComplete) {
+    html += `<div style="display:flex;gap:6px;margin-top:6px;align-items:center">
+      <input class="inp" id="li-url-${l.id}" placeholder="linkedin.com/in/..." style="font-size:11px;padding:4px 8px;flex:1;max-width:300px">
+      <button class="btn btn-sm" onclick="saveLinkedInUrl(${l.id})" title="${t('linkedin_save_url')}">&#x1f517; ${t('save')}</button>
+      <button class="btn btn-sm btn-purple" onclick="enrichOneLead(${l.id})" title="Apollo">&#x26a1;</button>
+    </div>`;
+  }
+
+  html += `</div></div></div>`;
+  return html;
 };
 
 const toggleLiSel = (id, checked) => {
@@ -3342,11 +3345,16 @@ const searchSelectedContacts = async () => {
   btn.disabled = true;
   btn.innerHTML = '<span class="sp"></span>' + t('linkedin_searching');
 
-  let found = 0;
+  let totalFound = 0;
   for(const lead of targets) {
+    // Show searching state on card
+    const card = $('liq-' + lead.id);
+    if(card) card.style.opacity = '0.5';
+
     try {
       const results = await apolloSearch(lead);
       if(results.length > 0) {
+        // First result → update existing lead
         const first = results[0];
         if(first.email && !lead.kontaktEmail) { lead.kontaktEmail = first.email; lead.email = first.email; }
         if(first.telefon && !lead.telefon) lead.telefon = first.telefon;
@@ -3357,8 +3365,37 @@ const searchSelectedContacts = async () => {
         if(first.kontakt && !lead.kontakt) lead.kontakt = first.kontakt;
         if(first.apolloData) lead.apolloData = first.apolloData;
         await apiSave('/api/leads/' + lead.id, 'PUT', lead);
-        found++;
+        totalFound++;
         addLog('Apollo: ' + lead.name + ' → ' + (first.kontakt || '') + ' · ' + (first.email || ''), 'ok');
+
+        // Additional results → create new leads under same company
+        for(let i = 1; i < results.length; i++) {
+          const p = results[i];
+          if(!p.email && !p.linkedin) continue;
+          const isDuplicate = leads.some(l =>
+            (p.linkedin && l.linkedin === p.linkedin) ||
+            (p.email && (l.kontaktEmail === p.email || l.email === p.email))
+          );
+          if(isDuplicate) continue;
+
+          const newLead = {
+            id: uid(), name: lead.name,
+            vorname: p.vorname, nachname: p.nachname, rolle: p.rolle,
+            kontakt: p.kontakt, kontaktEmail: p.email, email: p.email,
+            firmenEmail: '', telefon: p.telefon, linkedin: p.linkedin,
+            branche: lead.branche, ort: lead.ort, ma: lead.ma,
+            web: lead.web, fokus: lead.fokus,
+            status: 'Neu', apolloData: p.apolloData,
+            created: new Date().toLocaleDateString(loc())
+          };
+          const savedLead = await apiSave('/api/leads', 'POST', newLead);
+          if(savedLead) newLead.id = savedLead.id;
+          leads.unshift(newLead);
+          totalFound++;
+          addLog('Apollo+: ' + lead.name + ' → ' + p.kontakt + ' · ' + (p.email || ''), 'ok');
+        }
+      } else {
+        addLog('Apollo: ' + lead.name + ' → keine Kontakte gefunden', 'warn');
       }
       await slp(300);
     } catch(e) {
@@ -3370,7 +3407,7 @@ const searchSelectedContacts = async () => {
   save(); renderCompanyList(); renderLeads(); renderLeadPicker();
   btn.disabled = false;
   btn.textContent = t('linkedin_search_contacts');
-  showAlert('li-alrt', found + ' ' + t('linkedin_contacts_found'), 'ok');
+  showAlert('li-alrt', totalFound + ' ' + t('linkedin_contacts_found'), totalFound ? 'ok' : 'warn');
 };
 
 // ── APOLLO.IO ENRICHMENT ────────────────────────────────────────────────────
