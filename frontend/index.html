@@ -763,132 +763,53 @@ textarea.inp{resize:vertical;line-height:1.6}
   <div class="ph">
     <div>
       <div class="ph-t" data-t="linkedin_title">LinkedIn Prospecting</div>
-      <div class="ph-s" data-t="linkedin_subtitle">Ansprechpartner recherchieren · Profile öffnen · Kontaktdaten via Apollo.io anreichern</div>
-    </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-sm btn-purple" id="li-enrich-btn" onclick="enrichAllLeads()" data-t="linkedin_enrich_all">⚡ Alle anreichern</button>
-      <button class="btn btn-g" id="li-search-btn" onclick="runLinkedInSearch()" data-t="linkedin_search">🔍 Suche starten</button>
+      <div class="ph-s" data-t="linkedin_subtitle">Kontakte in gefundenen Firmen suchen via Apollo.io</div>
     </div>
   </div>
   <div id="li-alrt" style="display:none" class="alrt"></div>
 
-  <!-- HOW IT WORKS BANNER -->
-  <div style="background:rgba(75,143,255,.08);border:1px solid rgba(75,143,255,.2);border-radius:3px;padding:12px 16px;margin-bottom:14px;font-size:11px;color:var(--blue);line-height:1.7">
-    <strong style="color:var(--t1)" data-t="linkedin_howto">Wie es funktioniert:</strong>
-    <span data-t="linkedin_howto_text">&nbsp;① Agent generiert optimierte LinkedIn-Suchanfragen für deine Leads
-    &nbsp;·&nbsp;② Suchanfragen öffnen sich direkt in LinkedIn Sales Navigator / LinkedIn Search
-    &nbsp;·&nbsp;③ Apollo.io API findet E-Mail + Telefon automatisch
-    &nbsp;·&nbsp;④ Gefundene Kontakte werden direkt in die Lead-DB gespeichert</span>
-  </div>
-
-  <div style="display:grid;grid-template-columns:340px 1fr;gap:16px">
-    <!-- LEFT PANEL -->
-    <div>
-      <!-- SEARCH CONFIG -->
-      <div class="pn">
-        <div class="pn-h"><span class="pn-ht" data-t="linkedin_step1">① LinkedIn-Suche konfigurieren</span></div>
-        <div class="pn-b">
-          <div class="fg">
-            <label data-t="linkedin_jobtitle">Zielgruppe / Jobtitel</label>
-            <input class="inp" id="li-jobtitle" placeholder="z.B. CIO, IT-Leiter, Head of Compliance, CTO" data-tp="ph_li_jobtitle">
-          </div>
-          <div class="fg">
-            <label data-t="linkedin_keywords">Branche / Keywords</label>
-            <input class="inp" id="li-keywords" placeholder="z.B. Bankensektor, Sparkasse, Volksbank, RegTech" data-tp="ph_li_keywords">
-          </div>
-          <div class="fg">
-            <label data-t="linkedin_region">Region</label>
-            <select class="inp" id="li-region">
-              <option value="Deutschland">Deutschland</option>
-              <option value="DACH">DACH (DE/AT/CH)</option>
-              <option value="Bayern">Bayern</option>
-              <option value="NRW">Nordrhein-Westfalen</option>
-              <option value="Baden-Württemberg">Baden-Württemberg</option>
-              <option value="Hessen">Hessen (Frankfurt)</option>
-              <option value="Berlin">Berlin</option>
-              <option value="Hamburg">Hamburg</option>
-            </select>
-          </div>
-          <div class="fg" style="margin-bottom:0">
-            <label data-t="linkedin_mode">Suchmodus</label>
-            <select class="inp" id="li-mode">
-              <option value="people" data-t="linkedin_mode_people">People Search (nach Person)</option>
-              <option value="company" data-t="linkedin_mode_company">Company Search (nach Firma)</option>
-              <option value="both" data-t="linkedin_mode_both">Beides</option>
-            </select>
-          </div>
-        </div>
+  <!-- SEARCH CONFIG -->
+  <div class="pn" style="margin-bottom:14px">
+    <div class="pn-h"><span class="pn-ht" data-t="linkedin_search_config">Kontaktsuche konfigurieren</span></div>
+    <div class="pn-b">
+      <div class="fg">
+        <label data-t="linkedin_jobtitle">Zielgruppe / Jobtitel</label>
+        <input class="inp" id="li-jobtitle" placeholder="z.B. CIO, IT-Leiter, Head of Compliance, CTO" data-tp="ph_li_jobtitle">
       </div>
-
-      <!-- API STATUS -->
-      <div class="pn">
-        <div class="pn-h">
-          <span class="pn-ht" data-t="linkedin_step2">② Daten-Anreicherung</span>
-          <span id="li-api-status" class="pill pill-off">KEIN API</span>
-        </div>
-        <div class="pn-b">
-          <div style="font-size:11px;color:var(--t3)" data-t="apollo_config_hint">Apollo.io API Key wird unter Konfiguration eingestellt.</div>
-        </div>
+      <div class="fg">
+        <label data-t="linkedin_region">Region</label>
+        <select class="inp" id="li-region">
+          <option value="Deutschland">Deutschland</option>
+          <option value="DACH">DACH (DE/AT/CH)</option>
+          <option value="Bayern">Bayern</option>
+          <option value="NRW">Nordrhein-Westfalen</option>
+          <option value="Baden-Württemberg">Baden-Württemberg</option>
+          <option value="Hessen">Hessen (Frankfurt)</option>
+          <option value="Berlin">Berlin</option>
+          <option value="Hamburg">Hamburg</option>
+        </select>
       </div>
-
-      <!-- STATS -->
-      <div class="pn">
-        <div class="pn-h"><span class="pn-ht" data-t="stats">Statistik</span></div>
-        <div class="pn-b" style="padding:10px 16px">
-          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)" data-t="stat_profiles_found">Profile gefunden</span><span id="li-st-found" style="color:var(--t1);font-weight:700">0</span></div>
-          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)" data-t="stat_emails_enriched">E-Mails angereichert</span><span id="li-st-email" style="color:var(--green);font-weight:700">0</span></div>
-          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)" data-t="stat_phone_found">Telefon gefunden</span><span id="li-st-phone" style="color:var(--green);font-weight:700">0</span></div>
-          <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--t3)" data-t="stat_saved_leads">Gespeichert in Leads</span><span id="li-st-saved" style="color:var(--blue);font-weight:700">0</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT: RESULTS + QUEUE -->
-    <div>
-      <!-- GENERATED SEARCH URLS -->
-      <div class="pn" id="li-url-panel" style="display:none">
-        <div class="pn-h">
-          <span class="pn-ht" data-t="linkedin_step3">③ Generierte LinkedIn-Suchen</span>
-          <button class="btn btn-sm" onclick="openAllLinkedIn()" data-t="linkedin_open_all">Alle öffnen ↗</button>
-        </div>
-        <div class="pn-b" id="li-url-list" style="max-height:200px;overflow-y:auto"></div>
-      </div>
-
-      <!-- ENRICHMENT QUEUE -->
-      <div class="pn">
-        <div class="pn-h">
-          <span class="pn-ht">④ Leads anreichern via Apollo</span>
-          <div style="display:flex;gap:6px">
-            <button class="btn btn-sm" onclick="enrichSelected()" id="li-enrich-sel-btn">Auswahl anreichern</button>
-          </div>
-        </div>
-        <div class="pn-b" style="padding:0">
-          <div id="li-enrich-list" style="max-height:420px;overflow-y:auto"></div>
-        </div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button class="btn btn-g" id="li-search-btn" onclick="searchSelectedContacts()" data-t="linkedin_search_contacts">Kontakte suchen</button>
+        <button class="btn btn-sm btn-purple" id="li-enrich-btn" onclick="enrichAllLeads()" data-t="linkedin_enrich_all">Alle anreichern</button>
       </div>
     </div>
   </div>
 
-  <!-- MANUAL CAPTURE -->
+  <!-- COMPANY LIST -->
   <div class="pn">
     <div class="pn-h">
-      <span class="pn-ht">⑤ Manueller LinkedIn-Import</span>
-      <span style="font-size:10px;color:var(--t3)">Profil-Daten von LinkedIn kopieren & einfügen</span>
+      <span class="pn-ht" data-t="linkedin_companies">Firmen</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span id="li-counter" style="font-size:11px;color:var(--t3)"></span>
+        <label style="font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px;cursor:pointer">
+          <input type="checkbox" id="li-select-all" onchange="toggleSelectAll(this.checked)" style="width:13px;height:13px;accent-color:var(--green)">
+          <span data-t="linkedin_select_all">Alle</span>
+        </label>
+      </div>
     </div>
-    <div class="pn-b">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px">
-        <div class="fg" style="margin-bottom:0"><label>Name + Rolle</label><input class="inp" id="mc-kontakt" placeholder="Max Müller, CIO" data-tp="ph_mc_kontakt"></div>
-        <div class="fg" style="margin-bottom:0"><label>Firma</label><input class="inp" id="mc-firma" placeholder="Sparkasse XY GmbH" data-tp="ph_mc_firma"></div>
-        <div class="fg" style="margin-bottom:0"><label>LinkedIn URL</label><input class="inp" id="mc-linkedin" placeholder="linkedin.com/in/..."></div>
-        <div class="fg" style="margin-bottom:0"><label>E-Mail (optional)</label><input class="inp" id="mc-email" placeholder="m.mueller@firma.de" type="email"></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px">
-        <div class="fg" style="margin-bottom:0"><label>Telefon</label><input class="inp" id="mc-tel" placeholder="+49 30 ..."></div>
-        <div class="fg" style="margin-bottom:0"><label>Branche</label><input class="inp" id="mc-branche" placeholder="IT-Dienstleister" data-tp="ph_mc_branche"></div>
-        <div class="fg" style="margin-bottom:0"><label>Mitarbeiter</label><input class="inp" id="mc-ma" placeholder="~100"></div>
-        <div class="fg" style="margin-bottom:0"><label>Standort</label><input class="inp" id="mc-ort" placeholder="Berlin" data-tp="ph_mc_ort"></div>
-      </div>
-      <button class="btn btn-g btn-sm" onclick="saveManualCapture()">+ In Lead-DB speichern</button>
+    <div class="pn-b" style="padding:0">
+      <div id="li-company-list" style="max-height:600px;overflow-y:auto"></div>
     </div>
   </div>
 </div>
@@ -1092,21 +1013,21 @@ const I18N = {
     user_mgmt: 'Nutzer-Verwaltung',
     user_mgmt_hint: 'Neue Nutzer registrieren sich selbst über den Login-Screen. Als Admin kannst du alle Accounts sehen und löschen.',
     lang_title: 'Sprache / Language',
-    // LinkedIn
+    // LinkedIn Prospecting
     linkedin_title: 'LinkedIn Prospecting',
-    linkedin_subtitle: 'Ansprechpartner recherchieren · Profile öffnen · Kontaktdaten via Apollo.io anreichern',
-    linkedin_enrich_all: '⚡ Alle anreichern', linkedin_search: '🔍 Suche starten',
-    linkedin_howto: 'Wie es funktioniert:',
-    linkedin_howto_text: '① Agent generiert optimierte LinkedIn-Suchanfragen für deine Leads ·② Suchanfragen öffnen sich direkt in LinkedIn Sales Navigator / LinkedIn Search ·③ Apollo.io API findet E-Mail + Telefon automatisch ·④ Gefundene Kontakte werden direkt in die Lead-DB gespeichert',
-    linkedin_step1: '① LinkedIn-Suche konfigurieren',
-    linkedin_jobtitle: 'Zielgruppe / Jobtitel', linkedin_keywords: 'Branche / Keywords',
-    linkedin_region: 'Region', linkedin_mode: 'Suchmodus',
-    linkedin_mode_people: 'People Search (nach Person)', linkedin_mode_company: 'Company Search (nach Firma)',
-    linkedin_mode_both: 'Beides',
-    linkedin_step2: '② Daten-Anreicherung',
-    stat_profiles_found: 'Profile gefunden', stat_emails_enriched: 'E-Mails angereichert',
-    stat_phone_found: 'Telefon gefunden', stat_saved_leads: 'Gespeichert in Leads',
-    linkedin_step3: '③ Generierte LinkedIn-Suchen', linkedin_open_all: 'Alle öffnen ↗',
+    linkedin_subtitle: 'Kontakte in gefundenen Firmen suchen via Apollo.io',
+    linkedin_enrich_all: 'Alle anreichern',
+    linkedin_search_config: 'Kontaktsuche konfigurieren',
+    linkedin_jobtitle: 'Zielgruppe / Jobtitel', linkedin_region: 'Region',
+    linkedin_companies: 'Firmen', linkedin_select_all: 'Alle',
+    linkedin_search_contacts: 'Kontakte suchen',
+    linkedin_no_leads: 'Keine Firmen. Starte zuerst den Agent um Firmen zu finden.',
+    linkedin_needs_contacts: 'Kontakte fehlen',
+    linkedin_complete: 'Vollständig', linkedin_complete_short: 'vollständig',
+    linkedin_save_url: 'LinkedIn URL speichern', linkedin_invalid_url: 'Ungültige LinkedIn URL.',
+    linkedin_no_api: 'Apollo API-Key fehlt. Bitte unter Konfiguration einstellen.',
+    linkedin_no_targets: 'Keine Firmen zum Durchsuchen.',
+    linkedin_searching: 'Suche läuft…', linkedin_contacts_found: 'Kontakte gefunden',
     // Placeholders
     ph_email_login: 'daria@firma.de', ph_reg_name: 'Max Müller', ph_reg_email: 'max@firma.de',
     ph_prodname: 'z.B. AI-Prozessautomatisierung für Banken',
@@ -1124,9 +1045,7 @@ const I18N = {
     ph_backend: 'http://localhost:3000 oder https://your-app.railway.app',
     ph_company: 'Meine GmbH', ph_sig: 'Beste Grüße, Daria',
     ph_li_jobtitle: 'z.B. CIO, IT-Leiter, Head of Compliance, CTO',
-    ph_li_keywords: 'z.B. Bankensektor, Sparkasse, Volksbank, RegTech',
-    ph_mc_kontakt: 'Max Müller, CIO', ph_mc_firma: 'Sparkasse XY GmbH',
-    ph_mc_branche: 'IT-Dienstleister', ph_mc_ort: 'Berlin',
+    ph_li_linkedin: 'linkedin.com/in/...',
     ph_nu_name: 'Max Müller', ph_nu_pass: 'Temporäres Passwort',
     ph_subject: 'Betreff', ph_reply: 'Deine Antwort…',
     ph_lead_desc: 'Was macht die Firma? Spezialisierung, Kunden, Produkte…',
@@ -1257,13 +1176,7 @@ const I18N = {
     // Approval
     emails_total: 'E-Mails gesamt',
     // LinkedIn extra
-    li_enrich_title: '④ Leads anreichern via Apollo', li_enrich_btn: 'Auswahl anreichern',
-    li_no_leads_enrich: 'Keine Leads. Agent starten um Firmen zu finden.',
-    li_manual_title: '⑤ Manueller LinkedIn-Import', li_manual_hint: 'Profil-Daten von LinkedIn kopieren & einfügen',
-    li_label_name_role: 'Name + Rolle', li_label_firma: 'Firma', li_label_linkedin_url: 'LinkedIn URL',
-    li_label_email_opt: 'E-Mail (optional)', li_label_telefon: 'Telefon', li_label_branche: 'Branche',
-    li_label_mitarbeiter: 'Mitarbeiter', li_label_standort: 'Standort',
-    li_save_btn: '+ In Lead-DB speichern', li_no_api: 'KEIN API',
+    save: 'Speichern',
     // Config extra
     apollo_hint_free: 'Free: 50 Anfragen/Tag',
     user_badge_me: 'ICH', user_since: 'seit',
@@ -1365,21 +1278,21 @@ const I18N = {
     user_mgmt: 'User Management',
     user_mgmt_hint: 'New users register themselves via the login screen. As admin you can see and delete all accounts.',
     lang_title: 'Language',
-    // LinkedIn
+    // LinkedIn Prospecting
     linkedin_title: 'LinkedIn Prospecting',
-    linkedin_subtitle: 'Research contacts · Open profiles · Enrich contact data via Apollo.io',
-    linkedin_enrich_all: '⚡ Enrich All', linkedin_search: '🔍 Start Search',
-    linkedin_howto: 'How it works:',
-    linkedin_howto_text: '① Agent generates optimized LinkedIn search queries for your leads ·② Queries open directly in LinkedIn Sales Navigator / LinkedIn Search ·③ Apollo.io API finds email + phone automatically ·④ Found contacts are saved directly to the lead DB',
-    linkedin_step1: '① Configure LinkedIn Search',
-    linkedin_jobtitle: 'Target Audience / Job Title', linkedin_keywords: 'Industry / Keywords',
-    linkedin_region: 'Region', linkedin_mode: 'Search Mode',
-    linkedin_mode_people: 'People Search (by person)', linkedin_mode_company: 'Company Search (by company)',
-    linkedin_mode_both: 'Both',
-    linkedin_step2: '② Data Enrichment',
-    stat_profiles_found: 'Profiles found', stat_emails_enriched: 'Emails enriched',
-    stat_phone_found: 'Phone found', stat_saved_leads: 'Saved to leads',
-    linkedin_step3: '③ Generated LinkedIn Searches', linkedin_open_all: 'Open all ↗',
+    linkedin_subtitle: 'Find contacts in discovered companies via Apollo.io',
+    linkedin_enrich_all: 'Enrich All',
+    linkedin_search_config: 'Configure Contact Search',
+    linkedin_jobtitle: 'Target Audience / Job Title', linkedin_region: 'Region',
+    linkedin_companies: 'Companies', linkedin_select_all: 'All',
+    linkedin_search_contacts: 'Find Contacts',
+    linkedin_no_leads: 'No companies. Start the Agent first to find companies.',
+    linkedin_needs_contacts: 'Needs contacts',
+    linkedin_complete: 'Complete', linkedin_complete_short: 'complete',
+    linkedin_save_url: 'Save LinkedIn URL', linkedin_invalid_url: 'Invalid LinkedIn URL.',
+    linkedin_no_api: 'Apollo API key missing. Please configure under Settings.',
+    linkedin_no_targets: 'No companies to search.',
+    linkedin_searching: 'Searching…', linkedin_contacts_found: 'contacts found',
     // Placeholders
     ph_email_login: 'daria@company.com', ph_reg_name: 'John Smith', ph_reg_email: 'john@company.com',
     ph_prodname: 'e.g. AI Process Automation for Banks',
@@ -1397,9 +1310,7 @@ const I18N = {
     ph_backend: 'http://localhost:3000 or https://your-app.railway.app',
     ph_company: 'My Company Ltd', ph_sig: 'Best regards, Daria',
     ph_li_jobtitle: 'e.g. CIO, IT Director, Head of Compliance, CTO',
-    ph_li_keywords: 'e.g. Banking sector, Savings bank, RegTech',
-    ph_mc_kontakt: 'John Smith, CIO', ph_mc_firma: 'Acme Corp Ltd',
-    ph_mc_branche: 'IT Services', ph_mc_ort: 'Berlin',
+    ph_li_linkedin: 'linkedin.com/in/...',
     ph_nu_name: 'John Smith', ph_nu_pass: 'Temporary password',
     ph_subject: 'Subject', ph_reply: 'Your reply…',
     ph_lead_desc: 'What does the company do? Specialization, clients, products…',
@@ -1530,13 +1441,7 @@ const I18N = {
     // Approval
     emails_total: 'emails total',
     // LinkedIn extra
-    li_enrich_title: '④ Enrich leads via Apollo', li_enrich_btn: 'Enrich selected',
-    li_no_leads_enrich: 'No leads. Start agent to find companies.',
-    li_manual_title: '⑤ Manual LinkedIn Import', li_manual_hint: 'Copy & paste profile data from LinkedIn',
-    li_label_name_role: 'Name + Role', li_label_firma: 'Company', li_label_linkedin_url: 'LinkedIn URL',
-    li_label_email_opt: 'Email (optional)', li_label_telefon: 'Phone', li_label_branche: 'Industry',
-    li_label_mitarbeiter: 'Employees', li_label_standort: 'Location',
-    li_save_btn: '+ Save to Lead DB', li_no_api: 'NO API',
+    save: 'Save',
     // Config extra
     apollo_hint_free: 'Free: 50 requests/day',
     user_badge_me: 'ME', user_since: 'since',
@@ -1819,7 +1724,7 @@ const nav = id => {
   if(id==='inbox') renderInbox();
   if(id==='log') renderLog();
   if(id==='emailgen') { renderCatGrid(); renderLeadPicker(); }
-  if(id==='linkedin') { renderLinkedInEnrichList(); }
+  if(id==='linkedin') { renderCompanyList(); }
   if(id==='team') renderTeam();
   if(id==='config') { renderUsersList(); }
 };
@@ -2994,7 +2899,7 @@ const saveContact = id => {
   // keep legacy kontakt field in sync
   l.kontakt = [l.vorname, l.nachname].filter(Boolean).join(' ') + (l.rolle ? ', '+l.rolle : '');
   l.email   = l.kontaktEmail || l.firmenEmail || l.email;
-  save(); renderLeads(); renderLeadPicker(); renderLinkedInEnrichList();
+  save(); renderLeads(); renderLeadPicker(); renderCompanyList();
   addLog(`Kontakt gespeichert: ${l.name} · ${l.vorname} ${l.nachname} (${l.rolle||''})`, 'ok');
 };
 
@@ -3099,8 +3004,8 @@ const applyCfg = () => {
   if(cfg.gName) $('c-gname').value=cfg.gName;
   if(cfg.whUrl){$('c-wh').value=cfg.whUrl;setPill('p-wh',true);}
   if(cfg.backendUrl){$('c-backend').value=cfg.backendUrl;setPill('p-backend',true);}
-  if(cfg.apolloKey){$('c-apollo').value=cfg.apolloKey;setPill('p-apollo',true);setPill('li-api-status',true);$('li-api-status').textContent='● APOLLO ONLINE';}
-  else if(envDefaults.apolloKey){setPill('p-apollo',true);setPill('li-api-status',true);$('li-api-status').textContent='● APOLLO ENV';$('c-apollo').placeholder='Server-Key gesetzt';}
+  if(cfg.apolloKey){$('c-apollo').value=cfg.apolloKey;setPill('p-apollo',true);}
+  else if(envDefaults.apolloKey){setPill('p-apollo',true);$('c-apollo').placeholder='Server-Key gesetzt';}
   if(cfg.perplexityKey){$('c-perplexity').value=cfg.perplexityKey;setPill('p-perplexity',true);}
   else if(envDefaults.perplexityKey){setPill('p-perplexity',true);$('c-perplexity').placeholder='Server-Key gesetzt';}
   if(cfg.lang){$('c-lang').value=cfg.lang;}
@@ -3128,7 +3033,7 @@ const saveConfig = async () => {
   save();
   await apiSave('/api/settings', 'PUT', { cfg });
   if(cfg.claudeKey||envDefaults.claudeKey){setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent=cfg.claudeKey?'● API':'● ENV';}
-  if(cfg.apolloKey||envDefaults.apolloKey){setPill('p-apollo',true);setPill('li-api-status',true);$('li-api-status').textContent=cfg.apolloKey?'● APOLLO ONLINE':'● APOLLO ENV';}
+  if(cfg.apolloKey||envDefaults.apolloKey){setPill('p-apollo',true);}
   if(cfg.perplexityKey||envDefaults.perplexityKey) setPill('p-perplexity',true);
   if(cfg.gFrom) setPill('p-gmail',true);
   if(cfg.whUrl) setPill('p-wh',true);
@@ -3307,68 +3212,99 @@ const tick = () => { $('clk').textContent=new Date().toLocaleTimeString(loc(),{h
 
 
 // ─── LINKEDIN PROSPECTING ─────────────────────────────────────────────────────
-let liProfiles = []; // enriched profile queue
 let liSelectedIds = new Set();
 
-const renderLinkedInEnrichList = () => {
-  const el = $('li-enrich-list');
+const renderCompanyList = () => {
+  const el = $('li-company-list');
   if(!leads.length) {
-    el.innerHTML = '<div style="padding:20px;text-align:center;font-size:12px;color:var(--t3)">Keine Leads. Agent starten um Firmen zu finden.</div>';
+    el.innerHTML = '<div style="padding:30px;text-align:center;font-size:12px;color:var(--t3)">' + t('linkedin_no_leads') + '</div>';
+    $('li-counter').textContent = '';
     return;
   }
-  // show leads that need enrichment (missing kontakt, telefon or email)
-  const needsWork = leads.filter(l => !l.kontaktEmail || !l.telefon || !l.vorname);
-  const enriched  = leads.filter(l => l.kontaktEmail && l.telefon && l.vorname && l.nachname);
+
+  const needsWork = leads.filter(l => !l.kontaktEmail || !l.vorname);
+  const complete  = leads.filter(l => l.kontaktEmail && l.vorname);
+  const needsBadge = leads.filter(l => !l.kontaktEmail || !l.telefon).length;
+  $('b-li').textContent = needsBadge;
+  $('b-li').style.display = needsBadge ? '' : 'none';
+  $('li-counter').textContent = complete.length + '/' + leads.length + ' ' + t('linkedin_complete_short');
 
   let html = '';
+
+  // — Companies needing contacts —
   if(needsWork.length) {
-    html += `<div style="padding:8px 14px;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;border-bottom:var(--bd)">Needs Enrichment (${needsWork.length})</div>`;
-    html += needsWork.map(l => `
-      <div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--s2)" id="liq-${l.id}">
-        <input type="checkbox" style="width:14px;height:14px;accent-color:var(--green);flex-shrink:0" ${liSelectedIds.has(l.id)?'checked':''} onchange="toggleLiSel(${l.id},this.checked)">
-        <div style="flex:1;min-width:0">
-          <div style="font-size:12px;font-weight:700;color:var(--t1)">${esc(l.name)}</div>
-          <div style="font-size:10px;color:var(--t3)">${esc(l.branche||'')} · ${esc(l.ort||'')}</div>
-          <div style="display:flex;gap:8px;margin-top:3px;flex-wrap:wrap">
-            ${(l.vorname||l.nachname)?`<span style="font-size:10px;color:var(--green)">👤 ${esc(l.vorname||'')} ${esc(l.nachname||'')}${l.rolle?', '+esc(l.rolle):''}</span>`:'<span style="font-size:10px;color:var(--red)">👤 '+t('no_contact')+'</span>'}
-            ${l.email?`<span style="font-size:10px;color:var(--green)">✉ ${esc(l.email)}</span>`:'<span style="font-size:10px;color:var(--red)">✉ '+t('missing')+'</span>'}
-            ${l.telefon?`<span style="font-size:10px;color:var(--green)">📞 ${esc(l.telefon)}</span>`:'<span style="font-size:10px;color:var(--yellow)">📞 '+t('missing')+'</span>'}
-          </div>
-        </div>
-        <div style="display:flex;gap:5px;flex-shrink:0">
-          <button class="btn btn-sm" onclick="openLinkedInSearch('${esc(l.name)}','${esc(l.kontakt||'')}','${esc(l.ort||'')}')" title="LinkedIn öffnen">🔗</button>
-          <button class="btn btn-sm btn-purple" onclick="enrichOneLead(${l.id})" title="Apollo anreichern">⚡</button>
-        </div>
-      </div>`).join('');
+    html += `<div style="padding:8px 14px;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;border-bottom:var(--bd)">${t('linkedin_needs_contacts')} (${needsWork.length})</div>`;
+    html += needsWork.map(l => renderCompanyCard(l, false)).join('');
   }
-  if(enriched.length) {
-    html += `<div style="padding:8px 14px;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;border-bottom:var(--bd)">Vollständig (${enriched.length})</div>`;
-    html += enriched.map(l => `
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--s2);opacity:.6">
-        <div style="flex:1">
-          <div style="font-size:12px;font-weight:700;color:var(--t1)">${esc(l.name)}</div>
-          <div style="display:flex;gap:8px;margin-top:2px;flex-wrap:wrap">
-            <span style="font-size:10px;color:var(--green)">👤 ${esc(l.kontakt)}</span>
-            <span style="font-size:10px;color:var(--green)">✉ ${esc(l.email)}</span>
-            <span style="font-size:10px;color:var(--green)">📞 ${esc(l.telefon)}</span>
-            ${l.linkedin?`<a href="${esc(l.linkedin)}" target="_blank" style="font-size:10px;color:var(--blue)">LinkedIn ↗</a>`:''}
-          </div>
-        </div>
-        <span class="pill pill-on" style="font-size:9px">VOLLSTÄNDIG</span>
-      </div>`).join('');
+
+  // — Complete companies —
+  if(complete.length) {
+    html += `<div style="padding:8px 14px;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;border-bottom:var(--bd)">${t('linkedin_complete')} (${complete.length})</div>`;
+    html += complete.map(l => renderCompanyCard(l, true)).join('');
   }
+
   el.innerHTML = html;
-  $('li-st-found').textContent = leads.length;
-  $('li-st-email').textContent = leads.filter(l=>l.email).length;
-  $('li-st-phone').textContent = leads.filter(l=>l.telefon).length;
-  $('li-st-saved').textContent = leads.filter(l=>l.kontakt&&l.email).length;
-  $('b-li').textContent = leads.filter(l=>!l.email||!l.telefon).length;
-  $('b-li').style.display = leads.filter(l=>!l.email||!l.telefon).length ? '' : 'none';
+};
+
+const renderCompanyCard = (l, isComplete) => {
+  const hasContact = l.vorname || l.nachname;
+  const contactLine = hasContact
+    ? `<span style="color:var(--green)">&#x1f464; ${esc(l.vorname||'')} ${esc(l.nachname||'')}${l.rolle?', '+esc(l.rolle):''}</span>`
+    : `<span style="color:var(--t3)">&#x1f464; ${t('no_contact')}</span>`;
+  const emailLine = l.kontaktEmail
+    ? `<span style="color:var(--green)">&#x2709; ${esc(l.kontaktEmail)}</span>`
+    : `<span style="color:var(--red)">&#x2709; ${t('missing')}</span>`;
+  const phoneLine = l.telefon
+    ? `<span style="color:var(--green)">&#x260e; ${esc(l.telefon)}</span>`
+    : '';
+  const linkedinLine = l.linkedin
+    ? `<a href="${esc(l.linkedin)}" target="_blank" style="color:var(--blue);text-decoration:none">LinkedIn &#x2197;</a>`
+    : '';
+
+  return `<div style="padding:10px 14px;border-bottom:1px solid var(--s2);${isComplete?'opacity:.7':''}" id="liq-${l.id}">
+    <div style="display:flex;align-items:flex-start;gap:10px">
+      <input type="checkbox" style="width:14px;height:14px;accent-color:var(--green);flex-shrink:0;margin-top:2px" ${liSelectedIds.has(l.id)?'checked':''} onchange="toggleLiSel(${l.id},this.checked)">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;font-weight:700;color:var(--t1)">${esc(l.name)}</span>
+          ${l.web?`<span style="font-size:10px;color:var(--t3)">${esc(l.web)}</span>`:''}
+          ${isComplete?'<span class="pill pill-on" style="font-size:9px">OK</span>':''}
+        </div>
+        <div style="font-size:10px;color:var(--t3);margin-top:2px">${[l.branche,l.ort].filter(Boolean).map(esc).join(' · ')}</div>
+        <div style="display:flex;gap:10px;margin-top:4px;flex-wrap:wrap;font-size:10px">
+          ${contactLine}${emailLine}${phoneLine}${linkedinLine}
+        </div>
+        ${!isComplete?`<div style="display:flex;gap:6px;margin-top:6px;align-items:center">
+          <input class="inp" id="li-url-${l.id}" placeholder="linkedin.com/in/..." style="font-size:11px;padding:4px 8px;flex:1;max-width:300px">
+          <button class="btn btn-sm" onclick="saveLinkedInUrl(${l.id})" title="${t('linkedin_save_url')}">&#x1f517; ${t('save')}</button>
+          <button class="btn btn-sm btn-purple" onclick="enrichOneLead(${l.id})" title="Apollo">&#x26a1;</button>
+        </div>`:''}
+      </div>
+    </div>
+  </div>`;
 };
 
 const toggleLiSel = (id, checked) => {
   if(checked) liSelectedIds.add(id);
   else liSelectedIds.delete(id);
+};
+
+const toggleSelectAll = (checked) => {
+  leads.forEach(l => { if(checked) liSelectedIds.add(l.id); else liSelectedIds.delete(l.id); });
+  renderCompanyList();
+};
+
+const saveLinkedInUrl = async (id) => {
+  const lead = leads.find(l => l.id === id);
+  if(!lead) return;
+  const url = V('li-url-' + id)?.trim();
+  if(!url) return;
+  const full = url.startsWith('http') ? url : 'https://' + url;
+  if(!isValidLinkedIn(full)) { showAlert('li-alrt', t('linkedin_invalid_url'), 'warn'); return; }
+  lead.linkedin = full;
+  await apiSave('/api/leads/' + lead.id, 'PUT', lead);
+  save(); renderCompanyList();
+  addLog('LinkedIn URL: ' + lead.name + ' → ' + full, 'ok');
 };
 
 // ── LinkedIn URL validation ─────────────────────────────────────────────────
@@ -3386,122 +3322,55 @@ const extractDomain = (web) => {
   } catch { return null; }
 };
 
-// Build LinkedIn People Search URL
-const buildLinkedInURL = (name, role, company, region) => {
-  const q = [name, role, company].filter(Boolean).join(' ');
-  const base = 'https://www.linkedin.com/search/results/people/?keywords=';
-  const params = new URLSearchParams({ keywords: q });
-  if(region && region !== 'Deutschland') params.set('geoUrn', region);
-  return base + encodeURIComponent(q);
-};
-
-const buildLinkedInCompanyURL = (company) => {
-  return 'https://www.linkedin.com/search/results/companies/?keywords=' + encodeURIComponent(company);
-};
-
-// Run LinkedIn search — find real profiles via Apollo API
-const runLinkedInSearch = async () => {
-  const jobtitle = V('li-jobtitle');
-  const keywords = V('li-keywords');
-  const region   = V('li-region');
-
-  if(!leads.length && !jobtitle) {
-    showAlert('li-alrt', t('msg_li_load_leads'), 'warn');
+// Search contacts for selected (or all) companies via Apollo
+const searchSelectedContacts = async () => {
+  if(!cfg.apolloKey && !envDefaults.apolloKey) {
+    showAlert('li-alrt', t('linkedin_no_api'), 'warn');
     return;
   }
 
-  if(!cfg.apolloKey && !envDefaults.apolloKey) {
-    showAlert('li-alrt', 'Apollo API-Key fehlt. Bitte unter Konfiguration einstellen.', 'warn');
+  const targets = liSelectedIds.size
+    ? leads.filter(l => liSelectedIds.has(l.id))
+    : leads.filter(l => !l.kontaktEmail || !l.vorname);
+
+  if(!targets.length) {
+    showAlert('li-alrt', t('linkedin_no_targets'), 'warn');
     return;
   }
 
   const btn = $('li-search-btn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="sp"></span>Suche läuft…';
+  btn.innerHTML = '<span class="sp"></span>' + t('linkedin_searching');
 
-  const results = [];
-  const targets = leads.filter(l => !l.kontakt || !l.linkedin).slice(0, 15);
-
+  let found = 0;
   for(const lead of targets) {
     try {
-      const people = await apolloSearch(lead);
-      for(const p of people) {
-        results.push({
-          leadId: lead.id,
-          leadName: lead.name,
-          kontakt: p.kontakt,
-          email: p.email,
-          telefon: p.telefon,
-          linkedin: p.linkedin,
-          apolloData: p.apolloData
-        });
-      }
-      if(!people.length) {
-        results.push({
-          leadId: lead.id,
-          leadName: lead.name,
-          kontakt: '',
-          email: '',
-          telefon: '',
-          linkedin: '',
-          fallbackUrl: buildLinkedInURL(jobtitle || 'IT-Leiter', '', lead.name, region)
-        });
+      const results = await apolloSearch(lead);
+      if(results.length > 0) {
+        const first = results[0];
+        if(first.email && !lead.kontaktEmail) { lead.kontaktEmail = first.email; lead.email = first.email; }
+        if(first.telefon && !lead.telefon) lead.telefon = first.telefon;
+        if(first.linkedin && !lead.linkedin) lead.linkedin = first.linkedin;
+        if(first.vorname && !lead.vorname) lead.vorname = first.vorname;
+        if(first.nachname && !lead.nachname) lead.nachname = first.nachname;
+        if(first.rolle && !lead.rolle) lead.rolle = first.rolle;
+        if(first.kontakt && !lead.kontakt) lead.kontakt = first.kontakt;
+        if(first.apolloData) lead.apolloData = first.apolloData;
+        await apiSave('/api/leads/' + lead.id, 'PUT', lead);
+        found++;
+        addLog('Apollo: ' + lead.name + ' → ' + (first.kontakt || '') + ' · ' + (first.email || ''), 'ok');
       }
       await slp(300);
     } catch(e) {
-      addLog('Apollo-Fehler für ' + lead.name + ': ' + e.message, 'err');
-      results.push({
-        leadId: lead.id,
-        leadName: lead.name,
-        kontakt: '',
-        email: '',
-        telefon: '',
-        linkedin: '',
-        fallbackUrl: buildLinkedInURL(jobtitle || 'IT-Leiter', '', lead.name, region)
-      });
+      addLog('Apollo-Fehler: ' + lead.name + ' — ' + e.message, 'err');
     }
+    renderCompanyList();
   }
 
-  // Show results
-  $('li-url-panel').style.display = '';
-  const found = results.filter(r => r.linkedin);
-  $('li-url-list').innerHTML = results.map(r => `
-    <div style="padding:10px 14px;border-bottom:1px solid var(--s2);display:flex;align-items:center;gap:10px">
-      <div style="flex:1">
-        <div style="font-size:12px;font-weight:700;color:var(--t1)">${esc(r.leadName)}</div>
-        <div style="font-size:11px;color:var(--t2)">${esc(r.kontakt)}${r.email ? ' · ' + esc(r.email) : ''}${r.telefon ? ' · ' + esc(r.telefon) : ''}</div>
-      </div>
-      <div style="display:flex;gap:6px">
-        ${r.linkedin
-          ? `<a href="${esc(r.linkedin)}" target="_blank" class="btn btn-sm btn-purple" style="text-decoration:none">👤 Profil ↗</a>`
-          : r.fallbackUrl
-            ? `<a href="${esc(r.fallbackUrl)}" target="_blank" class="btn btn-sm" style="text-decoration:none;opacity:.6">🔍 Suche ↗</a>`
-            : '<span style="font-size:10px;color:var(--t3)">Kein Profil</span>'}
-      </div>
-    </div>`).join('') || '<div style="padding:16px;color:var(--t3);font-size:12px">Keine Ergebnisse.</div>';
-
-  $('li-st-found').textContent = results.length;
-  $('li-st-email').textContent = results.filter(r => r.email).length;
-  $('li-st-phone').textContent = results.filter(r => r.telefon).length;
-
-  addLog('Apollo LinkedIn-Suche: ' + found.length + ' Profile, ' + results.length + ' Ergebnisse', 'agent');
-  showAlert('li-alrt', found.length + ' LinkedIn-Profile gefunden, ' + results.length + ' Ergebnisse gesamt.', 'ok');
-
+  save(); renderCompanyList(); renderLeads(); renderLeadPicker();
   btn.disabled = false;
-  btn.textContent = '🔍 Suche starten';
-};
-
-const openAllLinkedIn = () => {
-  const links = $('li-url-list').querySelectorAll('a[href]');
-  links.forEach(a => window.open(a.href, '_blank'));
-  addLog('Alle LinkedIn-Links geöffnet (' + links.length + ')', 'agent');
-};
-
-const openLinkedInSearch = (company, kontakt, ort) => {
-  const jobtitle = V('li-jobtitle') || 'IT-Leiter';
-  const url = buildLinkedInURL(jobtitle, kontakt, company, ort);
-  window.open(url, '_blank');
-  addLog('LinkedIn-Suche geöffnet: ' + company, 'agent');
+  btn.textContent = t('linkedin_search_contacts');
+  showAlert('li-alrt', found + ' ' + t('linkedin_contacts_found'), 'ok');
 };
 
 // ── APOLLO.IO ENRICHMENT ────────────────────────────────────────────────────
@@ -3563,32 +3432,20 @@ const enrichOneLead = async (id) => {
     } catch (e) { addLog('Apollo-Fehler: ' + e.message, 'err'); }
   }
 
-  save(); renderLinkedInEnrichList(); renderLeads(); renderLeadPicker();
+  save(); renderCompanyList(); renderLeads(); renderLeadPicker();
   if (btn) { btn.disabled = false; btn.textContent = enriched ? '✓' : '⚡'; }
 };
 
-const enrichSelected = async () => {
-  if(!liSelectedIds.size) { showAlert('li-alrt', t('msg_li_select'), 'warn'); return; }
-  const btn = $('li-enrich-sel-btn');
-  btn.disabled = true;
-  for(const id of liSelectedIds) {
-    await enrichOneLead(id);
-    await slp(400);
-  }
-  btn.disabled = false;
-  showAlert('li-alrt', liSelectedIds.size + t('msg_li_enriched'), 'ok');
-};
-
 const enrichAllLeads = async () => {
-  const needsWork = leads.filter(l => !l.email || !l.kontakt);
+  const needsWork = leads.filter(l => !l.kontaktEmail || !l.vorname);
   if(!needsWork.length) { showAlert('li-alrt', t('msg_li_complete'), 'ok'); return; }
   const btn = $('li-enrich-btn');
-  btn.disabled = true; btn.innerHTML = '<span class="sp"></span>Läuft…';
+  btn.disabled = true; btn.innerHTML = '<span class="sp"></span>' + t('linkedin_searching');
   for(const l of needsWork) {
     await enrichOneLead(l.id);
     await slp(500);
   }
-  btn.disabled = false; btn.textContent = '⚡ Alle anreichern';
+  btn.disabled = false; btn.textContent = t('linkedin_enrich_all');
   showAlert('li-alrt', t('msg_li_enrich_done'), 'ok');
 };
 
@@ -3602,12 +3459,11 @@ const apolloSearch = async (lead) => {
   // Use real domain from web field only — no guessing
   const domain = extractDomain(lead.web) || undefined;
 
-  const keywords = V('li-keywords')?.trim() || '';
   const region = V('li-region') || '';
 
   const body = {
     q_organization_domains: domain ? [domain] : undefined,
-    q_keywords: [lead.name, keywords].filter(Boolean).join(' '),
+    q_keywords: lead.name,
     person_titles: titles,
     page: 1,
     per_page: 5
@@ -3649,7 +3505,6 @@ const testApollo = async () => {
     if(data.ok) {
       cfg.apolloKey = key; save();
       setPill('p-apollo', true);
-      setPill('li-api-status', true); $('li-api-status').textContent = '● APOLLO ONLINE';
       showAlert('cfg-alrt', t('msg_apollo_ok'), 'ok');
       addLog('Apollo API: OK', 'ok');
       await apiSave('/api/settings', 'PUT', { cfg });
@@ -3681,51 +3536,6 @@ const testPerplexity = async () => {
   } catch(e) { showAlert('cfg-alrt', 'Perplexity-Fehler: ' + e.message, 'err'); }
 };
 
-// Manual capture from LinkedIn
-const saveManualCapture = async () => {
-  const firma = V('mc-firma').trim();
-  const kontakt = V('mc-kontakt').trim();
-  if(!firma && !kontakt) { showAlert('li-alrt', t('msg_li_enter_data'), 'warn'); return; }
-
-  // Check if lead already exists
-  let lead = leads.find(l => l.name.toLowerCase() === firma.toLowerCase());
-  if(lead) {
-    // Update existing lead
-    if(kontakt)     lead.kontakt  = kontakt;
-    if(V('mc-linkedin') && isValidLinkedIn(V('mc-linkedin'))) lead.linkedin = V('mc-linkedin');
-    if(V('mc-email'))    lead.email    = V('mc-email');
-    if(V('mc-tel'))      lead.telefon  = V('mc-tel');
-    if(V('mc-branche'))  lead.branche  = V('mc-branche');
-    if(V('mc-ma'))       lead.ma       = V('mc-ma');
-    if(V('mc-ort'))      lead.ort      = V('mc-ort');
-    await apiSave('/api/leads/' + lead.id, 'PUT', lead);
-    addLog('Lead aktualisiert: ' + firma + ' · ' + kontakt, 'ok');
-  } else {
-    // Create new lead
-    // Split "Hans Schmidt, CTO" into name and role parts
-    const [nameStr, ...roleParts] = kontakt.split(',').map(s => s.trim());
-    const rolle = roleParts.join(', ').trim();
-    const nameParts = nameStr.split(' ');
-    lead = {
-      id: uid(), name: firma,
-      vorname: nameParts[0]||'', nachname: nameParts.slice(1).join(' ')||'',
-      rolle,
-      kontakt, linkedin: isValidLinkedIn(V('mc-linkedin')) ? V('mc-linkedin') : '',
-      kontaktEmail: V('mc-email'), firmenEmail: V('mc-email'),
-      email: V('mc-email'), telefon: V('mc-tel'), branche: V('mc-branche'),
-      ma: V('mc-ma'), ort: V('mc-ort'), fokus: '', web: '',
-      status: 'Neu', created: new Date().toLocaleDateString(loc())
-    };
-    const savedLead = await apiSave('/api/leads', 'POST', lead);
-    if (savedLead) lead.id = savedLead.id;
-    leads.unshift(lead);
-    addLog(t('log_lead_linkedin') + firma + ' · ' + kontakt, 'ok');
-  }
-
-  save(); ui(); renderLinkedInEnrichList(); renderLeads(); renderLeadPicker();
-  ['mc-kontakt','mc-firma','mc-linkedin','mc-email','mc-tel','mc-branche','mc-ma','mc-ort'].forEach(id => { const e=$(id); if(e) e.value=''; });
-  showAlert('li-alrt', (lead ? t('li_saved') : t('li_created')) + ': ' + firma, 'ok');
-};
 
 
 // ─── LEGACY MIGRATION ────────────────────────────────────────────────────────
@@ -4165,7 +3975,7 @@ const changeOwnPassword = async () => {
   if(!loggedIn) return;
   await load(); migrateLegacyLeads(); applyCfg(); ui();
   renderLeads(); renderApprove(); renderInbox(); renderLog();
-  renderCatGrid(); renderLeadPicker(); renderLinkedInEnrichList();
+  renderCatGrid(); renderLeadPicker(); renderCompanyList();
   applyLang();
   setInterval(tick,1000); tick();
 
