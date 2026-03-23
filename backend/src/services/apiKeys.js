@@ -10,6 +10,7 @@ const ENV_MAP = {
   geminiKey:  'GEMINI_API_KEY',
   apolloKey:  'APOLLO_API_KEY',
   perplexityKey: 'PERPLEXITY_API_KEY',
+  hunterKey:     'HUNTER_API_KEY',
 };
 
 /**

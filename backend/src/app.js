@@ -66,6 +66,17 @@ app.post('/api/apollo/test', async (req, res) => {
   }
 });
 app.use('/api/apollo', authMiddleware, apolloRoutes);
+// Hunter.io test — no auth needed (validates external key)
+app.post('/api/hunter/test', async (req, res) => {
+  const { key } = req.body;
+  if (!key) return res.status(400).json({ ok: false, error: 'No key provided' });
+  try {
+    const r = await fetch(`https://api.hunter.io/v2/account?api_key=${key}`);
+    return res.json({ ok: r.ok, status: r.status });
+  } catch (e) {
+    return res.json({ ok: false, error: e.message });
+  }
+});
 
 // Serper.dev Google Search proxy — requires auth, key from user settings or env
 app.post('/api/perplexity/search', authMiddleware, async (req, res) => {

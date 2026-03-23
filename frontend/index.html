@@ -677,6 +677,19 @@ textarea.inp{resize:vertical;line-height:1.6}
     </div>
   </div>
   <div class="pn">
+    <div class="pn-h"><span class="pn-ht">Hunter.io (Fallback Kontaktsuche)</span><span id="p-hunter" class="pill pill-off">● OFFLINE</span></div>
+    <div class="pn-b">
+      <div class="fg" style="margin-bottom:0">
+        <label>Hunter.io API Key</label>
+        <div style="display:flex;gap:10px">
+          <input class="inp" id="c-hunter" type="password" placeholder="hunter_api_key_...">
+          <button class="btn btn-sm" onclick="testHunter()" data-t="test">Testen</button>
+        </div>
+        <div style="font-size:10px;color:var(--t3);margin-top:4px">hunter.io → API Keys · Free: 25 Suchen/Monat · Fallback wenn Apollo 403</div>
+      </div>
+    </div>
+  </div>
+  <div class="pn">
     <div class="pn-h"><span class="pn-ht">Perplexity (AI-Suche)</span><span id="p-perplexity" class="pill pill-off">● OFFLINE</span></div>
     <div class="pn-b">
       <div class="fg" style="margin-bottom:0">
@@ -914,7 +927,7 @@ let leads   = [];
 let pending = [];
 let inbox   = [];
 let logs    = [];
-let cfg = { provider:'claude', claudeKey:'', openaiKey:'', geminiKey:'', model:'claude-sonnet-4-20250514', name:'Daria', role:'Lead AI Architect', co:'', sig:'Beste Grüße', gFrom:'', gName:'', whUrl:'', apolloKey:'', perplexityKey:'', backendUrl:'https://darya-production.up.railway.app', lang:'de' };
+let cfg = { provider:'claude', claudeKey:'', openaiKey:'', geminiKey:'', model:'claude-sonnet-4-20250514', name:'Daria', role:'Lead AI Architect', co:'', sig:'Beste Grüße', gFrom:'', gName:'', whUrl:'', apolloKey:'', hunterKey:'', perplexityKey:'', backendUrl:'https://darya-production.up.railway.app', lang:'de' };
 let envDefaults = {}; // which API keys have server-side env defaults
 let agentOn = false, abort = false;
 
@@ -3006,6 +3019,8 @@ const applyCfg = () => {
   if(cfg.backendUrl){$('c-backend').value=cfg.backendUrl;setPill('p-backend',true);}
   if(cfg.apolloKey){$('c-apollo').value=cfg.apolloKey;setPill('p-apollo',true);}
   else if(envDefaults.apolloKey){setPill('p-apollo',true);$('c-apollo').placeholder='Server-Key gesetzt';}
+  if(cfg.hunterKey){$('c-hunter').value=cfg.hunterKey;setPill('p-hunter',true);}
+  else if(envDefaults.hunterKey){setPill('p-hunter',true);$('c-hunter').placeholder='Server-Key gesetzt';}
   if(cfg.perplexityKey){$('c-perplexity').value=cfg.perplexityKey;setPill('p-perplexity',true);}
   else if(envDefaults.perplexityKey){setPill('p-perplexity',true);$('c-perplexity').placeholder='Server-Key gesetzt';}
   if(cfg.lang){$('c-lang').value=cfg.lang;}
@@ -3027,6 +3042,7 @@ const saveConfig = async () => {
   cfg.model=V('c-model'); cfg.name=V('c-name'); cfg.role=V('c-role');
   cfg.co=V('c-co'); cfg.sig=V('c-sig'); cfg.gFrom=V('c-gfrom'); cfg.gName=V('c-gname'); cfg.whUrl=V('c-wh');
   if(V('c-apollo')) cfg.apolloKey=V('c-apollo');
+  if(V('c-hunter')) cfg.hunterKey=V('c-hunter');
   if(V('c-perplexity')) cfg.perplexityKey=V('c-perplexity');
   if(V('c-backend')) cfg.backendUrl=V('c-backend').replace(/\/$/,'');
   cfg.lang=V('c-lang')||'de';
@@ -3558,6 +3574,28 @@ const testApollo = async () => {
       showAlert('cfg-alrt', 'Apollo: ' + t('msg_invalid_key') + ' (' + (data.status||data.error) + ')', 'err');
     }
   } catch(e) { showAlert('cfg-alrt', 'Apollo-Fehler: ' + e.message, 'err'); }
+};
+
+// Hunter.io test (via backend proxy)
+const testHunter = async () => {
+  const key = V('c-hunter');
+  if(!key) { showAlert('cfg-alrt', 'Hunter.io API-Key eingeben.', 'warn'); return; }
+  try {
+    const res = await fetch((cfg.backendUrl||'')+'/api/hunter/test', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key })
+    });
+    const data = await res.json();
+    if(data.ok) {
+      cfg.hunterKey = key; save();
+      setPill('p-hunter', true);
+      showAlert('cfg-alrt', 'Hunter.io: Verbindung OK', 'ok');
+      addLog('Hunter.io API: OK', 'ok');
+      await apiSave('/api/settings', 'PUT', { cfg });
+    } else {
+      showAlert('cfg-alrt', 'Hunter.io: ' + t('msg_invalid_key') + ' (' + (data.status||data.error) + ')', 'err');
+    }
+  } catch(e) { showAlert('cfg-alrt', 'Hunter.io-Fehler: ' + e.message, 'err'); }
 };
 
 // Perplexity test (via backend proxy)
