@@ -23,6 +23,7 @@ if (!process.env.JWT_SECRET || process.env.JWT_SECRET.includes('change-me')) {
 }
 
 const app = express();
+app.set('trust proxy', 1);
 
 const origins = (process.env.CORS_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
 app.use(cors({
