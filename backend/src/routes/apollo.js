@@ -19,7 +19,7 @@ router.post('/search', async (req, res) => {
   }
 
   try {
-    const r = await fetch('https://api.apollo.io/v1/mixed_people/search', {
+    const r = await fetch('https://api.apollo.io/api/v1/mixed_people/search', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ router.post('/organizations', async (req, res) => {
   }
 
   try {
-    const r = await fetch('https://api.apollo.io/v1/mixed_companies/search', {
+    const r = await fetch('https://api.apollo.io/api/v1/mixed_companies/search', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
