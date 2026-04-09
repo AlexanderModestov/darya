@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { query } from '../services/db.js';
 import { logActivity } from '../services/log.js';
 import { sendEmail } from '../services/resend.js';
+import { getApiKey } from '../services/apiKeys.js';
 
 const router = Router();
 
@@ -91,11 +92,13 @@ router.post('/:id/reply', async (req, res, next) => {
 
     const item = rows[0];
 
-    // Send reply via Resend
+    // Send reply via Resend (user's key or server env fallback)
+    const resendKey = await getApiKey(req.user.id, 'resendKey');
     await sendEmail({
       to: item.from_email,
       subject: 'Re: ' + (item.subject || ''),
       text: replyBody,
+      apiKey: resendKey
     });
 
     // Update inbox entry

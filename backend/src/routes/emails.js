@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { query } from '../services/db.js';
 import { logActivity } from '../services/log.js';
 import { sendEmail } from '../services/resend.js';
+import { getApiKey } from '../services/apiKeys.js';
 
 const router = Router();
 
@@ -67,6 +68,7 @@ router.post('/', async (req, res, next) => {
 router.post('/approve-all', async (req, res, next) => {
   try {
     const userId = req.user.id;
+    const resendKey = await getApiKey(userId, 'resendKey');
 
     const { rows: pending } = await query(
       "SELECT * FROM emails WHERE user_id = $1 AND status = 'pending' AND lead_email IS NOT NULL AND lead_email != ''",
@@ -80,7 +82,8 @@ router.post('/approve-all', async (req, res, next) => {
         const data = await sendEmail({
           to: email.lead_email,
           subject: email.subject,
-          text: email.body
+          text: email.body,
+          apiKey: resendKey
         });
 
         await query(
@@ -179,11 +182,13 @@ router.post('/:id/approve', async (req, res, next) => {
       return res.status(400).json({ error: 'No lead email address' });
     }
 
-    // 4. Send via Resend
+    // 4. Send via Resend (user's key or server env fallback)
+    const resendKey = await getApiKey(userId, 'resendKey');
     const data = await sendEmail({
       to: email.lead_email,
       subject: email.subject,
-      text: email.body
+      text: email.body,
+      apiKey: resendKey
     });
 
     // 5. Update email status

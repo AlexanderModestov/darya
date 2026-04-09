@@ -703,6 +703,18 @@ textarea.inp{resize:vertical;line-height:1.6}
     </div>
   </div>
   <div class="pn">
+    <div class="pn-h"><span class="pn-ht">Resend (E-Mail-Versand)</span><span id="p-resend" class="pill pill-off">● OFFLINE</span></div>
+    <div class="pn-b">
+      <div class="fg" style="margin-bottom:0">
+        <label>Resend API Key</label>
+        <div style="display:flex;gap:10px">
+          <input class="inp" id="c-resend" type="password" placeholder="re_...">
+        </div>
+        <div style="font-size:10px;color:var(--t3);margin-top:4px">resend.com → API Keys · Wird für E-Mail-Versand verwendet (Freigabe &amp; Antworten)</div>
+      </div>
+    </div>
+  </div>
+  <div class="pn">
     <div class="pn-h"><span class="pn-ht">Backend</span><span id="p-backend" class="pill pill-off">● OFFLINE</span></div>
     <div class="pn-b">
       <div class="fg" style="margin-bottom:0">
@@ -927,7 +939,7 @@ let leads   = [];
 let pending = [];
 let inbox   = [];
 let logs    = [];
-let cfg = { provider:'claude', claudeKey:'', openaiKey:'', geminiKey:'', model:'claude-sonnet-4-20250514', name:'Daria', role:'Lead AI Architect', co:'', sig:'Beste Grüße', gFrom:'', gName:'', whUrl:'', apolloKey:'', hunterKey:'', perplexityKey:'', backendUrl:'https://darya-production.up.railway.app', lang:'de' };
+let cfg = { provider:'claude', claudeKey:'', openaiKey:'', geminiKey:'', model:'claude-sonnet-4-20250514', name:'Daria', role:'Lead AI Architect', co:'', sig:'Beste Grüße', gFrom:'', gName:'', whUrl:'', apolloKey:'', hunterKey:'', perplexityKey:'', resendKey:'', backendUrl:'https://darya-production.up.railway.app', lang:'de' };
 let envDefaults = {}; // which API keys have server-side env defaults
 let agentOn = false, abort = false;
 
@@ -3023,6 +3035,8 @@ const applyCfg = () => {
   else if(envDefaults.hunterKey){setPill('p-hunter',true);$('c-hunter').placeholder='Server-Key gesetzt';}
   if(cfg.perplexityKey){$('c-perplexity').value=cfg.perplexityKey;setPill('p-perplexity',true);}
   else if(envDefaults.perplexityKey){setPill('p-perplexity',true);$('c-perplexity').placeholder='Server-Key gesetzt';}
+  if(cfg.resendKey){$('c-resend').value=cfg.resendKey;setPill('p-resend',true);}
+  else if(envDefaults.resendKey){setPill('p-resend',true);$('c-resend').placeholder='Server-Key gesetzt';}
   if(cfg.lang){$('c-lang').value=cfg.lang;}
   // load saved product prompt and fill fields
   const raw = localStorage.getItem('los3_product');
@@ -3044,6 +3058,7 @@ const saveConfig = async () => {
   if(V('c-apollo')) cfg.apolloKey=V('c-apollo');
   if(V('c-hunter')) cfg.hunterKey=V('c-hunter');
   if(V('c-perplexity')) cfg.perplexityKey=V('c-perplexity');
+  if(V('c-resend')) cfg.resendKey=V('c-resend');
   if(V('c-backend')) cfg.backendUrl=V('c-backend').replace(/\/$/,'');
   cfg.lang=V('c-lang')||'de';
   save();
@@ -3051,6 +3066,7 @@ const saveConfig = async () => {
   if(cfg.claudeKey||envDefaults.claudeKey){setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent=cfg.claudeKey?'● API':'● ENV';}
   if(cfg.apolloKey||envDefaults.apolloKey){setPill('p-apollo',true);}
   if(cfg.perplexityKey||envDefaults.perplexityKey) setPill('p-perplexity',true);
+  if(cfg.resendKey||envDefaults.resendKey) setPill('p-resend',true);
   if(cfg.gFrom) setPill('p-gmail',true);
   if(cfg.whUrl) setPill('p-wh',true);
   showAlert('cfg-alrt',t('msg_config_saved'),'ok');

@@ -11,6 +11,7 @@ const ENV_MAP = {
   apolloKey:  'APOLLO_API_KEY',
   perplexityKey: 'PERPLEXITY_API_KEY',
   hunterKey:     'HUNTER_API_KEY',
+  resendKey:     'RESEND_API_KEY',
 };
 
 /**
