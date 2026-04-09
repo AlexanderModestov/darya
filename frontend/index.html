@@ -3731,7 +3731,7 @@ const doLogin = async () => {
         btn.disabled=false; btn.textContent='Einloggen'; return;
       }
       saveToken(data.token);
-      onLoginSuccess(data.user);
+      await onLoginSuccess(data.user);
     } else {
       // ── Local login ────────────────────────────────────────────────────
       const users = getUsers();
@@ -3740,14 +3740,14 @@ const doLogin = async () => {
         const hash = await hashPass(pass);
         const admin = {id:uid(), name:'Admin', email, passHash:hash, role:'admin', created:new Date().toISOString()};
         saveUsers([admin]);
-        onLoginSuccess(admin);
+        await onLoginSuccess(admin);
         return;
       }
       const user = users.find(u => u.email === email);
       if(!user) { showLoginErr('E-Mail nicht gefunden.'); btn.disabled=false; btn.textContent='Einloggen'; return; }
       const hash = await hashPass(pass);
       if(hash !== user.passHash) { showLoginErr('Falsches Passwort.'); btn.disabled=false; btn.textContent='Einloggen'; return; }
-      onLoginSuccess(user);
+      await onLoginSuccess(user);
     }
   } catch(err) {
     showLoginErr('Verbindungsfehler: ' + err.message);
@@ -3784,7 +3784,7 @@ const doRegister = async () => {
         btn.disabled=false; btn.textContent='Account erstellen'; return;
       }
       saveToken(data.token);
-      onLoginSuccess(data.user);
+      await onLoginSuccess(data.user);
     } else {
       // ── Local register ─────────────────────────────────────────────────
       const users = getUsers();
@@ -3792,7 +3792,7 @@ const doRegister = async () => {
       const hash = await hashPass(pass);
       const newUser = {id:uid(), name, email, passHash:hash, role:'user', created:new Date().toISOString()};
       saveUsers([...users, newUser]);
-      onLoginSuccess(newUser);
+      await onLoginSuccess(newUser);
     }
   } catch(err) {
     showRegErr('Verbindungsfehler: ' + err.message);
@@ -3809,7 +3809,7 @@ const checkSession = async () => {
       const res = await authFetch('/api/auth/me');
       if(res.ok) {
         const data = await res.json();
-        onLoginSuccess(data.user);
+        await onLoginSuccess(data.user);
         return true;
       }
     } catch(e) {}
@@ -3822,12 +3822,12 @@ const checkSession = async () => {
   if(!s) return false;
   const days = (new Date() - new Date(s.loginAt)) / (1000*60*60*24);
   if(days > 7) { clearSession(); return false; }
-  onLoginSuccess({id:s.userId, name:s.name, email:s.email, role:s.role});
+  await onLoginSuccess({id:s.userId, name:s.name, email:s.email, role:s.role});
   return true;
 };
 
 // ── ON LOGIN SUCCESS ─────────────────────────────────────────────────────────
-const onLoginSuccess = (user) => {
+const onLoginSuccess = async (user) => {
   saveSession({userId:user.id, name:user.name, email:user.email, role:user.role, loginAt:new Date().toISOString()});
 
   // Track lastLogin
@@ -3857,6 +3857,15 @@ const onLoginSuccess = (user) => {
   if(teamNav) teamNav.style.display = user.role==='admin' ? '' : 'none';
 
   addLog('✓ Login: '+user.name+' ('+user.email+') · '+(user.role||'user'), 'ok');
+
+  // Load user data from backend and render all views
+  await load();
+  migrateLegacyLeads();
+  applyCfg();
+  ui();
+  renderLeads(); renderApprove(); renderInbox(); renderLog();
+  renderCatGrid(); renderLeadPicker(); renderCompanyList();
+  applyLang();
 };
 
 // ── LOGOUT ───────────────────────────────────────────────────────────────────
@@ -4053,14 +4062,10 @@ const changeOwnPassword = async () => {
 };
 
 // ─── BOOT ────────────────────────────────────────────────────────────────────
-// Check login session before loading app
+// Check login session before loading app (onLoginSuccess handles data load + render)
 (async () => {
   const loggedIn = await checkSession();
   if(!loggedIn) return;
-  await load(); migrateLegacyLeads(); applyCfg(); ui();
-  renderLeads(); renderApprove(); renderInbox(); renderLog();
-  renderCatGrid(); renderLeadPicker(); renderCompanyList();
-  applyLang();
   setInterval(tick,1000); tick();
 
   // Inbox polling (backend mode)
