@@ -30,6 +30,13 @@ git push -u origin main
    | `EMAIL_FROM` | `sales@yourdomain.com` |
    | `NODE_ENV` | `production` |
    | `CORS_ORIGINS` | `https://your-app.vercel.app` |
+   | `LLM_PROVIDER` | `claude` |
+   | `LLM_MODEL` | `claude-sonnet-4-20250514` |
+   | `CLAUDE_API_KEY` / `OPENAI_API_KEY` / `GEMINI_API_KEY` | key matching `LLM_PROVIDER` |
+   | `APOLLO_API_KEY` / `HUNTER_API_KEY` / `PERPLEXITY_API_KEY` | lead-search keys |
+   | `SENDER_NAME` / `SENDER_ROLE` / `SENDER_COMPANY` / `EMAIL_SIGNATURE` | persona used in generated emails |
+   | `SENDER_EMAIL` / `SENDER_DISPLAY_NAME` | matches inbox replies to your sent mail |
+   | `CRM_WEBHOOK_URL` | optional — fired server-side when a lead is created |
 
 5. **Settings → Networking → Generate Domain** — получить URL бэкенда
 
