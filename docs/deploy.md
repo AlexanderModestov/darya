@@ -62,7 +62,7 @@ git push -u origin main
 ## 4. Связать frontend и backend
 
 1. Скопировать Railway domain (например `https://daria-production.up.railway.app`)
-2. Открыть свой сайт в браузере (Vercel URL) → внутри LeadOS перейти в **Einstellungen** → в поле **Backend URL** вставить Railway URL → нажать **Testen**
+2. В `frontend/index.html` найти `const BACKEND_URL = '...'` и заменить на свой Railway domain, закоммитить и запушить (Vercel передеплоит автоматически)
 3. В Railway dashboard → Variables → обновить `CORS_ORIGINS` на URL Vercel-приложения (например `https://daria.vercel.app`)
 
 ---
