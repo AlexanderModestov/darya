@@ -1,20 +1,18 @@
 import { Router } from 'express';
-import { getCfgWithDefaults } from '../services/apiKeys.js';
+import { getApiKey } from '../services/apiKeys.js';
 
 const router = Router();
 
-// POST /api/llm — Proxy LLM requests (Claude, OpenAI, Gemini)
+// POST /api/llm — Proxy LLM requests to the configured provider
 router.post('/', async (req, res, next) => {
   try {
-    // Get user's settings with env fallbacks
-    const cfg = await getCfgWithDefaults(req.user.id);
-
-    const { provider, model, prompt, max_tokens } = req.body;
-    const prov = provider || cfg.provider || 'claude';
+    const provider = process.env.LLM_PROVIDER || 'claude';
+    const model = process.env.LLM_MODEL || 'claude-sonnet-4-20250514';
+    const { prompt, max_tokens } = req.body;
     const maxTok = max_tokens || 1200;
 
-    if (prov === 'claude') {
-      const key = cfg.claudeKey;
+    if (provider === 'claude') {
+      const key = getApiKey('claudeKey');
       if (!key) return res.status(400).json({ error: 'Kein Claude API-Key eingetragen' });
 
       const r = await fetch('https://api.anthropic.com/v1/messages', {
@@ -25,7 +23,7 @@ router.post('/', async (req, res, next) => {
           'anthropic-version': '2023-06-01'
         },
         body: JSON.stringify({
-          model: model || 'claude-sonnet-4-20250514',
+          model,
           max_tokens: maxTok,
           messages: [{ role: 'user', content: prompt }]
         })
@@ -41,8 +39,8 @@ router.post('/', async (req, res, next) => {
       return res.json({ text });
     }
 
-    if (prov === 'openai') {
-      const key = cfg.openaiKey;
+    if (provider === 'openai') {
+      const key = getApiKey('openaiKey');
       if (!key) return res.status(400).json({ error: 'Kein OpenAI API-Key eingetragen' });
 
       const r = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -52,7 +50,7 @@ router.post('/', async (req, res, next) => {
           'Authorization': `Bearer ${key}`
         },
         body: JSON.stringify({
-          model: model || 'gpt-4o',
+          model,
           max_tokens: maxTok,
           messages: [{ role: 'user', content: prompt }]
         })
@@ -68,12 +66,11 @@ router.post('/', async (req, res, next) => {
       return res.json({ text });
     }
 
-    if (prov === 'gemini') {
-      const key = cfg.geminiKey;
+    if (provider === 'gemini') {
+      const key = getApiKey('geminiKey');
       if (!key) return res.status(400).json({ error: 'Kein Gemini API-Key eingetragen' });
 
-      const gemModel = model || 'gemini-1.5-flash';
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${gemModel}:generateContent?key=${key}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
 
       const r = await fetch(url, {
         method: 'POST',
@@ -94,50 +91,9 @@ router.post('/', async (req, res, next) => {
       return res.json({ text });
     }
 
-    return res.status(400).json({ error: `Unbekannter Anbieter: ${prov}` });
+    return res.status(400).json({ error: `Unbekannter Anbieter: ${provider}` });
   } catch (err) {
     next(err);
-  }
-});
-
-// POST /api/llm/test — Test API key connectivity
-router.post('/test', async (req, res) => {
-  const { provider, key } = req.body;
-
-  try {
-    if (provider === 'claude') {
-      const r = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': key,
-          'anthropic-version': '2023-06-01'
-        },
-        body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
-          max_tokens: 5,
-          messages: [{ role: 'user', content: 'Hi' }]
-        })
-      });
-      return res.json({ ok: r.ok, status: r.status });
-    }
-
-    if (provider === 'openai') {
-      const r = await fetch('https://api.openai.com/v1/models', {
-        headers: { 'Authorization': `Bearer ${key}` }
-      });
-      return res.json({ ok: r.ok, status: r.status });
-    }
-
-    if (provider === 'gemini') {
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
-      return res.json({ ok: r.ok, status: r.status });
-    }
-
-    return res.status(400).json({ error: 'Unknown provider' });
-  } catch (e) {
-    console.error('LLM test error:', e.message);
-    return res.json({ ok: false, error: e.message });
   }
 });
 
