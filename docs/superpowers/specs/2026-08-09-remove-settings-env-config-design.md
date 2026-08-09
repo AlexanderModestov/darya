@@ -111,6 +111,24 @@ have entered, custom persona text) from the production database. Confirmed
 intentional — nothing in that table is meant to survive since everything moves to
 shared `.env` values set directly by the operator.
 
+## Addendum: leftover panels found during planning
+
+Reading the full Settings page HTML (not just the settings API route) surfaced two
+more sections bundled into `pg-config` that weren't part of the original design
+discussion:
+
+- A **"Daten" panel** (JSON export/import, "delete my data") for the local-only
+  `leads/pending/inbox/logs` arrays — a leftover from a local-only mode that predates
+  the hardcoded backend URL decision above.
+- A **legacy "Nutzer-Verwaltung" mini-panel** (`users-list`/`p-admin`, read-only user
+  list with delete) that duplicates the full **Team & Benutzer** page (`pg-team`),
+  which already has add-user, a table, role management, and password reset.
+
+Decision: delete both along with the rest of the Settings page. The Leads page
+(`pg-leads`) has its own JSON export/import buttons calling the same `expJSON`/
+`impJSON` functions, so those functions are kept — only the duplicate buttons and the
+Settings-page-only `nukeAll` function/button are removed.
+
 ## Testing & verification
 
 No existing automated test suite in this repo — verification is manual smoke-testing:
