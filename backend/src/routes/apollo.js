@@ -3,14 +3,6 @@ import { getApiKey } from '../services/apiKeys.js';
 
 const router = Router();
 
-async function getApolloKey(userId) {
-  return getApiKey(userId, 'apolloKey');
-}
-
-async function getHunterKey(userId) {
-  return getApiKey(userId, 'hunterKey');
-}
-
 /**
  * Call Hunter.io Domain Search and map results to Apollo-like format.
  */
@@ -56,7 +48,7 @@ async function hunterSearch(hunterKey, body) {
 // ─── People Search (Apollo → Hunter.io fallback) ─────────────────────────────
 
 router.post('/search', async (req, res) => {
-  const apolloKey = await getApolloKey(req.user.id);
+  const apolloKey = getApiKey('apolloKey');
 
   // Try Apollo first
   if (apolloKey) {
@@ -82,7 +74,7 @@ router.post('/search', async (req, res) => {
   }
 
   // Fallback: Hunter.io
-  const hunterKey = await getHunterKey(req.user.id);
+  const hunterKey = getApiKey('hunterKey');
   if (!hunterKey) {
     return res.status(400).json({
       error: 'Apollo API returned 403 (free plan) and no Hunter.io key configured. Add a Hunter.io API key in settings.'
@@ -101,7 +93,7 @@ router.post('/search', async (req, res) => {
 // ─── Apollo Organization Search (proxy) ──────────────────────────────────────
 
 router.post('/organizations', async (req, res) => {
-  const apolloKey = await getApolloKey(req.user.id);
+  const apolloKey = getApiKey('apolloKey');
   if (!apolloKey) {
     return res.status(400).json({ error: 'Apollo API key not configured' });
   }

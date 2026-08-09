@@ -93,7 +93,7 @@ router.post('/:id/reply', async (req, res, next) => {
     const item = rows[0];
 
     // Send reply via Resend (user's key or server env fallback)
-    const resendKey = await getApiKey(req.user.id, 'resendKey');
+    const resendKey = getApiKey('resendKey');
     await sendEmail({
       to: item.from_email,
       subject: 'Re: ' + (item.subject || ''),

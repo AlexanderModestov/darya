@@ -68,7 +68,7 @@ router.post('/', async (req, res, next) => {
 router.post('/approve-all', async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const resendKey = await getApiKey(userId, 'resendKey');
+    const resendKey = getApiKey('resendKey');
 
     const { rows: pending } = await query(
       "SELECT * FROM emails WHERE user_id = $1 AND status = 'pending' AND lead_email IS NOT NULL AND lead_email != ''",
@@ -183,7 +183,7 @@ router.post('/:id/approve', async (req, res, next) => {
     }
 
     // 4. Send via Resend (user's key or server env fallback)
-    const resendKey = await getApiKey(userId, 'resendKey');
+    const resendKey = getApiKey('resendKey');
     const data = await sendEmail({
       to: email.lead_email,
       subject: email.subject,
