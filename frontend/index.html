@@ -1312,11 +1312,8 @@ const applyLang = () => {
 const switchLang = (lang) => {
   cfg.lang = lang;
   save();
-  apiSave('/api/settings', 'PUT', { cfg });
   applyLang();
   // Re-render dynamic elements that use t()
-  if(typeof switchProvider === 'function') switchProvider(cfg.provider || 'claude');
-  if(typeof renderUsersList === 'function') renderUsersList();
   if(typeof renderTeam === 'function') renderTeam();
 };
 
@@ -1596,10 +1593,9 @@ const claude = async (prompt, max=1200) => {
 };
 
 const llmViaBackend = async (prompt, max) => {
-  const prov = cfg.provider || 'claude';
   const r = await authFetch('/api/llm', {
     method:'POST',
-    body: JSON.stringify({ provider:prov, model:cfg.model, prompt, max_tokens:max })
+    body: JSON.stringify({ prompt, max_tokens:max })
   });
   if(!r.ok) {
     const d = await r.json().catch(()=>({}));
@@ -1625,8 +1621,8 @@ const runAgent = async () => {
     tlog('✗ ' + t('msg_no_backend'),'lr');
     endAgent(); return;
   }
-  if(!cfg.apolloKey && !envDefaults.apolloKey && !cfg.perplexityKey && !envDefaults.perplexityKey) {
-    tlog('✗ Apollo oder Perplexity API-Key fehlt. Bitte unter Konfiguration einstellen.','lr');
+  if(!envDefaults.apolloKey && !envDefaults.perplexityKey) {
+    tlog('✗ Apollo oder Perplexity API-Key fehlt. Bitte in der Server-.env eintragen.','lr');
     endAgent(); return;
   }
   tlog('Firmensuche gestartet…','lg');
@@ -1638,7 +1634,7 @@ const runAgent = async () => {
   let orgs = []; // [{name, industry, city, employees, domain, description}]
 
   // Try Perplexity AI Search (replaces Serper+Claude two-step)
-  if(cfg.perplexityKey || envDefaults.perplexityKey) {
+  if(envDefaults.perplexityKey) {
     try {
       stepD(1,'Firmensuche via Perplexity AI…');
       tlog('Perplexity-Suche gestartet…','lg');
@@ -1681,7 +1677,7 @@ Antworte AUSSCHLIESSLICH mit einem JSON-Array, KEIN anderer Text:
   }
 
   // Fallback: Apollo Organization Search (with pagination)
-  if(!orgs.length && (cfg.apolloKey || envDefaults.apolloKey)) {
+  if(!orgs.length && envDefaults.apolloKey) {
     try {
       stepD(1,'Suche Firmen via Apollo…');
       const perPage = 25;
@@ -1771,7 +1767,6 @@ Antworte AUSSCHLIESSLICH mit einem JSON-Array, KEIN anderer Text:
     const saved = await apiSave('/api/leads', 'POST', l);
     if (saved) l.id = saved.id;
     leads.unshift(l);
-    if(cfg.whUrl) sendWH(l);
   }
   save(); ui();
   step(3,'done'); stepD(3, newLeads.length+' Leads gespeichert');
@@ -1840,7 +1835,7 @@ const saveProductPrompt = async () => {
     showAlert('eg-alrt',t('msg_fill_product'),'err'); return;
   }
   localStorage.setItem('los3_product', JSON.stringify(data));
-  await apiSave('/api/settings', 'PUT', { product: data });
+  await apiSave('/api/product-profile', 'PUT', data);
   $('eg-saved-info').textContent = t('profile_saved_prefix') + data.saved;
   showAlert('eg-alrt',t('msg_profile_saved'),'ok');
   addLog(t('log_profile_saved') + (data.name||data.what||'').substring(0,40), 'ok');
@@ -1865,11 +1860,11 @@ const loadProductPrompt = async () => {
   // Try server first, then localStorage
   let d = null;
   try {
-    const res = await authFetch('/api/settings');
+    const res = await authFetch('/api/product-profile');
     if(res.ok) {
       const s = await res.json();
-      if(s.product && (s.product.name || s.product.what || s.product.prompt)) {
-        d = s.product;
+      if(s && (s.name || s.what || s.prompt)) {
+        d = s;
         localStorage.setItem('los3_product', JSON.stringify(d));
       }
     }
@@ -2828,31 +2823,6 @@ const clearLeads=()=>{ if(confirm('Alle Leads löschen?')){leads=[];save();rende
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 const applyCfg = () => {
-  if(cfg.provider) { const s=$('c-provider'); if(s) s.value=cfg.provider; switchProvider(cfg.provider); }
-  if(cfg.claudeKey){$('c-key').value=cfg.claudeKey;setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● '+cfg.provider.toUpperCase();}
-  else if(envDefaults.claudeKey && cfg.provider==='claude'){setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● ENV';$('c-key').placeholder='Server-Key gesetzt';}
-  if(cfg.openaiKey) $('c-openai-key').value=cfg.openaiKey;
-  else if(envDefaults.openaiKey) $('c-openai-key').placeholder='Server-Key gesetzt';
-  if(cfg.geminiKey) $('c-gemini-key').value=cfg.geminiKey;
-  else if(envDefaults.geminiKey) $('c-gemini-key').placeholder='Server-Key gesetzt';
-  if(cfg.model) $('c-model').value=cfg.model;
-  if(cfg.name) $('c-name').value=cfg.name;
-  if(cfg.role) $('c-role').value=cfg.role;
-  if(cfg.co) $('c-co').value=cfg.co;
-  if(cfg.sig) $('c-sig').value=cfg.sig;
-  if(cfg.gFrom){$('c-gfrom').value=cfg.gFrom;setPill('p-gmail',true);}
-  if(cfg.gName) $('c-gname').value=cfg.gName;
-  if(cfg.whUrl){$('c-wh').value=cfg.whUrl;setPill('p-wh',true);}
-  if(cfg.backendUrl){$('c-backend').value=cfg.backendUrl;setPill('p-backend',true);}
-  if(cfg.apolloKey){$('c-apollo').value=cfg.apolloKey;setPill('p-apollo',true);}
-  else if(envDefaults.apolloKey){setPill('p-apollo',true);$('c-apollo').placeholder='Server-Key gesetzt';}
-  if(cfg.hunterKey){$('c-hunter').value=cfg.hunterKey;setPill('p-hunter',true);}
-  else if(envDefaults.hunterKey){setPill('p-hunter',true);$('c-hunter').placeholder='Server-Key gesetzt';}
-  if(cfg.perplexityKey){$('c-perplexity').value=cfg.perplexityKey;setPill('p-perplexity',true);}
-  else if(envDefaults.perplexityKey){setPill('p-perplexity',true);$('c-perplexity').placeholder='Server-Key gesetzt';}
-  if(cfg.resendKey){$('c-resend').value=cfg.resendKey;setPill('p-resend',true);}
-  else if(envDefaults.resendKey){setPill('p-resend',true);$('c-resend').placeholder='Server-Key gesetzt';}
-  if(cfg.lang){$('c-lang').value=cfg.lang;}
   // load saved product prompt and fill fields
   const raw = localStorage.getItem('los3_product');
   if(raw) {
@@ -2863,114 +2833,6 @@ const applyCfg = () => {
     } catch(e){}
   }
 };
-const saveConfig = async () => {
-  cfg.provider=V('c-provider')||'claude';
-  const key=V('c-key'); if(key) cfg.claudeKey=key;
-  const okey=V('c-openai-key'); if(okey) cfg.openaiKey=okey;
-  const gkey=V('c-gemini-key'); if(gkey) cfg.geminiKey=gkey;
-  cfg.model=V('c-model'); cfg.name=V('c-name'); cfg.role=V('c-role');
-  cfg.co=V('c-co'); cfg.sig=V('c-sig'); cfg.gFrom=V('c-gfrom'); cfg.gName=V('c-gname'); cfg.whUrl=V('c-wh');
-  if(V('c-apollo')) cfg.apolloKey=V('c-apollo');
-  if(V('c-hunter')) cfg.hunterKey=V('c-hunter');
-  if(V('c-perplexity')) cfg.perplexityKey=V('c-perplexity');
-  if(V('c-resend')) cfg.resendKey=V('c-resend');
-  if(V('c-backend')) cfg.backendUrl=V('c-backend').replace(/\/$/,'');
-  cfg.lang=V('c-lang')||'de';
-  save();
-  await apiSave('/api/settings', 'PUT', { cfg });
-  if(cfg.claudeKey||envDefaults.claudeKey){setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent=cfg.claudeKey?'● API':'● ENV';}
-  if(cfg.apolloKey||envDefaults.apolloKey){setPill('p-apollo',true);}
-  if(cfg.perplexityKey||envDefaults.perplexityKey) setPill('p-perplexity',true);
-  if(cfg.resendKey||envDefaults.resendKey) setPill('p-resend',true);
-  if(cfg.gFrom) setPill('p-gmail',true);
-  if(cfg.whUrl) setPill('p-wh',true);
-  showAlert('cfg-alrt',t('msg_config_saved'),'ok');
-  addLog('Konfiguration gespeichert','ok');
-};
-const switchProvider = (prov) => {
-  ['claude','openai','gemini'].forEach(p => {
-    const el = $('key-'+p); if(el) el.style.display = p===prov?'':'none';
-  });
-  const modelSel = $('c-model');
-  if(!modelSel) return;
-  const models = {
-    claude: [
-      {v:'claude-sonnet-4-20250514', l:'Claude Sonnet 4 ' + t('model_recommended')},
-      {v:'claude-opus-4-20250514',   l:'Claude Opus 4'},
-      {v:'claude-haiku-4-5-20251001',l:'Claude Haiku 4.5 ' + t('model_fast')},
-    ],
-    openai: [
-      {v:'gpt-4o',       l:'GPT-4o ' + t('model_recommended')},
-      {v:'gpt-4o-mini',  l:'GPT-4o Mini ' + t('model_fast_cheap')},
-      {v:'gpt-4-turbo',  l:'GPT-4 Turbo'},
-    ],
-    gemini: [
-      {v:'gemini-1.5-flash', l:'Gemini 1.5 Flash ' + t('model_recommended_free')},
-      {v:'gemini-1.5-pro',   l:'Gemini 1.5 Pro'},
-      {v:'gemini-2.0-flash', l:'Gemini 2.0 Flash'},
-    ],
-  };
-  const opts = models[prov] || models.claude;
-  modelSel.innerHTML = opts.map(o=>`<option value="${o.v}">${o.l}</option>`).join('');
-  cfg.provider = prov;
-};
-
-const testOpenAI = async () => {
-  const key=V('c-openai-key'); if(!key){alert('OpenAI API Key eintragen');return;}
-  try {
-    const r=await authFetch('/api/llm/test',{method:'POST',body:JSON.stringify({provider:'openai',key})});
-    const d=await r.json();
-    if(d.ok){cfg.openaiKey=key;save();apiSave('/api/settings','PUT',{cfg});setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● OPENAI';showAlert('cfg-alrt',t('msg_openai_ok'),'ok');addLog('OpenAI API: OK','ok');}
-    else showAlert('cfg-alrt','OpenAI: '+t('msg_invalid_key')+(d.status||'?')+')','err');
-  } catch(e){showAlert('cfg-alrt','Fehler: '+e.message,'err');}
-};
-
-const testGemini = async () => {
-  const key=V('c-gemini-key'); if(!key){alert('Gemini API Key eintragen');return;}
-  try {
-    const r=await authFetch('/api/llm/test',{method:'POST',body:JSON.stringify({provider:'gemini',key})});
-    const d=await r.json();
-    if(d.ok){cfg.geminiKey=key;save();apiSave('/api/settings','PUT',{cfg});setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● GEMINI';showAlert('cfg-alrt',t('msg_gemini_ok'),'ok');addLog('Gemini API: OK','ok');}
-    else showAlert('cfg-alrt','Gemini: '+t('msg_invalid_key')+(d.status||'?')+')','err');
-  } catch(e){showAlert('cfg-alrt','Fehler: '+e.message,'err');}
-};
-
-const testClaude = async () => {
-  const key=V('c-key'); if(!key){alert('Key eintragen');return;}
-  try {
-    const r=await authFetch('/api/llm/test',{method:'POST',body:JSON.stringify({provider:'claude',key})});
-    const txt=await r.text();
-    console.log('testClaude response:', r.status, txt);
-    if(!r.ok){showAlert('cfg-alrt',t('msg_server_error')+r.status+'): '+txt,'err');return;}
-    if(!txt){showAlert('cfg-alrt',t('msg_empty_response')+r.status+')','err');return;}
-    const d=JSON.parse(txt);
-    if(d.ok){cfg.claudeKey=key;save();apiSave('/api/settings','PUT',{cfg});setPill('p-claude',true);$('pill-api').className='pill pill-on';$('pill-api').textContent='● API';showAlert('cfg-alrt',t('msg_claude_ok'),'ok');addLog('Claude API OK','ok');}
-    else showAlert('cfg-alrt',t('msg_invalid_key')+(d.status||'?')+')' + (d.error ? ': '+d.error : ''),'err');
-  } catch(e){showAlert('cfg-alrt',t('msg_conn_error')+e.message,'err');}
-};
-const testBackend = async () => {
-  const url = V('c-backend').replace(/\/$/, '');
-  if(!url) { showAlert('cfg-alrt', t('msg_backend_enter'), 'warn'); return; }
-  try {
-    const res = await fetch(url + '/api/health');
-    if(res.ok) {
-      cfg.backendUrl = url; save();
-      setPill('p-backend', true);
-      // Switch to backend mode
-      showAlert('cfg-alrt', t('msg_backend_connected'), 'ok');
-      addLog('Backend verbunden: ' + url, 'ok');
-    } else {
-      showAlert('cfg-alrt', t('msg_backend_bad') + res.status + ')', 'err');
-    }
-  } catch(e) { showAlert('cfg-alrt', t('msg_backend_unreachable') + e.message, 'err'); }
-};
-
-const testWH = async () => {
-  const url=V('c-wh'); if(!url){alert('URL eintragen');return;}
-  try{await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({test:true,source:'LeadOS'})});cfg.whUrl=url;save();setPill('p-wh',true);showAlert('cfg-alrt',t('msg_webhook_ok'),'ok');}
-  catch(e){showAlert('cfg-alrt',t('msg_webhook_fail'),'err');}
-};
-const sendWH = async data => { if(!cfg.whUrl) return; try{await fetch(cfg.whUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data,source:'LeadOS',ts:new Date().toISOString()})});}catch(e){} };
 
 // ─── EXPORT ───────────────────────────────────────────────────────────────────
 const expCSV = async () => {
@@ -3010,40 +2872,6 @@ const impJSON = () => {
       alert('Import OK: '+leads.length+' Leads');addLog('Import: '+leads.length+' Leads','ok');
     }catch(e){alert('Fehler: '+e.message);}};r.readAsText(f);};inp.click();
 };
-const nukeAll = () => { if(!confirm('Alle DEINE Daten löschen? (Andere Nutzer bleiben unberührt)'))return; leads=[];pending=[];inbox=[];logs=[];save();ui();renderLeads();renderApprove();renderInbox();renderLog();addLog('Alle Daten gelöscht','warn'); };
-
-// ─── USER MANAGEMENT ─────────────────────────────────────────────────────────
-const renderUsersList = () => {
-  const session = getSession();
-  if(!session) return;
-  const isAdmin = session.role === 'admin';
-  const adminPill = $('p-admin');
-  if(adminPill) {
-    if(isAdmin) { adminPill.style.display=''; adminPill.className='pill pill-purple'; adminPill.textContent=t('team_admin_badge'); }
-    else { adminPill.style.display='none'; }
-  }
-  const users = getUsers();
-  const el = $('users-list'); if(!el) return;
-  if(!isAdmin) {
-    el.innerHTML = `<div style="font-size:12px;color:var(--t2)">${t('team_logged_in_as')}: <strong style="color:var(--t1)">${esc(session.name)}</strong> &nbsp;·&nbsp; ${esc(session.email)}</div>`;
-    return;
-  }
-  el.innerHTML = users.map(u => `
-    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--s3)">
-      <div style="width:28px;height:28px;border-radius:50%;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green);flex-shrink:0">
-        ${esc((u.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().substring(0,2))}
-      </div>
-      <div style="flex:1">
-        <div style="font-size:12px;font-weight:700;color:var(--t1)">${esc(u.name)}
-          ${u.role==='admin'?'<span class="pill pill-purple" style="font-size:9px;margin-left:6px">ADMIN</span>':''}
-          ${u.id===session.userId?'<span class="pill pill-on" style="font-size:9px;margin-left:4px">ICH</span>':''}
-        </div>
-        <div style="font-size:10px;color:var(--t3)">${esc(u.email)} &nbsp;·&nbsp; seit ${new Date(u.created||Date.now()).toLocaleDateString(loc())}</div>
-      </div>
-      ${u.id !== session.userId ? `<button class="btn btn-sm btn-r" onclick="deleteUser('${u.id}')">Löschen</button>` : ''}
-    </div>`).join('') || '<div style="font-size:12px;color:var(--t3)">' + t('team_no_other_users') + '</div>';
-};
-
 const deleteUserAccount = (userId) => {
   const users = getUsers();
   const user = users.find(u=>u.id===userId);
@@ -3174,7 +3002,7 @@ const extractDomain = (web) => {
 
 // Search contacts for selected (or all) companies via Apollo
 const searchSelectedContacts = async () => {
-  if(!cfg.apolloKey && !envDefaults.apolloKey) {
+  if(!envDefaults.apolloKey) {
     showAlert('li-alrt', t('linkedin_no_api'), 'warn');
     return;
   }
@@ -3272,7 +3100,7 @@ const enrichOneLead = async (id) => {
 
   let enriched = false;
 
-  if (cfg.apolloKey || envDefaults.apolloKey) {
+  if (envDefaults.apolloKey) {
     try {
       const results = await apolloSearch(lead);
       if (results.length > 0) {
@@ -3383,75 +3211,6 @@ const apolloSearch = async (lead) => {
     apolloData: person
   }));
 };
-
-
-// Apollo test (via backend proxy)
-const testApollo = async () => {
-  const key = V('c-apollo');
-  if(!key) { showAlert('cfg-alrt', t('msg_apollo_enter'), 'warn'); return; }
-  try {
-    const res = await fetch((cfg.backendUrl||'')+'/api/apollo/test', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key })
-    });
-    const data = await res.json();
-    if(data.ok) {
-      cfg.apolloKey = key; save();
-      setPill('p-apollo', true);
-      showAlert('cfg-alrt', t('msg_apollo_ok'), 'ok');
-      addLog('Apollo API: OK', 'ok');
-      await apiSave('/api/settings', 'PUT', { cfg });
-    } else {
-      showAlert('cfg-alrt', 'Apollo: ' + t('msg_invalid_key') + ' (' + (data.status||data.error) + ')', 'err');
-    }
-  } catch(e) { showAlert('cfg-alrt', 'Apollo-Fehler: ' + e.message, 'err'); }
-};
-
-// Hunter.io test (via backend proxy)
-const testHunter = async () => {
-  const key = V('c-hunter');
-  if(!key) { showAlert('cfg-alrt', 'Hunter.io API-Key eingeben.', 'warn'); return; }
-  try {
-    const res = await fetch((cfg.backendUrl||'')+'/api/hunter/test', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key })
-    });
-    const data = await res.json();
-    if(data.ok) {
-      cfg.hunterKey = key; save();
-      setPill('p-hunter', true);
-      showAlert('cfg-alrt', 'Hunter.io: Verbindung OK', 'ok');
-      addLog('Hunter.io API: OK', 'ok');
-      await apiSave('/api/settings', 'PUT', { cfg });
-    } else {
-      showAlert('cfg-alrt', 'Hunter.io: ' + t('msg_invalid_key') + ' (' + (data.status||data.error) + ')', 'err');
-    }
-  } catch(e) { showAlert('cfg-alrt', 'Hunter.io-Fehler: ' + e.message, 'err'); }
-};
-
-// Perplexity test (via backend proxy)
-const testPerplexity = async () => {
-  const key = V('c-perplexity');
-  if(!key) { showAlert('cfg-alrt', 'Perplexity API-Key eingeben.', 'warn'); return; }
-  try {
-    const res = await fetch((cfg.backendUrl||'')+'/api/perplexity/test', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key })
-    });
-    const data = await res.json();
-    if(data.ok) {
-      cfg.perplexityKey = key; save();
-      setPill('p-perplexity', true);
-      showAlert('cfg-alrt', 'Perplexity API verbunden!', 'ok');
-      addLog('Perplexity API: OK', 'ok');
-      await apiSave('/api/settings', 'PUT', { cfg });
-    } else {
-      showAlert('cfg-alrt', 'Perplexity: Ungültiger Key (' + (data.status||data.error) + ')', 'err');
-    }
-  } catch(e) { showAlert('cfg-alrt', 'Perplexity-Fehler: ' + e.message, 'err'); }
-};
-
-
 
 // ─── LEGACY MIGRATION ────────────────────────────────────────────────────────
 // Converts old leads (kontakt string) to new structure (vorname/nachname/rolle)
