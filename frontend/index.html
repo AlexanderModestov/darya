@@ -750,8 +750,8 @@ let leads   = [];
 let pending = [];
 let inbox   = [];
 let logs    = [];
-let cfg = { provider:'claude', claudeKey:'', openaiKey:'', geminiKey:'', model:'claude-sonnet-4-20250514', name:'Daria', role:'Lead AI Architect', co:'', sig:'Beste Grüße', gFrom:'', gName:'', whUrl:'', apolloKey:'', hunterKey:'', perplexityKey:'', resendKey:'', backendUrl:'https://darya-production.up.railway.app', lang:'de' };
-let envDefaults = {}; // which API keys have server-side env defaults
+let cfg = { name:'Daria', role:'Lead AI Architect', co:'', sig:'Beste Grüße', gFrom:'', gName:'', lang:'de' };
+let envDefaults = {}; // { apolloKey: boolean, perplexityKey: boolean } — from GET /api/config
 let agentOn = false, abort = false;
 
 // ─── I18N ────────────────────────────────────────────────────────────────────
@@ -1444,7 +1444,7 @@ Diese E-Mails funktionieren durch ihre Direktheit — halte sie ehrlich und knap
 let _currentUserId = null;
 const userKey = (k) => _currentUserId ? 'los3_u_'+_currentUserId+'_'+k : 'los3_'+k;
 const save = () => {
-  // Always persist cfg to localStorage (needed to bootstrap backend URL)
+  // Always persist cfg to localStorage (bootstraps persona defaults before /api/config responds)
   localStorage.setItem('los3_cfg', JSON.stringify(cfg));
   if (AUTH_MODE === 'backend' && AUTH_API()) return;
   ['leads','pending','inbox','logs'].forEach(k => localStorage.setItem(userKey(k), JSON.stringify(eval(k))));
@@ -1455,14 +1455,13 @@ const load = async () => {
 
   if (AUTH_MODE === 'backend' && AUTH_API()) {
     try {
-      const localOnly = { backendUrl: cfg.backendUrl };
-      const [leadsRes, emailsRes, inboxRes, settingsRes, logsRes, defaultsRes] = await Promise.all([
+      const [leadsRes, emailsRes, inboxRes, configRes, logsRes, productRes] = await Promise.all([
         authFetch('/api/leads'),
         authFetch('/api/emails'),
         authFetch('/api/inbox'),
-        authFetch('/api/settings'),
+        authFetch('/api/config'),
         authFetch('/api/logs?limit=200'),
-        authFetch('/api/settings/defaults')
+        authFetch('/api/product-profile')
       ]);
       if (leadsRes.ok) leads = (await leadsRes.json()).map(l => ({
         ...l,
@@ -1494,17 +1493,23 @@ const load = async () => {
         replyBody: i.replyBody || i.reply_body,
         time: i.time || i.received_at
       }));
-      if (settingsRes.ok) {
-        const s = await settingsRes.json();
-        if (s.cfg) cfg = { ...cfg, ...s.cfg, ...localOnly };
-        if (s.product) try { localStorage.setItem('los3_product', JSON.stringify(s.product)); } catch(e){}
+      if (configRes.ok) {
+        const c = await configRes.json();
+        cfg.name = c.senderName || cfg.name;
+        cfg.role = c.senderRole || cfg.role;
+        cfg.co = c.senderCompany || cfg.co;
+        cfg.sig = c.signature || cfg.sig;
+        cfg.gFrom = c.senderEmail || cfg.gFrom;
+        cfg.gName = c.senderDisplayName || cfg.gName;
+        envDefaults = { apolloKey: c.hasApolloKey, perplexityKey: c.hasPerplexityKey };
       }
       if (logsRes.ok) {
         const serverLogs = await logsRes.json();
         logs = serverLogs.map(l => ({ msg: l.action + (l.details?.name ? ': ' + l.details.name : ''), t: 'info', time: l.created_at }));
       }
-      if (defaultsRes.ok) {
-        envDefaults = await defaultsRes.json();
+      if (productRes.ok) {
+        const p = await productRes.json();
+        if (p && (p.name || p.what || p.prompt)) try { localStorage.setItem('los3_product', JSON.stringify(p)); } catch(e){}
       }
     } catch (e) { console.error('Load failed:', e); }
     return;
@@ -3483,7 +3488,8 @@ const migrateLegacyLeads = () => {
 // Mode: 'local' (localStorage) or 'backend' (API)
 // Switch to 'backend' once Node.js server is running
 const AUTH_MODE = 'backend';
-const AUTH_API  = () => (cfg.backendUrl || window.location.origin).replace(/\/$/, '');
+const BACKEND_URL = 'https://darya-production.up.railway.app';
+const AUTH_API  = () => BACKEND_URL;
 
 // ── Token storage ──────────────────────────────────────────────────────────
 const getToken    = ()    => localStorage.getItem('los3_token') || '';
