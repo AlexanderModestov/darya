@@ -130,6 +130,22 @@ const spec = {
           hasPerplexityKey:  { type: 'boolean' },
         },
       },
+      ProductProfile: {
+        type: 'object',
+        description: 'Free-form sales-pitch content used to personalize generated emails',
+        properties: {
+          name:     { type: 'string' },
+          target:   { type: 'string' },
+          what:     { type: 'string' },
+          problems: { type: 'string' },
+          usp:      { type: 'string' },
+          roi:      { type: 'string' },
+          pricing:  { type: 'string' },
+          refs:     { type: 'string' },
+          prompt:   { type: 'string' },
+          saved:    { type: 'string' },
+        },
+      },
     },
   },
   paths: {
@@ -480,6 +496,25 @@ const spec = {
         security: [{ bearerAuth: [] }],
         responses: {
           200: { description: 'Config', content: { 'application/json': { schema: { $ref: '#/components/schemas/Config' } } } },
+        },
+      },
+    },
+    '/api/product-profile': {
+      get: {
+        tags: ['Config'],
+        summary: "Get the current user's saved product profile",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: { description: 'Product profile', content: { 'application/json': { schema: { $ref: '#/components/schemas/ProductProfile' } } } },
+        },
+      },
+      put: {
+        tags: ['Config'],
+        summary: "Upsert the current user's product profile",
+        security: [{ bearerAuth: [] }],
+        requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/ProductProfile' } } } },
+        responses: {
+          200: { description: 'Saved product profile', content: { 'application/json': { schema: { $ref: '#/components/schemas/ProductProfile' } } } },
         },
       },
     },

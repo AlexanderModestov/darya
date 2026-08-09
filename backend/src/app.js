@@ -10,6 +10,7 @@ import emailsRoutes from './routes/emails.js';
 import inboxRoutes from './routes/inbox.js';
 import usersRoutes from './routes/users.js';
 import configRoutes from './routes/config.js';
+import productProfileRoutes from './routes/productProfile.js';
 import logsRoutes from './routes/logs.js';
 import llmRoutes from './routes/llm.js';
 import apolloRoutes from './routes/apollo.js';
@@ -51,6 +52,7 @@ app.use('/api/emails', authMiddleware, emailsRoutes);
 app.use('/api/inbox', authMiddleware, inboxRoutes);
 app.use('/api/users', authMiddleware, usersRoutes);
 app.use('/api/config', authMiddleware, configRoutes);
+app.use('/api/product-profile', authMiddleware, productProfileRoutes);
 app.use('/api/logs', authMiddleware, logsRoutes);
 app.use('/api/apollo', authMiddleware, apolloRoutes);
 
