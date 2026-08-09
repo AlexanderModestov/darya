@@ -146,6 +146,13 @@ router.post('/', async (req, res) => {
     const userId = req.user.id;
     const lead = await insertLead(userId, req.body);
     await logActivity(userId, 'lead_created', 'lead', lead.id, { name: lead.name });
+    if (process.env.CRM_WEBHOOK_URL) {
+      fetch(process.env.CRM_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...lead, source: 'LeadOS', ts: new Date().toISOString() }),
+      }).catch((e) => console.error('CRM webhook error:', e.message));
+    }
     res.status(201).json(lead);
   } catch (err) {
     console.error('Create lead error:', err);
