@@ -15,7 +15,7 @@ const spec = {
     { name: 'Emails', description: 'Email generation, approval, sending' },
     { name: 'Inbox', description: 'Incoming replies & responses' },
     { name: 'Users', description: 'User management (admin only)' },
-    { name: 'Settings', description: 'User configuration & company profile' },
+    { name: 'Config', description: 'Server-side persona and integration config' },
     { name: 'Logs', description: 'Activity log' },
   ],
   components: {
@@ -117,11 +117,17 @@ const spec = {
           created_at:  { type: 'string', format: 'date-time' },
         },
       },
-      Settings: {
+      Config: {
         type: 'object',
         properties: {
-          cfg:     { type: 'object', description: 'UI configuration JSON' },
-          product: { type: 'object', description: 'Company profile JSON' },
+          senderName:        { type: 'string' },
+          senderRole:        { type: 'string' },
+          senderCompany:     { type: 'string' },
+          signature:         { type: 'string' },
+          senderEmail:       { type: 'string' },
+          senderDisplayName: { type: 'string' },
+          hasApolloKey:      { type: 'boolean' },
+          hasPerplexityKey:  { type: 'boolean' },
         },
       },
     },
@@ -466,23 +472,14 @@ const spec = {
       },
     },
 
-    // ── Settings ────────────────────────────────────
-    '/api/settings': {
+    // ── Config ──────────────────────────────────────
+    '/api/config': {
       get: {
-        tags: ['Settings'],
-        summary: 'Get user settings',
+        tags: ['Config'],
+        summary: 'Get server-side persona and integration config',
         security: [{ bearerAuth: [] }],
         responses: {
-          200: { description: 'Settings', content: { 'application/json': { schema: { $ref: '#/components/schemas/Settings' } } } },
-        },
-      },
-      put: {
-        tags: ['Settings'],
-        summary: 'Update user settings',
-        security: [{ bearerAuth: [] }],
-        requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/Settings' } } } },
-        responses: {
-          200: { description: 'Updated', content: { 'application/json': { schema: { $ref: '#/components/schemas/Settings' } } } },
+          200: { description: 'Config', content: { 'application/json': { schema: { $ref: '#/components/schemas/Config' } } } },
         },
       },
     },
