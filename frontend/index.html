@@ -223,7 +223,6 @@ textarea.inp{resize:vertical;line-height:1.6}
   <div class="ni" onclick="nav('leads')"><span>◈</span> <span data-t="nav_leads">Lead-Datenbank</span></div>
   <div class="ni" onclick="nav('log')"><span>≡</span> <span data-t="nav_log">Aktivitätslog</span></div>
   <div class="nav-sec" data-t="nav_system_sec">System</div>
-  <div class="ni" onclick="nav('config')"><span>⊕</span> <span data-t="nav_config">Konfiguration</span></div>
   <div class="ni" id="nav-team" onclick="nav('team')" style="display:none"><span>👥</span> <span data-t="nav_team">Team & Benutzer</span></div>
   <div class="side-foot">
     <div id="sb-inf">0 Leads · 0 Produkte</div>
@@ -593,194 +592,6 @@ textarea.inp{resize:vertical;line-height:1.6}
     <button class="btn btn-sm btn-r" onclick="clearLog()" data-t="log_clear">Log leeren</button>
   </div>
   <div class="pn"><div class="pn-b" id="log-body" style="max-height:560px;overflow-y:auto;padding:0 16px"></div></div>
-</div>
-
-<!-- ═══ CONFIG ═══ -->
-<div id="pg-config" class="pg">
-  <div class="ph">
-    <div><div class="ph-t" data-t="config_title">Konfiguration</div><div class="ph-s" data-t="config_subtitle">API-Keys, Apollo.io, Absender-Profil, Webhook</div></div>
-    <button class="btn btn-g" onclick="saveConfig()" data-t="save">Speichern</button>
-  </div>
-  <div class="pn">
-    <div class="pn-h"><span class="pn-ht" data-t="lang_title">Sprache / Language</span></div>
-    <div class="pn-b">
-      <div class="fg" style="margin-bottom:0">
-        <select class="inp" id="c-lang" onchange="switchLang(this.value)">
-          <option value="de">Deutsch</option>
-          <option value="en">English</option>
-        </select>
-      </div>
-    </div>
-  </div>
-  <div id="cfg-alrt" style="display:none" class="alrt"></div>
-  <div class="pn">
-    <div class="pn-h"><span class="pn-ht" data-t="ai_provider">KI-Anbieter</span><span id="p-claude" class="pill pill-off">● OFFLINE</span></div>
-    <div class="pn-b">
-      <div class="fr" style="margin-bottom:14px">
-        <div class="fg" style="margin-bottom:0">
-          <label data-t="choose_provider">Anbieter wählen</label>
-          <select class="inp" id="c-provider" onchange="switchProvider(this.value)">
-            <option value="claude">Anthropic Claude</option>
-            <option value="openai">OpenAI (ChatGPT)</option>
-            <option value="gemini">Google Gemini</option>
-          </select>
-        </div>
-        <div class="fg" style="margin-bottom:0">
-          <label data-t="model">Modell</label>
-          <select class="inp" id="c-model" style="max-width:360px">
-            <option value="claude-sonnet-4-20250514">Claude Sonnet 4 (empfohlen)</option>
-            <option value="claude-opus-4-20250514">Claude Opus 4</option>
-            <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (schnell)</option>
-          </select>
-        </div>
-      </div>
-      <!-- Claude -->
-      <div id="key-claude" class="fg">
-        <label>Claude API Key</label>
-        <div style="display:flex;gap:10px">
-          <input class="inp" id="c-key" type="password" placeholder="sk-ant-api03-…">
-          <button class="btn btn-sm" onclick="testClaude()" data-t="test">Testen</button>
-        </div>
-        <div style="font-size:10px;color:var(--t3);margin-top:4px">console.anthropic.com → API Keys</div>
-      </div>
-      <!-- OpenAI -->
-      <div id="key-openai" class="fg" style="display:none">
-        <label>OpenAI API Key</label>
-        <div style="display:flex;gap:10px">
-          <input class="inp" id="c-openai-key" type="password" placeholder="sk-proj-…">
-          <button class="btn btn-sm" onclick="testOpenAI()" data-t="test">Testen</button>
-        </div>
-        <div style="font-size:10px;color:var(--t3);margin-top:4px">platform.openai.com → API Keys</div>
-      </div>
-      <!-- Gemini -->
-      <div id="key-gemini" class="fg" style="display:none;margin-bottom:0">
-        <label>Gemini API Key</label>
-        <div style="display:flex;gap:10px">
-          <input class="inp" id="c-gemini-key" type="password" placeholder="AIzaSy…">
-          <button class="btn btn-sm" onclick="testGemini()" data-t="test">Testen</button>
-        </div>
-        <div style="font-size:10px;color:var(--t3);margin-top:4px">aistudio.google.com → Get API Key · Kostenlos</div>
-      </div>
-    </div>
-  </div>
-  <div class="pn">
-    <div class="pn-h"><span class="pn-ht" data-t="apollo_title">Apollo.io (Kontaktsuche)</span><span id="p-apollo" class="pill pill-off">● OFFLINE</span></div>
-    <div class="pn-b">
-      <div class="fg" style="margin-bottom:0">
-        <label>Apollo.io API Key</label>
-        <div style="display:flex;gap:10px">
-          <input class="inp" id="c-apollo" type="password" placeholder="apollo_api_key_...">
-          <button class="btn btn-sm" onclick="testApollo()" data-t="test">Testen</button>
-        </div>
-        <div style="font-size:10px;color:var(--t3);margin-top:4px">apollo.io → Settings → API Keys · Free: 50 Anfragen/Tag</div>
-      </div>
-    </div>
-  </div>
-  <div class="pn">
-    <div class="pn-h"><span class="pn-ht">Hunter.io (Fallback Kontaktsuche)</span><span id="p-hunter" class="pill pill-off">● OFFLINE</span></div>
-    <div class="pn-b">
-      <div class="fg" style="margin-bottom:0">
-        <label>Hunter.io API Key</label>
-        <div style="display:flex;gap:10px">
-          <input class="inp" id="c-hunter" type="password" placeholder="hunter_api_key_...">
-          <button class="btn btn-sm" onclick="testHunter()" data-t="test">Testen</button>
-        </div>
-        <div style="font-size:10px;color:var(--t3);margin-top:4px">hunter.io → API Keys · Free: 25 Suchen/Monat · Fallback wenn Apollo 403</div>
-      </div>
-    </div>
-  </div>
-  <div class="pn">
-    <div class="pn-h"><span class="pn-ht">Perplexity (AI-Suche)</span><span id="p-perplexity" class="pill pill-off">● OFFLINE</span></div>
-    <div class="pn-b">
-      <div class="fg" style="margin-bottom:0">
-        <label>Perplexity API Key</label>
-        <div style="display:flex;gap:10px">
-          <input class="inp" id="c-perplexity" type="password" placeholder="pplx-...">
-          <button class="btn btn-sm" onclick="testPerplexity()" data-t="test">Testen</button>
-        </div>
-        <div style="font-size:10px;color:var(--t3);margin-top:4px">perplexity.ai → API Settings → API Keys</div>
-      </div>
-    </div>
-  </div>
-  <div class="pn">
-    <div class="pn-h"><span class="pn-ht">Resend (E-Mail-Versand)</span><span id="p-resend" class="pill pill-off">● OFFLINE</span></div>
-    <div class="pn-b">
-      <div class="fg" style="margin-bottom:0">
-        <label>Resend API Key</label>
-        <div style="display:flex;gap:10px">
-          <input class="inp" id="c-resend" type="password" placeholder="re_...">
-        </div>
-        <div style="font-size:10px;color:var(--t3);margin-top:4px">resend.com → API Keys · Wird für E-Mail-Versand verwendet (Freigabe &amp; Antworten)</div>
-      </div>
-    </div>
-  </div>
-  <div class="pn">
-    <div class="pn-h"><span class="pn-ht">Backend</span><span id="p-backend" class="pill pill-off">● OFFLINE</span></div>
-    <div class="pn-b">
-      <div class="fg" style="margin-bottom:0">
-        <label data-t="backend_url">Backend URL</label>
-        <div style="display:flex;gap:10px">
-          <input class="inp" id="c-backend" placeholder="http://localhost:3000 oder https://your-app.railway.app" data-tp="ph_backend">
-          <button class="btn btn-sm" onclick="testBackend()" data-t="test">Testen</button>
-        </div>
-        <div style="font-size:10px;color:var(--t3);margin-top:5px" data-t="backend_hint">
-          Leer lassen = lokaler Modus (Daten im Browser). Mit Backend-URL = Server-Modus (Daten in PostgreSQL).
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="pn">
-    <div class="pn-h"><span class="pn-ht" data-t="sender_profile">Absender-Profil</span></div>
-    <div class="pn-b">
-      <div class="fr">
-        <div class="fg"><label>Name</label><input class="inp" id="c-name" placeholder="Daria"></div>
-        <div class="fg"><label data-t="role">Rolle</label><input class="inp" id="c-role" placeholder="Lead AI Architect"></div>
-      </div>
-      <div class="fr" style="margin-bottom:0">
-        <div class="fg" style="margin-bottom:0"><label data-t="company">Unternehmen</label><input class="inp" id="c-co" placeholder="Meine GmbH" data-tp="ph_company"></div>
-        <div class="fg" style="margin-bottom:0"><label data-t="signature">Signatur</label><input class="inp" id="c-sig" placeholder="Beste Grüße, Daria" data-tp="ph_sig"></div>
-      </div>
-    </div>
-  </div>
-  <div class="pn">
-    <div class="pn-h"><span class="pn-ht" data-t="gmail_email">Gmail / E-Mail</span><span id="p-gmail" class="pill pill-off">● OFFLINE</span></div>
-    <div class="pn-b">
-      <div class="fr" style="margin-bottom:0">
-        <div class="fg" style="margin-bottom:0"><label data-t="sender_email">Absender-E-Mail</label><input class="inp" id="c-gfrom" placeholder="daria@firma.de" type="email"></div>
-        <div class="fg" style="margin-bottom:0"><label data-t="display_name">Anzeigename</label><input class="inp" id="c-gname" placeholder="Daria, Lead AI Architect"></div>
-      </div>
-    </div>
-  </div>
-  <div class="pn">
-    <div class="pn-h"><span class="pn-ht" data-t="webhook_crm">Webhook / CRM</span><span id="p-wh" class="pill pill-off">● OFFLINE</span></div>
-    <div class="pn-b">
-      <div class="fg" style="margin-bottom:0"><label>Webhook URL</label>
-        <div style="display:flex;gap:10px">
-          <input class="inp" id="c-wh" placeholder="https://hook.zapier.com/…">
-          <button class="btn btn-sm" onclick="testWH()" data-t="test">Testen</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="pn">
-    <div class="pn-h"><span class="pn-ht" data-t="data">Daten</span></div>
-    <div class="pn-b" style="display:flex;gap:8px">
-      <button class="btn btn-sm" onclick="expJSON()" data-t="json_export">JSON Export</button>
-      <button class="btn btn-sm" onclick="impJSON()" data-t="json_import">JSON Import</button>
-      <button class="btn btn-sm btn-r" onclick="nukeAll()" data-t="delete_data">Meine Daten löschen</button>
-    </div>
-  </div>
-  <div class="pn">
-    <div class="pn-h">
-      <span class="pn-ht" data-t="user_mgmt">Nutzer-Verwaltung</span>
-      <span id="p-admin" class="pill" style="display:none"></span>
-    </div>
-    <div class="pn-b">
-      <div id="users-list" style="margin-bottom:10px"></div>
-      <div style="font-size:10px;color:var(--t3)" data-t="user_mgmt_hint">Neue Nutzer registrieren sich selbst über den Login-Screen. Als Admin kannst du alle Accounts sehen und löschen.</div>
-    </div>
-  </div>
 </div>
 
 <!-- ═══ LINKEDIN PROSPECTING ═══ -->
@@ -1740,7 +1551,7 @@ const tlog = (msg, cls='ld') => {
 const clearTerm = () => { $('term').innerHTML='<div class="ln ld">// '+t('terminal_cleared')+'</div>'; };
 
 // ─── NAV ─────────────────────────────────────────────────────────────────────
-const PAGES = ['agent','linkedin','emailgen','approve','inbox','leads','log','config','team'];
+const PAGES = ['agent','linkedin','emailgen','approve','inbox','leads','log','team'];
 const nav = id => {
   PAGES.forEach(p => { $('pg-'+p).classList.toggle('on', p===id); });
   document.querySelectorAll('.ni').forEach((el,i) => el.classList.toggle('on', PAGES[i]===id));
@@ -1751,7 +1562,6 @@ const nav = id => {
   if(id==='emailgen') { renderCatGrid(); renderLeadPicker(); }
   if(id==='linkedin') { renderCompanyList(); }
   if(id==='team') renderTeam();
-  if(id==='config') { renderUsersList(); }
 };
 
 // ─── UI UPDATE ────────────────────────────────────────────────────────────────
