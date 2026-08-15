@@ -15,7 +15,7 @@ try {
     console.log(`Migration ${file} applied successfully`);
   }
 } catch (err) {
-  console.error('Migration failed:', err.message);
+  console.error('Migration failed:', err.errors ?? err.stack ?? err);
   process.exit(1);
 } finally {
   await pool.end();

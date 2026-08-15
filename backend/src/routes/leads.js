@@ -147,24 +147,12 @@ router.post('/', async (req, res) => {
     const lead = await insertLead(userId, req.body);
     await logActivity(userId, 'lead_created', 'lead', lead.id, { name: lead.name });
     if (process.env.CRM_WEBHOOK_URL) {
+      const { user_id, deleted_at, updated_at, apollo_data, kontakt_email, firmen_email, created_at, ...rest } = lead;
       const webhookPayload = {
-        id: lead.id,
-        name: lead.name,
-        vorname: lead.vorname,
-        nachname: lead.nachname,
-        rolle: lead.rolle,
-        kontaktEmail: lead.kontakt_email,
-        firmenEmail: lead.firmen_email,
-        telefon: lead.telefon,
-        linkedin: lead.linkedin,
-        beschreibung: lead.beschreibung,
-        branche: lead.branche,
-        ort: lead.ort,
-        ma: lead.ma,
-        web: lead.web,
-        fokus: lead.fokus,
-        status: lead.status,
-        created: lead.created_at,
+        ...rest,
+        kontaktEmail: kontakt_email,
+        firmenEmail: firmen_email,
+        created: created_at,
         source: 'LeadOS',
         ts: new Date().toISOString(),
       };
