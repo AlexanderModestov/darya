@@ -1,30 +1,44 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
 <title>LeadOS — Autonomer Sales Agent</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0b0b0b;--s1:#111;--s2:#181818;--s3:#202020;--s4:#2a2a2a;
-  --green:#00d4a0;--green2:#00a87f;--red:#ff4545;--yellow:#f5c218;
-  --blue:#4b8fff;--purple:#a855f7;--orange:#f97316;
-  --t1:#f0f0f0;--t2:#888;--t3:#444;
-  --bd:1px solid #1e1e1e;
+  /* Aktenpapier — ledger-and-signature system, shared with the LeadOS marketing identity */
+  --bg:#E7E4D9;--s1:#F2EFE4;--s2:#EAE6D8;--s3:#DBD6C2;--s4:#CDC7AC;
+  --green:#2E6B4C;--green2:#234F39;--red:#A3392C;--yellow:#7A5D1B;
+  --blue:#2E4E68;--purple:#5C4A7A;--orange:#A15A2E;
+  --t1:#1C2A33;--t2:#51616A;--t3:#6E7162;
+  --bd:1px solid #C6C1AA;
+  /* the terminal stays an inked-in printout inset against the paper chrome */
+  --term-bg:#12191E;--term-fg:#ECE7D6;--term-dim:#8A9199;
+  --term-green:#3FBE8E;--term-red:#E2695A;--term-blue:#6FA0C4;--term-yellow:#D4AE4E;--term-purple:#A78FC9;
 }
-html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'SF Mono',ui-monospace,monospace;font-size:13px;overflow:hidden}
+html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:13px;overflow:hidden}
+body{
+  background-image:repeating-linear-gradient(to bottom, transparent 0 31px, rgba(28,42,51,.035) 32px),
+                    repeating-linear-gradient(to right, transparent 0 31px, rgba(28,42,51,.035) 32px);
+  background-size:32px 32px;
+}
+/* Data, forms, labels and system output keep the ledger's monospace hand; headings and prose read in the humanist faces */
+.nav-sec,.pn-ht,.fg label,.field-lbl,.login-lbl,.login-sub,.tbl,.tbl th,.tbl td,.term,.inp,.btn,.pill,.bdg,.ni-badge,
+.isel,.tbtn,.miss-btn,.prod-tag,.sn,.login-inp,.clk,.side-foot,.user-avatar{font-family:'IBM Plex Mono',ui-monospace,monospace}
 .shell{display:grid;grid-template-rows:50px 1fr;grid-template-columns:240px 1fr;height:100vh}
 .top{grid-column:1/-1;background:var(--s1);border-bottom:var(--bd);display:flex;align-items:center;justify-content:space-between;padding:0 20px}
-.brand{font-size:14px;font-weight:900;letter-spacing:.18em;color:var(--green)}
-.brand em{color:var(--t3);font-style:normal;font-weight:400}
+.brand{font-family:'Oswald',system-ui,sans-serif;font-size:16px;font-weight:700;letter-spacing:.04em;color:var(--t1)}
+.brand em{color:var(--green);font-style:normal;font-weight:600}
 .top-right{display:flex;gap:10px;align-items:center}
 .side{background:var(--s1);border-right:var(--bd);display:flex;flex-direction:column;overflow-y:auto}
 .nav-sec{font-size:10px;letter-spacing:.14em;color:var(--t3);padding:14px 16px 5px;text-transform:uppercase}
 .ni{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:12px;color:var(--t2);cursor:pointer;border-left:2px solid transparent;transition:all .12s;user-select:none}
 .ni:hover{color:var(--t1);background:var(--s2)}
-.ni.on{color:var(--green);border-left-color:var(--green);background:var(--s2)}
+.ni.on{color:var(--green);border-left-color:var(--green);background:var(--s3)}
 .ni-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center}
 .side-foot{margin-top:auto;padding:12px 16px;border-top:var(--bd);font-size:10px;color:var(--t3);line-height:1.7}
 .main{overflow-y:auto;padding:26px 24px}
@@ -32,62 +46,62 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'SF Mono'
 .pg.on{display:block;animation:fu .18s ease}
 @keyframes fu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 .ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px}
-.ph-t{font-size:20px;font-weight:800;letter-spacing:-.02em;color:var(--t1)}
-.ph-s{font-size:11px;color:var(--t3);margin-top:4px;letter-spacing:.04em}
+.ph-t{font-family:'Oswald',system-ui,sans-serif;font-size:23px;font-weight:600;letter-spacing:-.01em;color:var(--t1)}
+.ph-s{font-size:12px;color:var(--t2);margin-top:4px;letter-spacing:.01em}
 .pn{background:var(--s1);border:var(--bd);border-radius:3px;margin-bottom:14px}
 .pn-h{padding:11px 16px;border-bottom:var(--bd);display:flex;align-items:center;justify-content:space-between}
 .pn-ht{font-size:10px;letter-spacing:.12em;color:var(--t2);text-transform:uppercase}
 .pn-b{padding:16px}
-.btn{padding:7px 16px;font-size:11px;letter-spacing:.07em;border:var(--bd);border-radius:3px;cursor:pointer;background:transparent;color:var(--t1);text-transform:uppercase;font-family:inherit;transition:all .12s}
+.btn{padding:7px 16px;font-size:11px;letter-spacing:.07em;border:var(--bd);border-radius:2px;cursor:pointer;background:var(--s2);color:var(--t1);text-transform:uppercase;transition:all .12s}
 .btn:hover{background:var(--s3)}
 .btn:active{transform:scale(.98)}
 .btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
-.btn-g{background:var(--green);border-color:var(--green);color:#000;font-weight:800}
-.btn-g:hover{background:var(--green2)}
-.btn-r{border-color:var(--red);color:var(--red)}
-.btn-r:hover{background:var(--red);color:#fff}
-.btn-ok{background:rgba(0,212,160,.12);border-color:var(--green);color:var(--green)}
-.btn-ok:hover{background:var(--green);color:#000}
-.btn-rej{background:rgba(255,69,69,.1);border-color:var(--red);color:var(--red)}
-.btn-rej:hover{background:var(--red);color:#fff}
-.btn-purple{background:var(--purple);border-color:var(--purple);color:#fff;font-weight:800}
-.btn-purple:hover{background:#9333ea}
+.btn-g{background:var(--green);border-color:var(--green);color:var(--s1);font-weight:600}
+.btn-g:hover{background:var(--green2);border-color:var(--green2)}
+.btn-r{background:transparent;border-color:var(--red);color:var(--red)}
+.btn-r:hover{background:var(--red);color:var(--s1)}
+.btn-ok{background:rgba(46,107,76,.12);border-color:var(--green);color:var(--green)}
+.btn-ok:hover{background:var(--green);color:var(--s1)}
+.btn-rej{background:rgba(163,57,44,.1);border-color:var(--red);color:var(--red)}
+.btn-rej:hover{background:var(--red);color:var(--s1)}
+.btn-purple{background:var(--purple);border-color:var(--purple);color:var(--s1);font-weight:600}
+.btn-purple:hover{background:#4A3A64}
 .btn-sm{padding:5px 12px;font-size:10px}
-.inp{width:100%;padding:8px 12px;font-size:12px;font-family:inherit;background:var(--bg);border:var(--bd);border-radius:3px;color:var(--t1);outline:none;transition:border-color .12s}
-.inp:focus{border-color:var(--green)}
+.inp{width:100%;padding:8px 12px;font-size:12px;background:var(--bg);border:var(--bd);border-radius:2px;color:var(--t1);outline:none;transition:border-color .12s}
+.inp:focus{border-color:var(--blue)}
 .inp::placeholder{color:var(--t3)}
 select.inp option{background:var(--s1)}
-textarea.inp{resize:vertical;line-height:1.6}
+textarea.inp{resize:vertical;line-height:1.6;font-family:'IBM Plex Sans',system-ui,sans-serif}
 .fg{margin-bottom:12px}
 .fg label{display:block;font-size:10px;letter-spacing:.1em;color:var(--t3);text-transform:uppercase;margin-bottom:5px}
 .fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 .pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:2px;font-size:10px;font-weight:700;letter-spacing:.06em}
-.pill-on{background:rgba(0,212,160,.12);color:var(--green)}
-.pill-off{background:rgba(255,69,69,.1);color:var(--red)}
-.pill-warn{background:rgba(245,194,24,.12);color:var(--yellow)}
-.pill-info{background:rgba(75,143,255,.12);color:var(--blue)}
-.pill-purple{background:rgba(168,85,247,.12);color:var(--purple)}
+.pill-on{background:rgba(46,107,76,.12);color:var(--green)}
+.pill-off{background:rgba(163,57,44,.1);color:var(--red)}
+.pill-warn{background:rgba(122,93,27,.12);color:var(--yellow)}
+.pill-info{background:rgba(46,78,104,.12);color:var(--blue)}
+.pill-purple{background:rgba(92,74,122,.12);color:var(--purple)}
 .bdg{display:inline-block;padding:2px 7px;border-radius:2px;font-size:10px;font-weight:700;letter-spacing:.05em}
-.bdg-new{background:rgba(75,143,255,.15);color:#6fa3ff}
-.bdg-sent{background:rgba(0,212,160,.15);color:var(--green)}
-.bdg-warm{background:rgba(245,200,66,.15);color:var(--yellow)}
-.bdg-rep{background:rgba(0,212,160,.28);color:#00eeb0}
-.bdg-cold{background:rgba(120,120,120,.1);color:var(--t3)}
-.term{background:#000;border:var(--bd);border-radius:3px;padding:14px;font-size:11px;line-height:1.75;max-height:300px;overflow-y:auto;font-family:inherit}
+.bdg-new{background:rgba(46,78,104,.15);color:var(--blue)}
+.bdg-sent{background:rgba(46,107,76,.15);color:var(--green)}
+.bdg-warm{background:rgba(122,93,27,.15);color:var(--yellow)}
+.bdg-rep{background:rgba(46,107,76,.3);color:var(--green2)}
+.bdg-cold{background:rgba(110,113,98,.15);color:var(--t3)}
+.term{background:var(--term-bg);border:var(--bd);border-radius:3px;padding:14px;font-size:11px;line-height:1.75;max-height:300px;overflow-y:auto}
 .term .ln{margin:0}
-.lg{color:var(--green)}.lr{color:var(--red)}.lb{color:var(--blue)}.ly{color:var(--yellow)}.ld{color:var(--t3)}.lw{color:var(--t1)}.lp{color:var(--purple)}
+.lg{color:var(--term-green)}.lr{color:var(--term-red)}.lb{color:var(--term-blue)}.ly{color:var(--term-yellow)}.ld{color:var(--term-dim)}.lw{color:var(--term-fg)}.lp{color:var(--term-purple)}
 .step{display:flex;gap:14px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--s3)}
 .step:last-child{border-bottom:none}
-.sn{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+.sn{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
 .sn-pend{background:var(--s3);color:var(--t3)}
-.sn-act{background:var(--green);color:#000}
+.sn-act{background:var(--green);color:var(--s1)}
 .sn-done{background:var(--s4);color:var(--green);border:1px solid var(--green)}
 .acard{background:var(--s2);border:var(--bd);border-radius:3px;padding:16px;margin-bottom:12px;transition:border-color .15s}
-.acard.pend{border-color:rgba(245,194,24,.35)}
-.acard.appr{border-color:rgba(0,212,160,.25)}
-.acard.rej{border-color:rgba(255,69,69,.15);opacity:.55}
-.eml-prev{background:var(--bg);border:var(--bd);border-radius:3px;padding:12px;font-size:12px;line-height:1.65;color:var(--t2);white-space:pre-wrap;max-height:220px;overflow-y:auto;margin:8px 0}
+.acard.pend{border-color:rgba(122,93,27,.4)}
+.acard.appr{border-color:rgba(46,107,76,.35)}
+.acard.rej{border-color:rgba(163,57,44,.2);opacity:.55}
+.eml-prev{background:var(--bg);border:var(--bd);border-radius:3px;padding:12px;font-size:12.5px;line-height:1.65;color:var(--t1);white-space:pre-wrap;max-height:220px;overflow-y:auto;margin:8px 0;font-family:'IBM Plex Sans',system-ui,sans-serif}
 .icard{background:var(--s2);border:var(--bd);border-radius:3px;padding:14px;margin-bottom:10px}
 .icard.unread{border-left:3px solid var(--green)}
 .icard.replied{opacity:.6}
@@ -97,53 +111,55 @@ textarea.inp{resize:vertical;line-height:1.6}
 .tbl tr:hover td{background:var(--s2);color:var(--t1)}
 .sp{display:inline-block;width:12px;height:12px;border:2px solid var(--s3);border-top-color:var(--green);border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.alrt{padding:10px 14px;border-radius:3px;font-size:12px;margin-bottom:14px}
-.alrt-ok{background:rgba(0,212,160,.1);border:1px solid rgba(0,212,160,.3);color:var(--green)}
-.alrt-err{background:rgba(255,69,69,.1);border:1px solid rgba(255,69,69,.3);color:var(--red)}
-.alrt-warn{background:rgba(245,194,24,.08);border:1px solid rgba(245,194,24,.25);color:var(--yellow)}
+.alrt{padding:10px 14px;border-radius:3px;font-size:12px;margin-bottom:14px;font-family:'IBM Plex Sans',system-ui,sans-serif}
+.alrt-ok{background:rgba(46,107,76,.1);border:1px solid rgba(46,107,76,.3);color:var(--green)}
+.alrt-err{background:rgba(163,57,44,.1);border:1px solid rgba(163,57,44,.3);color:var(--red)}
+.alrt-warn{background:rgba(122,93,27,.08);border:1px solid rgba(122,93,27,.3);color:var(--yellow)}
 .sep{height:1px;background:var(--s3);margin:14px 0}
-.tbtn{background:transparent;border:none;cursor:pointer;padding:3px 6px;color:var(--t3);font-size:12px;border-radius:2px;font-family:inherit}
+.tbtn{background:transparent;border:none;cursor:pointer;padding:3px 6px;color:var(--t3);font-size:12px;border-radius:2px}
 .tbtn:hover{color:var(--t1);background:var(--s3)}
-.isel{background:transparent;border:none;font-size:11px;font-family:inherit;cursor:pointer;color:var(--t3);outline:none}
+.isel{background:transparent;border:none;font-size:11px;cursor:pointer;color:var(--t3);outline:none}
 .field-lbl{font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em}
-.miss-btn{background:transparent;border:1px solid rgba(245,194,24,.35);border-radius:2px;padding:3px 8px;font-size:10px;color:var(--yellow);cursor:pointer;font-family:inherit;transition:all .12s}
-.miss-btn:hover{background:rgba(245,194,24,.1)}
+.miss-btn{background:transparent;border:1px solid rgba(122,93,27,.4);border-radius:2px;padding:3px 8px;font-size:10px;color:var(--yellow);cursor:pointer;transition:all .12s}
+.miss-btn:hover{background:rgba(122,93,27,.1)}
 
 /* ── EMAIL GENERATOR SPECIFIC ─────────────────────────────── */
 .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:6px}
 .cat-card{background:var(--s2);border:2px solid var(--s3);border-radius:4px;padding:14px 12px;cursor:pointer;transition:all .15s;text-align:left}
 .cat-card:hover{border-color:var(--s4);background:var(--s3)}
-.cat-card.sel{border-color:var(--green);background:rgba(0,212,160,.06)}
+.cat-card.sel{border-color:var(--green);background:rgba(46,107,76,.07)}
 .cat-card .cat-icon{font-size:20px;margin-bottom:6px;display:block}
-.cat-card .cat-name{font-size:12px;font-weight:700;color:var(--t1);margin-bottom:3px}
-.cat-card .cat-desc{font-size:10px;color:var(--t3);line-height:1.4}
+.cat-card .cat-name{font-size:12px;font-weight:600;color:var(--t1);margin-bottom:3px;font-family:'IBM Plex Sans',system-ui,sans-serif}
+.cat-card .cat-desc{font-size:10px;color:var(--t3);line-height:1.4;font-family:'IBM Plex Sans',system-ui,sans-serif}
 .prod-card{background:var(--s2);border:var(--bd);border-radius:3px;padding:14px;margin-bottom:10px}
 .prod-card.active-prod{border-color:var(--green)}
 .prod-tag{display:inline-block;padding:2px 8px;border-radius:2px;font-size:10px;font-weight:700;margin-right:4px;margin-bottom:4px}
 .gen-progress{height:4px;background:var(--s3);border-radius:2px;overflow:hidden;margin:8px 0}
 .gen-progress-fill{height:100%;background:var(--green);border-radius:2px;transition:width .4s ease;width:0%}
 .lead-checkbox{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:3px;cursor:pointer;transition:background .1s}
-.lead-checkbox:hover{background:var(--s2)}
+.lead-checkbox:hover{background:var(--s3)}
 .lead-checkbox input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:var(--green)}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:var(--s1)}
-::-webkit-scrollbar-thumb{background:var(--s3);border-radius:2px}
+::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px}
 
 /* ── LOGIN ───────────────────────────────────────────────────────────────── */
-.login-wrap{position:fixed;inset:0;background:#0b0b0b;display:flex;align-items:center;justify-content:center;z-index:9999}
-.login-box{background:#111;border:1px solid #1e1e1e;border-radius:6px;padding:40px;width:380px;max-width:90vw}
-.login-logo{font-size:28px;font-weight:900;letter-spacing:.14em;color:#00d4a0;margin-bottom:4px}
-.login-sub{font-size:11px;color:#444;margin-bottom:32px;letter-spacing:.06em}
-.login-lbl{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
-.login-inp{width:100%;padding:10px 14px;background:#0b0b0b;border:1px solid #1e1e1e;border-radius:3px;color:#f0f0f0;font-family:inherit;font-size:13px;outline:none;margin-bottom:14px;transition:border-color .15s}
-.login-inp:focus{border-color:#00d4a0}
-.login-btn{width:100%;padding:11px;background:#00d4a0;border:none;border-radius:3px;color:#000;font-weight:900;font-size:13px;letter-spacing:.06em;cursor:pointer;font-family:inherit;margin-top:4px;transition:background .15s}
-.login-btn:hover{background:#00a87f}
+.login-wrap{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-box{background:var(--s1);border:var(--bd);border-radius:3px;padding:40px;width:380px;max-width:90vw;box-shadow:0 24px 48px -28px rgba(28,42,51,.4)}
+.login-logo{font-family:'Oswald',system-ui,sans-serif;font-size:26px;font-weight:700;letter-spacing:.01em;color:var(--t1);margin-bottom:4px}
+.login-sub{font-size:11px;color:var(--t3);margin-bottom:32px;letter-spacing:.1em;text-transform:uppercase}
+.login-lbl{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
+.login-inp{width:100%;padding:10px 14px;background:var(--bg);border:var(--bd);border-radius:2px;color:var(--t1);font-size:13px;outline:none;margin-bottom:14px;transition:border-color .15s}
+.login-inp:focus{border-color:var(--blue)}
+.login-btn{width:100%;padding:11px;background:var(--green);border:1px solid var(--green);border-radius:2px;color:var(--s1);font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;font-family:'IBM Plex Mono',ui-monospace,monospace;margin-top:4px;transition:background .15s}
+.login-btn:hover{background:var(--green2)}
 .login-btn:disabled{opacity:.4;cursor:not-allowed}
-.login-err{background:rgba(255,69,69,.1);border:1px solid rgba(255,69,69,.3);color:#ff4545;font-size:12px;padding:8px 12px;border-radius:3px;margin-bottom:14px;display:none}
-.login-footer{font-size:10px;color:#333;text-align:center;margin-top:20px}
+.login-err{background:rgba(163,57,44,.1);border:1px solid rgba(163,57,44,.3);color:var(--red);font-size:12px;padding:8px 12px;border-radius:3px;margin-bottom:14px;display:none;font-family:'IBM Plex Sans',system-ui,sans-serif}
+.login-footer{font-size:11px;color:var(--blue);text-align:center;margin-top:20px}
 .user-pill{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--t3)}
 .user-avatar{width:24px;height:24px;border-radius:50%;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+::selection{background:var(--red);color:var(--s1)}
 </style>
 </head>
 <body>
@@ -156,32 +172,32 @@ textarea.inp{resize:vertical;line-height:1.6}
 
     <div id="login-view">
       <div id="login-err" class="login-err"></div>
-      <div class="login-lbl" data-t="email">E-Mail</div>
-      <input class="login-inp" id="li-email" type="email" placeholder="daria@firma.de" data-tp="ph_email_login" autocomplete="username">
-      <div class="login-lbl" data-t="password">Passwort</div>
+      <div class="login-lbl" data-t="email">Email</div>
+      <input class="login-inp" id="li-email" type="email" placeholder="daria@company.com" data-tp="ph_email_login" autocomplete="username">
+      <div class="login-lbl" data-t="password">Password</div>
       <input class="login-inp" id="li-pass" type="password" placeholder="••••••••" autocomplete="current-password"
         onkeydown="if(event.key==='Enter') doLogin()">
-      <button class="login-btn" id="li-btn" onclick="doLogin()" data-t="login">Einloggen</button>
+      <button class="login-btn" id="li-btn" onclick="doLogin()" data-t="login">Log in</button>
       <div class="login-footer">
-        <span style="cursor:pointer;color:#555" onclick="showRegView()" data-t="create_account">Neuen Account erstellen →</span>
+        <span style="cursor:pointer;color:var(--blue)" onclick="showRegView()" data-t="create_account">Create new account →</span>
       </div>
     </div>
 
     <div id="register-view" style="display:none">
       <div id="reg-err" class="login-err"></div>
       <div class="login-lbl" data-t="name">Name</div>
-      <input class="login-inp" id="reg-name" type="text" placeholder="Max Müller" data-tp="ph_reg_name">
-      <div class="login-lbl" data-t="email">E-Mail</div>
-      <input class="login-inp" id="reg-email" type="email" placeholder="max@firma.de" data-tp="ph_reg_email">
-      <div class="login-lbl" data-t="password_min8">Passwort (min. 8 Zeichen)</div>
+      <input class="login-inp" id="reg-name" type="text" placeholder="John Smith" data-tp="ph_reg_name">
+      <div class="login-lbl" data-t="email">Email</div>
+      <input class="login-inp" id="reg-email" type="email" placeholder="john@company.com" data-tp="ph_reg_email">
+      <div class="login-lbl" data-t="password_min8">Password (min. 8 characters)</div>
       <input class="login-inp" id="reg-pass" type="password" placeholder="••••••••"
         onkeydown="if(event.key==='Enter') doRegister()">
-      <div class="login-lbl" data-t="password_repeat">Passwort wiederholen</div>
+      <div class="login-lbl" data-t="password_repeat">Repeat password</div>
       <input class="login-inp" id="reg-pass2" type="password" placeholder="••••••••"
         onkeydown="if(event.key==='Enter') doRegister()">
-      <button class="login-btn" id="reg-btn" onclick="doRegister()" data-t="register">Account erstellen</button>
+      <button class="login-btn" id="reg-btn" onclick="doRegister()" data-t="register">Create account</button>
       <div class="login-footer">
-        <span style="cursor:pointer;color:#555" onclick="showLoginView()" data-t="back_to_login">← Zurück zum Login</span>
+        <span style="cursor:pointer;color:var(--blue)" onclick="showLoginView()" data-t="back_to_login">← Back to login</span>
       </div>
     </div>
   </div>
@@ -192,13 +208,9 @@ textarea.inp{resize:vertical;line-height:1.6}
 <!-- TOP -->
 <div class="top">
   <div class="brand">LeadOS <em>AGENT</em></div>
-  <div style="font-size:11px;color:var(--t3)" data-t="subtitle">Autonomer B2B Sales-Agent · Bankensektor Deutschland</div>
+  <div style="font-size:11px;color:var(--t3)" data-t="subtitle">Autonomous B2B Sales Agent · Banking Sector Germany</div>
   <div class="top-right">
-    <select id="lang-toggle" class="tbtn" onchange="switchLang(this.value)" style="font-size:10px;color:var(--t3);background:transparent;border:1px solid var(--s3);border-radius:4px">
-      <option value="de">DE</option>
-      <option value="en">EN</option>
-    </select>
-    <div class="user-pill"><div class="user-avatar" id="user-avatar">?</div><span id="user-name-lbl" style="font-size:11px;color:var(--t2)"></span><button class="tbtn" id="btn-logout" onclick="doLogout()" style="font-size:10px;color:var(--t3);margin-left:4px" title="Ausloggen">⏻</button></div>
+    <div class="user-pill"><div class="user-avatar" id="user-avatar">?</div><span id="user-name-lbl" style="font-size:11px;color:var(--t2)"></span><button class="tbtn" id="btn-logout" onclick="doLogout()" style="font-size:10px;color:var(--t3);margin-left:4px" title="Log out">⏻</button></div>
     <span id="pill-agent" style="display:none" class="pill pill-off" data-t="agent_offline">● AGENT OFFLINE</span>
     <span id="pill-api" style="display:none" class="pill pill-off">● API</span>
     <span id="clk" style="font-size:11px;color:var(--t3)"></span>
@@ -208,26 +220,26 @@ textarea.inp{resize:vertical;line-height:1.6}
 <!-- SIDEBAR -->
 <div class="side">
   <div class="nav-sec" data-t="nav_agent_sec">Agent</div>
-  <div class="ni on" onclick="nav('agent')"><span>⚡</span> <span data-t="nav_agent">Agent & Suche</span></div>
+  <div class="ni on" onclick="nav('agent')"><span>⚡</span> <span data-t="nav_agent">Agent & Search</span></div>
   <div class="ni" onclick="nav('linkedin')">
     <span>🔗</span> <span data-t="nav_linkedin">LinkedIn Prospecting</span>
     <span class="ni-badge" id="b-li" style="display:none">0</span>
   </div>
-  <div class="nav-sec" data-t="nav_emails_sec">E-Mails</div>
-  <div class="ni" onclick="nav('emailgen')"><span>✉</span> <span data-t="nav_emailgen">E-Mails generieren</span></div>
+  <div class="nav-sec" data-t="nav_emails_sec">Emails</div>
+  <div class="ni" onclick="nav('emailgen')"><span>✉</span> <span data-t="nav_emailgen">Generate Emails</span></div>
   <div class="ni" onclick="nav('approve')">
-    <span>✓</span> <span data-t="nav_approve">Freigabe</span>
+    <span>✓</span> <span data-t="nav_approve">Approval</span>
     <span class="ni-badge" id="b-app" style="display:none">0</span>
   </div>
   <div class="ni" onclick="nav('inbox')">
-    <span>📥</span> <span data-t="nav_inbox">Inbox / Antworten</span>
+    <span>📥</span> <span data-t="nav_inbox">Inbox / Replies</span>
     <span class="ni-badge" id="b-inbox" style="display:none">0</span>
   </div>
-  <div class="nav-sec" data-t="nav_data_sec">Daten</div>
-  <div class="ni" onclick="nav('leads')"><span>◈</span> <span data-t="nav_leads">Lead-Datenbank</span></div>
-  <div class="ni" onclick="nav('log')"><span>≡</span> <span data-t="nav_log">Aktivitätslog</span></div>
+  <div class="nav-sec" data-t="nav_data_sec">Data</div>
+  <div class="ni" onclick="nav('leads')"><span>◈</span> <span data-t="nav_leads">Lead Database</span></div>
+  <div class="ni" onclick="nav('log')"><span>≡</span> <span data-t="nav_log">Activity Log</span></div>
   <div class="nav-sec" data-t="nav_system_sec">System</div>
-  <div class="ni" id="nav-team" onclick="nav('team')" style="display:none"><span>👥</span> <span data-t="nav_team">Team & Benutzer</span></div>
+  <div class="ni" id="nav-team" onclick="nav('team')" style="display:none"><span>👥</span> <span data-t="nav_team">Team & Users</span></div>
   <div class="side-foot">
     <div id="sb-inf">0 Leads · 0 Produkte</div>
     <div style="color:var(--t3);margin-top:2px">lokal · localStorage</div>
@@ -241,25 +253,25 @@ textarea.inp{resize:vertical;line-height:1.6}
 <div id="pg-agent" class="pg on">
   <div class="ph">
     <div>
-      <div class="ph-t" data-t="agent_title">Agent & Firmensuche</div>
-      <div class="ph-s" data-t="agent_subtitle">Agent recherchiert Firmen und speichert sie als Leads — E-Mails werden separat generiert</div>
+      <div class="ph-t" data-t="agent_title">Agent & Company Search</div>
+      <div class="ph-s" data-t="agent_subtitle">Agent researches companies and saves them as leads — emails are generated separately</div>
     </div>
     <div style="display:flex;gap:8px">
-      <button class="btn btn-sm btn-r" id="btn-stop" style="display:none" onclick="stopAgent()" data-t="agent_stop">⬛ Stopp</button>
-      <button class="btn btn-g" id="btn-run" onclick="runAgent()" data-t="agent_start">▶ Agent starten</button>
+      <button class="btn btn-sm btn-r" id="btn-stop" style="display:none" onclick="stopAgent()" data-t="agent_stop">⬛ Stop</button>
+      <button class="btn btn-g" id="btn-run" onclick="runAgent()" data-t="agent_start">▶ Start Agent</button>
     </div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;margin-bottom:14px">
     <div class="pn">
-      <div class="pn-h"><span class="pn-ht" data-t="agent_search_prompt">Suchauftrag / Prompt</span></div>
+      <div class="pn-h"><span class="pn-ht" data-t="agent_search_prompt">Search Query / Prompt</span></div>
       <div class="pn-b">
         <div class="fg">
-          <label data-t="agent_search_label">Was soll der Agent suchen?</label>
-          <textarea class="inp" id="a-prompt" style="min-height:110px">Suche nach deutschen IT-Dienstleistern und Fintech-Unternehmen mit 50–200 Mitarbeitern, die aktiv Banken, Sparkassen oder Volksbanken als Kunden haben. Fokus auf: RegTech, Core-Banking, Compliance-Software, Zahlungsverkehr. Keine Großkonzerne.</textarea>
+          <label data-t="agent_search_label">What should the agent search for?</label>
+          <textarea class="inp" id="a-prompt" style="min-height:110px">Search for German IT service providers and fintech companies with 50-200 employees that actively serve banks, savings banks, or cooperative banks as customers. Focus on: RegTech, core banking, compliance software, payments. No large corporations.</textarea>
         </div>
         <div class="fr">
           <div class="fg" style="margin-bottom:0">
-            <label data-t="agent_lead_count">Anzahl neue Leads</label>
+            <label data-t="agent_lead_count">Number of new leads</label>
             <select class="inp" id="a-count">
               <option value="5" data-t="agent_5leads">5 Leads</option>
               <option value="8" selected data-t="agent_8leads">8 Leads</option>
@@ -268,10 +280,10 @@ textarea.inp{resize:vertical;line-height:1.6}
             </select>
           </div>
           <div class="fg" style="margin-bottom:0">
-            <label data-t="agent_after_search">Nach Suche</label>
+            <label data-t="agent_after_search">After Search</label>
             <select class="inp" id="a-after">
-              <option value="nothing" data-t="agent_save_only">Nur Leads speichern</option>
-              <option value="emailgen" data-t="agent_goto_emails">Direkt zu E-Mails generieren</option>
+              <option value="nothing" data-t="agent_save_only">Save leads only</option>
+              <option value="emailgen" data-t="agent_goto_emails">Go to email generation</option>
             </select>
           </div>
         </div>
@@ -279,27 +291,27 @@ textarea.inp{resize:vertical;line-height:1.6}
     </div>
     <div>
       <div class="pn" style="margin-bottom:10px">
-        <div class="pn-h"><span class="pn-ht" data-t="agent_steps">Schritte</span></div>
+        <div class="pn-h"><span class="pn-ht" data-t="agent_steps">Steps</span></div>
         <div class="pn-b" style="padding:10px 16px">
-          <div class="step"><div class="sn sn-pend" id="s1">1</div><div><div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:2px" data-t="agent_step1">Firmen recherchieren</div><div style="font-size:11px;color:var(--t3)" id="s1d" data-t="agent_waiting">Wartet…</div></div></div>
-          <div class="step"><div class="sn sn-pend" id="s2">2</div><div><div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:2px" data-t="agent_step2">Leads speichern</div><div style="font-size:11px;color:var(--t3)" id="s2d" data-t="agent_waiting">Wartet…</div></div></div>
-          <div class="step" style="border:none"><div class="sn sn-pend" id="s3">3</div><div><div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:2px" data-t="agent_step3">Fertig</div><div style="font-size:11px;color:var(--t3)" id="s3d" data-t="agent_waiting">Wartet…</div></div></div>
+          <div class="step"><div class="sn sn-pend" id="s1">1</div><div><div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:2px" data-t="agent_step1">Research companies</div><div style="font-size:11px;color:var(--t3)" id="s1d" data-t="agent_waiting">Waiting…</div></div></div>
+          <div class="step"><div class="sn sn-pend" id="s2">2</div><div><div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:2px" data-t="agent_step2">Save leads</div><div style="font-size:11px;color:var(--t3)" id="s2d" data-t="agent_waiting">Waiting…</div></div></div>
+          <div class="step" style="border:none"><div class="sn sn-pend" id="s3">3</div><div><div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:2px" data-t="agent_step3">Done</div><div style="font-size:11px;color:var(--t3)" id="s3d" data-t="agent_waiting">Waiting…</div></div></div>
         </div>
       </div>
       <div class="pn">
-        <div class="pn-h"><span class="pn-ht" data-t="stats">Statistik</span></div>
+        <div class="pn-h"><span class="pn-ht" data-t="stats">Statistics</span></div>
         <div class="pn-b" style="padding:10px 16px">
-          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)" data-t="stat_total_leads">Leads gesamt</span><span id="st-tot" style="color:var(--t1);font-weight:700">0</span></div>
-          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)" data-t="stat_pending">Pending Freigaben</span><span id="st-pen" style="color:var(--yellow);font-weight:700">0</span></div>
-          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)" data-t="stat_approved_emails">E-Mails genehmigt</span><span id="st-app" style="color:var(--green);font-weight:700">0</span></div>
-          <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--t3)" data-t="stat_replies">Antworten</span><span id="st-rep" style="color:var(--blue);font-weight:700">0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)" data-t="stat_total_leads">Total leads</span><span id="st-tot" style="color:var(--t1);font-weight:700">0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)" data-t="stat_pending">Pending approvals</span><span id="st-pen" style="color:var(--yellow);font-weight:700">0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--s3);font-size:12px"><span style="color:var(--t3)" data-t="stat_approved_emails">Emails approved</span><span id="st-app" style="color:var(--green);font-weight:700">0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--t3)" data-t="stat_replies">Replies</span><span id="st-rep" style="color:var(--blue);font-weight:700">0</span></div>
         </div>
       </div>
     </div>
   </div>
   <div class="pn">
-    <div class="pn-h"><span class="pn-ht" data-t="terminal">Terminal</span><button class="btn btn-sm btn-r" onclick="clearTerm()" data-t="clear">Leeren</button></div>
-    <div class="term" id="term"><div class="ln ld" data-t="terminal_ready">// LeadOS Agent bereit. Starte die Firmensuche oben.</div></div>
+    <div class="pn-h"><span class="pn-ht" data-t="terminal">Terminal</span><button class="btn btn-sm btn-r" onclick="clearTerm()" data-t="clear">Clear</button></div>
+    <div class="term" id="term"><div class="ln ld" data-t="terminal_ready">// LeadOS Agent ready. Start company search above.</div></div>
   </div>
 </div>
 
@@ -307,85 +319,85 @@ textarea.inp{resize:vertical;line-height:1.6}
 <div id="pg-emailgen" class="pg">
   <div class="ph">
     <div>
-      <div class="ph-t" data-t="emailgen_title">E-Mails generieren</div>
-      <div class="ph-s" data-t="emailgen_subtitle">Dein Produkt-Prompt → Kategorie wählen → Leads auswählen → KI generiert personalisierte E-Mails</div>
+      <div class="ph-t" data-t="emailgen_title">Generate Emails</div>
+      <div class="ph-s" data-t="emailgen_subtitle">Your product prompt → Choose category → Select leads → AI generates personalized emails</div>
     </div>
-    <button class="btn btn-g" id="eg-run-btn" onclick="runEmailGen()" data-t="emailgen_run">⚡ E-Mails generieren</button>
+    <button class="btn btn-g" id="eg-run-btn" onclick="runEmailGen()" data-t="emailgen_run">⚡ Generate Emails</button>
   </div>
   <div id="eg-alrt" style="display:none" class="alrt"></div>
 
   <!-- SCHRITT 1: DEIN PRODUKT -->
   <div class="pn">
     <div class="pn-h">
-      <span class="pn-ht" data-t="eg_step1">① Profil deines Unternehmens</span>
-      <span style="font-size:10px;color:var(--t3)" data-t="eg_step1_hint">Wird bei jeder E-Mail-Generierung verwendet — einmal ausfüllen, immer nutzen</span>
+      <span class="pn-ht" data-t="eg_step1">① Your Company Profile</span>
+      <span style="font-size:10px;color:var(--t3)" data-t="eg_step1_hint">Used for every email generation — fill in once, use always</span>
     </div>
     <div class="pn-b">
 
       <!-- ROW 1: Name + Zielgruppe -->
       <div class="fr" style="margin-bottom:12px">
         <div class="fg" style="margin-bottom:0">
-          <label data-t="eg_product_name">Produktname / Angebotsbezeichnung</label>
-          <input class="inp" id="eg-prodname" placeholder="z.B. AI-Prozessautomatisierung für Banken" data-tp="ph_prodname">
+          <label data-t="eg_product_name">Product Name / Offer Description</label>
+          <input class="inp" id="eg-prodname" placeholder="e.g. AI Process Automation for Banks" data-tp="ph_prodname">
         </div>
         <div class="fg" style="margin-bottom:0">
-          <label data-t="eg_target">Zielgruppe / Ansprechpartner</label>
-          <input class="inp" id="eg-target" placeholder="z.B. CIO, IT-Leiter, Compliance-Chef" data-tp="ph_target">
+          <label data-t="eg_target">Target Audience / Contact Person</label>
+          <input class="inp" id="eg-target" placeholder="e.g. CIO, IT Director, Compliance Head" data-tp="ph_target">
         </div>
       </div>
 
-      <!-- ROW 2: Was wir machen + Probleme die wir lösen -->
+      <!-- ROW 2: What we do + Problems we solve -->
       <div class="fr" style="margin-bottom:12px">
         <div class="fg" style="margin-bottom:0">
-          <label data-t="eg_what">Was wir machen (2-3 Sätze)</label>
-          <textarea class="inp" id="eg-what" style="min-height:72px;line-height:1.6" placeholder="Wir entwickeln KI-Agenten die Vertriebsprozesse automatisieren — von der Lead-Recherche bis zur E-Mail-Generierung. Unsere Lösung reduziert den manuellen Aufwand im B2B-Vertrieb um 60%." data-tp="ph_what"></textarea>
+          <label data-t="eg_what">What we do (2-3 sentences)</label>
+          <textarea class="inp" id="eg-what" style="min-height:72px;line-height:1.6" placeholder="We develop AI agents that automate sales processes — from lead research to email generation. Our solution reduces manual effort in B2B sales by 60%." data-tp="ph_what"></textarea>
         </div>
         <div class="fg" style="margin-bottom:0">
-          <label data-t="eg_problems">Welche Probleme lösen wir?</label>
-          <textarea class="inp" id="eg-problems" style="min-height:72px;line-height:1.6" placeholder="Vertriebsteams verlieren zu viel Zeit mit manueller Recherche und copy-paste E-Mails. CRM-Daten sind unvollständig. Follow-ups werden vergessen." data-tp="ph_problems"></textarea>
+          <label data-t="eg_problems">What problems do we solve?</label>
+          <textarea class="inp" id="eg-problems" style="min-height:72px;line-height:1.6" placeholder="Sales teams spend too much time on manual research and copy-paste emails. CRM data is incomplete. Follow-ups are forgotten." data-tp="ph_problems"></textarea>
         </div>
       </div>
 
       <!-- ROW 3: USP + ROI -->
       <div class="fr" style="margin-bottom:12px">
         <div class="fg" style="margin-bottom:0">
-          <label data-t="eg_usp">USP — Was macht uns einzigartig?</label>
-          <input class="inp" id="eg-usp" placeholder="z.B. Setup in 2 Wochen, kein IT-Team nötig, nachweisbar 40% Zeitersparnis" data-tp="ph_usp">
+          <label data-t="eg_usp">USP — What makes us unique?</label>
+          <input class="inp" id="eg-usp" placeholder="e.g. Setup in 2 weeks, no IT team needed, proven 40% time savings" data-tp="ph_usp">
         </div>
         <div class="fg" style="margin-bottom:0">
-          <label data-t="eg_roi">ROI / konkrete Kennzahlen</label>
-          <input class="inp" id="eg-roi" placeholder="z.B. ROI nach 8 Monaten, 15h/Woche gespart, +23% Conversion" data-tp="ph_roi">
+          <label data-t="eg_roi">ROI / Key Metrics</label>
+          <input class="inp" id="eg-roi" placeholder="e.g. ROI after 8 months, 15h/week saved, +23% conversion" data-tp="ph_roi">
         </div>
       </div>
 
       <!-- ROW 4: Preise + Referenzen -->
       <div class="fr" style="margin-bottom:12px">
         <div class="fg" style="margin-bottom:0">
-          <label data-t="eg_pricing">Preise / Pakete (optional)</label>
-          <input class="inp" id="eg-pricing" placeholder="z.B. ab 2.900 €/Monat, Setup einmalig 5.000 €, kostenlose Pilotphase" data-tp="ph_pricing">
+          <label data-t="eg_pricing">Pricing / Packages (optional)</label>
+          <input class="inp" id="eg-pricing" placeholder="e.g. from €2,900/month, one-time setup €5,000, free pilot phase" data-tp="ph_pricing">
         </div>
         <div class="fg" style="margin-bottom:0">
-          <label data-t="eg_refs">Referenzen / Kunden-Beispiele</label>
-          <input class="inp" id="eg-refs" placeholder="z.B. 3 Sparkassen in Bayern, FinTech-Startup Berlin, 200-MA IT-Dienstleister" data-tp="ph_refs">
+          <label data-t="eg_refs">References / Customer Examples</label>
+          <input class="inp" id="eg-refs" placeholder="e.g. 3 savings banks in Bavaria, FinTech startup Berlin, 200-employee IT provider" data-tp="ph_refs">
         </div>
       </div>
 
       <!-- ROW 5: Freier Zusatz-Prompt -->
       <div class="fg" style="margin-bottom:12px">
-        <label data-t="eg_context">Zusätzlicher Kontext (optional) — Besonderheiten, aktuelle Aktionen, Sprache</label>
-        <textarea class="inp" id="eg-prompt" style="min-height:60px;line-height:1.6" placeholder="z.B. Wir haben gerade eine Case Study mit Commerzbank veröffentlicht. Aktuell bieten wir bis Ende Q1 eine kostenlose Pilotphase an. Schreib immer auf Deutsch, Sie-Form." data-tp="ph_context"></textarea>
+        <label data-t="eg_context">Additional context (optional) — Specifics, current promotions, language</label>
+        <textarea class="inp" id="eg-prompt" style="min-height:60px;line-height:1.6" placeholder="e.g. We just published a case study with Commerzbank. Currently offering a free pilot phase until end of Q1. Always write in German, formal tone." data-tp="ph_context"></textarea>
       </div>
 
       <!-- Preview & Save -->
       <div style="background:var(--s2);border:var(--bd);border-radius:3px;padding:10px 14px;margin-bottom:12px;display:none" id="eg-preview-box">
-        <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px" data-t="eg_preview_label">Vorschau — was Claude sieht:</div>
+        <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px" data-t="eg_preview_label">Preview — what Claude sees:</div>
         <div id="eg-preview-text" style="font-size:11px;color:var(--t2);line-height:1.7;white-space:pre-wrap;max-height:140px;overflow-y:auto"></div>
       </div>
 
       <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn btn-sm btn-g" onclick="saveProductPrompt()" data-t="eg_save_profile">💾 Profil speichern</button>
-        <button class="btn btn-sm" onclick="loadProductPrompt()" data-t="eg_load_profile">📂 Gespeichertes laden</button>
-        <button class="btn btn-sm" onclick="togglePromptPreview()" data-t="eg_preview">👁 Vorschau</button>
+        <button class="btn btn-sm btn-g" onclick="saveProductPrompt()" data-t="eg_save_profile">💾 Save Profile</button>
+        <button class="btn btn-sm" onclick="loadProductPrompt()" data-t="eg_load_profile">📂 Load Saved</button>
+        <button class="btn btn-sm" onclick="togglePromptPreview()" data-t="eg_preview">👁 Preview</button>
         <span id="eg-saved-info" style="font-size:10px;color:var(--t3)"></span>
       </div>
     </div>
@@ -394,8 +406,8 @@ textarea.inp{resize:vertical;line-height:1.6}
   <!-- SCHRITT 2: KATEGORIE -->
   <div class="pn">
     <div class="pn-h">
-      <span class="pn-ht" data-t="eg_step2">② E-Mail-Kategorie wählen</span>
-      <span style="font-size:10px;color:var(--t3)" data-t="eg_step2_hint">Bestimmt Stil, Ton und Ziel der E-Mail</span>
+      <span class="pn-ht" data-t="eg_step2">② Choose Email Category</span>
+      <span style="font-size:10px;color:var(--t3)" data-t="eg_step2_hint">Determines style, tone and goal of the email</span>
     </div>
     <div class="pn-b">
       <div class="cat-grid" id="cat-grid">
@@ -406,56 +418,56 @@ textarea.inp{resize:vertical;line-height:1.6}
         <div class="sep"></div>
         <div class="fr3">
           <div class="fg" style="margin-bottom:0">
-            <label data-t="eg_tone">Tonalität</label>
+            <label data-t="eg_tone">Tone</label>
             <select class="inp" id="eg-tone">
-              <option value="professionell" data-t="tone_professional">Professionell & direkt</option>
-              <option value="locker" data-t="tone_casual">Locker & persönlich</option>
-              <option value="formell" data-t="tone_formal">Formell (Sie-Form)</option>
-              <option value="neugierig" data-t="tone_curious">Neugierig & fragend</option>
+              <option value="professionell" data-t="tone_professional">Professional & direct</option>
+              <option value="locker" data-t="tone_casual">Casual & personal</option>
+              <option value="formell" data-t="tone_formal">Formal</option>
+              <option value="neugierig" data-t="tone_curious">Curious & questioning</option>
             </select>
           </div>
           <div class="fg" style="margin-bottom:0">
-            <label data-t="eg_length">E-Mail-Länge</label>
+            <label data-t="eg_length">Email Length</label>
             <select class="inp" id="eg-len">
-              <option value="kurz" data-t="len_short">Kurz (3–4 Sätze)</option>
-              <option value="mittel" selected data-t="len_medium">Mittel (5–6 Sätze)</option>
-              <option value="lang" data-t="len_long">Ausführlich (7–9 Sätze)</option>
+              <option value="kurz" data-t="len_short">Short (3–4 sentences)</option>
+              <option value="mittel" selected data-t="len_medium">Medium (5–6 sentences)</option>
+              <option value="lang" data-t="len_long">Detailed (7–9 sentences)</option>
             </select>
           </div>
           <div class="fg" style="margin-bottom:0">
             <label data-t="eg_cta">Call-to-Action</label>
             <select class="inp" id="eg-cta">
               <option value="call" data-t="cta_call">15-Min Discovery Call</option>
-              <option value="demo" data-t="cta_demo">Kurze Demo</option>
-              <option value="info" data-t="cta_info">Infomaterial senden</option>
-              <option value="roi" data-t="cta_roi">ROI-Analyse anbieten</option>
-              <option value="pilot" data-t="cta_pilot">Pilot-Projekt vorschlagen</option>
+              <option value="demo" data-t="cta_demo">Short Demo</option>
+              <option value="info" data-t="cta_info">Send Info Material</option>
+              <option value="roi" data-t="cta_roi">Offer ROI Analysis</option>
+              <option value="pilot" data-t="cta_pilot">Propose Pilot Project</option>
             </select>
           </div>
         </div>
         <div class="fg" style="margin-top:12px;margin-bottom:0">
-          <label data-t="eg_extra">Zusätzliche Anweisungen (optional)</label>
-          <input class="inp" id="eg-extra" placeholder="z.B. Erwähne DORA-Regulierung. Vermeide das Wort 'revolutionär'. Beziehe dich auf aktuelle BaFin-Anforderungen." data-tp="ph_extra">
+          <label data-t="eg_extra">Additional instructions (optional)</label>
+          <input class="inp" id="eg-extra" placeholder="e.g. Mention DORA regulation. Avoid the word 'revolutionary'. Refer to current BaFin requirements." data-tp="ph_extra">
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SCHRITT 3: LEADS AUSWÄHLEN -->
+  <!-- STEP 3: SELECT LEADS -->
   <div class="pn">
     <div class="pn-h">
-      <span class="pn-ht" data-t="eg_step3">③ Leads auswählen</span>
-      <span id="eg-lead-count-lbl" style="font-size:10px;color:var(--t3)">0 ausgewählt</span>
+      <span class="pn-ht" data-t="eg_step3">③ Select Leads</span>
+      <span id="eg-lead-count-lbl" style="font-size:10px;color:var(--t3)">0 selected</span>
     </div>
     <div class="pn-b">
       <div class="fr" style="margin-bottom:12px">
         <div style="display:flex;gap:8px">
-          <button class="btn btn-sm" onclick="selectLeadsFilter('Neu')" data-t="eg_all_new">Alle Neu</button>
-          <button class="btn btn-sm" onclick="selectLeadsFilter('Kalt')" data-t="eg_all_cold">Alle Kalt</button>
-          <button class="btn btn-sm" onclick="selectLeadsFilter('all')" data-t="eg_all">Alle</button>
-          <button class="btn btn-sm btn-r" onclick="selectLeadsFilter('none')" data-t="eg_none">Keine</button>
+          <button class="btn btn-sm" onclick="selectLeadsFilter('Neu')" data-t="eg_all_new">All New</button>
+          <button class="btn btn-sm" onclick="selectLeadsFilter('Kalt')" data-t="eg_all_cold">All Cold</button>
+          <button class="btn btn-sm" onclick="selectLeadsFilter('all')" data-t="eg_all">All</button>
+          <button class="btn btn-sm btn-r" onclick="selectLeadsFilter('none')" data-t="eg_none">None</button>
         </div>
-        <input class="inp" id="eg-lead-search" placeholder="Leads filtern…" data-tp="ph_lead_filter" oninput="renderLeadPicker()">
+        <input class="inp" id="eg-lead-search" placeholder="Filter leads…" data-tp="ph_lead_filter" oninput="renderLeadPicker()">
       </div>
       <div id="lead-picker" style="max-height:220px;overflow-y:auto;border:var(--bd);border-radius:3px;padding:4px"></div>
     </div>
@@ -464,28 +476,28 @@ textarea.inp{resize:vertical;line-height:1.6}
   <!-- SCHRITT 4: VORSCHAU & START -->
   <div class="pn">
     <div class="pn-h">
-      <span class="pn-ht" data-t="eg_step4">④ Freigabe-Modus</span>
+      <span class="pn-ht" data-t="eg_step4">④ Approval Mode</span>
     </div>
     <div class="pn-b">
       <div class="fr">
         <div class="fg" style="margin-bottom:0">
-          <label data-t="eg_mode">Modus</label>
+          <label data-t="eg_mode">Mode</label>
           <select class="inp" id="eg-mode">
-            <option value="review" data-t="mode_review">Ich prüfe jede E-Mail vor dem Senden</option>
-            <option value="auto" data-t="mode_auto">Auto-Approve — sofort senden (simuliert)</option>
+            <option value="review" data-t="mode_review">I review each email before sending</option>
+            <option value="auto" data-t="mode_auto">Auto-Approve — send immediately (simulated)</option>
           </select>
         </div>
         <div class="fg" style="margin-bottom:0">
-          <label data-t="eg_test_email">Test-E-Mail (optional)</label>
+          <label data-t="eg_test_email">Test Email (optional)</label>
           <div style="display:flex;gap:8px">
-            <input class="inp" id="eg-test-lead" placeholder="Lead-Name für Test…" data-tp="ph_test_lead" style="flex:1">
+            <input class="inp" id="eg-test-lead" placeholder="Lead name for test…" data-tp="ph_test_lead" style="flex:1">
             <button class="btn btn-sm btn-purple" onclick="runTestEmail()"><span id="eg-test-sp" style="display:none" class="sp"></span>Test</button>
           </div>
         </div>
       </div>
       <div id="eg-test-result" style="display:none;margin-top:12px">
-        <div style="font-size:10px;color:var(--yellow);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em" data-t="eg_test_preview">Test-E-Mail Vorschau</div>
-        <div style="font-size:11px;color:var(--yellow);margin-bottom:4px"><span data-t="eg_subject">Betreff:</span> <span id="eg-test-subj" style="color:var(--t1)"></span></div>
+        <div style="font-size:10px;color:var(--yellow);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em" data-t="eg_test_preview">Test Email Preview</div>
+        <div style="font-size:11px;color:var(--yellow);margin-bottom:4px"><span data-t="eg_subject">Subject:</span> <span id="eg-test-subj" style="color:var(--t1)"></span></div>
         <div class="eml-prev" id="eg-test-body"></div>
       </div>
     </div>
@@ -494,7 +506,7 @@ textarea.inp{resize:vertical;line-height:1.6}
   <!-- FORTSCHRITT -->
   <div id="eg-progress-panel" class="pn" style="display:none">
     <div class="pn-h">
-      <span class="pn-ht" data-t="eg_generating">Generierung läuft</span>
+      <span class="pn-ht" data-t="eg_generating">Generation in progress</span>
       <span id="eg-prog-lbl" style="font-size:11px;color:var(--t3)">0 / 0</span>
     </div>
     <div class="pn-b">
@@ -508,47 +520,47 @@ textarea.inp{resize:vertical;line-height:1.6}
 <div id="pg-approve" class="pg">
   <div class="ph">
     <div>
-      <div class="ph-t" data-t="approve_title">Freigabe</div>
-      <div class="ph-s" data-t="approve_subtitle">Alle generierten E-Mails prüfen · bearbeiten · freigeben zum Versand</div>
+      <div class="ph-t" data-t="approve_title">Approval</div>
+      <div class="ph-s" data-t="approve_subtitle">Review · edit · approve all generated emails for sending</div>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <span id="app-counter" style="font-size:11px;color:var(--t3)"></span>
-      <button class="btn btn-sm" onclick="setApproveFilter('all')" id="af-all" data-t="all">Alle</button>
-      <button class="btn btn-sm" onclick="setApproveFilter('pending')" id="af-pend" data-t="pending">Ausstehend</button>
-      <button class="btn btn-sm" onclick="setApproveFilter('approved')" id="af-appr" data-t="sent">Gesendet</button>
-      <button class="btn btn-sm" onclick="setApproveFilter('rejected')" id="af-rej" data-t="rejected">Abgelehnt</button>
+      <button class="btn btn-sm" onclick="setApproveFilter('all')" id="af-all" data-t="all">All</button>
+      <button class="btn btn-sm" onclick="setApproveFilter('pending')" id="af-pend" data-t="pending">Pending</button>
+      <button class="btn btn-sm" onclick="setApproveFilter('approved')" id="af-appr" data-t="sent">Sent</button>
+      <button class="btn btn-sm" onclick="setApproveFilter('rejected')" id="af-rej" data-t="rejected">Rejected</button>
       <div style="width:1px;height:20px;background:var(--s4)"></div>
-      <button class="btn btn-sm" id="view-cards" onclick="setApproveView('cards')" title="Kartenansicht" data-t="cards">☰ Karten</button>
-      <button class="btn btn-sm" id="view-table" onclick="setApproveView('table')" title="Tabellenansicht" data-t="table">⊞ Tabelle</button>
+      <button class="btn btn-sm" id="view-cards" onclick="setApproveView('cards')" title="Kartenansicht" data-t="cards">☰ Cards</button>
+      <button class="btn btn-sm" id="view-table" onclick="setApproveView('table')" title="Tabellenansicht" data-t="table">⊞ Table</button>
       <div style="width:1px;height:20px;background:var(--s4)"></div>
-      <button class="btn btn-sm btn-ok" onclick="approveAll()" data-t="approve_all">✓ Alle freigeben</button>
-      <button class="btn btn-sm btn-rej" onclick="rejectAll()" data-t="reject_all">✕ Alle ablehnen</button>
+      <button class="btn btn-sm btn-ok" onclick="approveAll()" data-t="approve_all">✓ Approve All</button>
+      <button class="btn btn-sm btn-rej" onclick="rejectAll()" data-t="reject_all">✕ Reject All</button>
     </div>
   </div>
 
   <!-- STATS ROW -->
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
     <div style="background:var(--s1);border:var(--bd);border-radius:3px;padding:12px 14px">
-      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px" data-t="total">Gesamt</div>
+      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px" data-t="total">Total</div>
       <div style="font-size:22px;font-weight:800;color:var(--t1)" id="as-total">0</div>
     </div>
     <div style="background:var(--s1);border:var(--bd);border-left:3px solid var(--yellow);border-radius:3px;padding:12px 14px">
-      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px" data-t="stat_pending_label">Ausstehend</div>
+      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px" data-t="stat_pending_label">Pending</div>
       <div style="font-size:22px;font-weight:800;color:var(--yellow)" id="as-pend">0</div>
     </div>
     <div style="background:var(--s1);border:var(--bd);border-left:3px solid var(--green);border-radius:3px;padding:12px 14px">
-      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px" data-t="approved">Freigegeben</div>
+      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px" data-t="approved">Approved</div>
       <div style="font-size:22px;font-weight:800;color:var(--green)" id="as-appr">0</div>
     </div>
     <div style="background:var(--s1);border:var(--bd);border-left:3px solid var(--red);border-radius:3px;padding:12px 14px">
-      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px" data-t="stat_rejected_label">Abgelehnt</div>
+      <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px" data-t="stat_rejected_label">Rejected</div>
       <div style="font-size:22px;font-weight:800;color:var(--red)" id="as-rej">0</div>
     </div>
   </div>
 
   <div id="app-empty" style="display:none;text-align:center;padding:60px;color:var(--t3);font-size:13px">
-    <span data-t="no_emails_yet">Noch keine E-Mails generiert.</span><br>
-    <span style="font-size:11px;color:var(--t3);margin-top:8px;display:block" data-t="go_to_emailgen">Gehe zu "E-Mails generieren" um Kampagnen zu starten.</span>
+    <span data-t="no_emails_yet">No emails generated yet.</span><br>
+    <span style="font-size:11px;color:var(--t3);margin-top:8px;display:block" data-t="go_to_emailgen">Go to "Generate Emails" to start campaigns.</span>
   </div>
   <div id="app-list"></div>
 </div>
@@ -556,34 +568,34 @@ textarea.inp{resize:vertical;line-height:1.6}
 <!-- ═══ INBOX ═══ -->
 <div id="pg-inbox" class="pg">
   <div class="ph">
-    <div><div class="ph-t" data-t="inbox_title">Inbox / Antworten</div><div class="ph-s" data-t="inbox_subtitle">Agent antwortet kontextbasiert — immer mit Produkt-Kontext</div></div>
-    <button class="btn btn-sm" onclick="simReply()" data-t="inbox_simulate">+ Antwort simulieren</button>
+    <div><div class="ph-t" data-t="inbox_title">Inbox / Replies</div><div class="ph-s" data-t="inbox_subtitle">Agent replies context-based — always with product context</div></div>
+    <button class="btn btn-sm" onclick="simReply()" data-t="inbox_simulate">+ Simulate Reply</button>
   </div>
-  <div id="inbox-empty" style="display:none;text-align:center;padding:60px;color:var(--t3)" data-t="inbox_empty">Keine Antworten.</div>
+  <div id="inbox-empty" style="display:none;text-align:center;padding:60px;color:var(--t3)" data-t="inbox_empty">No replies.</div>
   <div id="inbox-list"></div>
 </div>
 
 <!-- ═══ LEADS ═══ -->
 <div id="pg-leads" class="pg">
   <div class="ph">
-    <div><div class="ph-t" data-t="leads_title">Lead-Datenbank</div><div class="ph-s" id="ld-lbl">0 Einträge</div></div>
+    <div><div class="ph-t" data-t="leads_title">Lead Database</div><div class="ph-s" id="ld-lbl">0 entries</div></div>
     <div style="display:flex;gap:8px">
       <button class="btn btn-sm" onclick="expCSV()" data-t="leads_csv">↓ CSV</button>
       <button class="btn btn-sm" onclick="expJSON()" data-t="leads_json">↓ JSON</button>
       <button class="btn btn-sm" onclick="impJSON()" data-t="leads_import">↑ Import</button>
-      <button class="btn btn-sm btn-r" onclick="clearLeads()" data-t="leads_clear">DB leeren</button>
+      <button class="btn btn-sm btn-r" onclick="clearLeads()" data-t="leads_clear">Clear DB</button>
     </div>
   </div>
   <div style="display:flex;gap:10px;margin-bottom:14px">
-    <input class="inp" id="ld-q" placeholder="Suchen…" data-tp="ph_search" oninput="renderLeads()" style="flex:1">
+    <input class="inp" id="ld-q" placeholder="Search…" data-tp="ph_search" oninput="renderLeads()" style="flex:1">
     <select class="inp" id="ld-fs" style="width:160px" onchange="renderLeads()">
-      <option value="" data-t="leads_all_status">Alle Status</option>
-      <option value="Neu" data-t="status_neu">Neu</option><option value="Kontaktiert" data-t="status_kontaktiert">Kontaktiert</option><option value="Warm" data-t="status_warm">Warm</option><option value="Geantwortet" data-t="status_geantwortet">Geantwortet</option><option value="Kalt" data-t="status_kalt">Kalt</option>
+      <option value="" data-t="leads_all_status">All Status</option>
+      <option value="Neu" data-t="status_neu">New</option><option value="Kontaktiert" data-t="status_kontaktiert">Contacted</option><option value="Warm" data-t="status_warm">Warm</option><option value="Geantwortet" data-t="status_geantwortet">Replied</option><option value="Kalt" data-t="status_kalt">Cold</option>
     </select>
   </div>
   <div class="pn"><div class="pn-b" style="padding:0">
     <table class="tbl">
-      <thead><tr><th data-t="th_company">Firma + E-Mail</th><th data-t="th_contact">Ansprechpartner</th><th data-t="th_phone">Telefon</th><th data-t="th_email">E-Mail Kontakt</th><th data-t="th_desc">Beschreibung</th><th data-t="th_status">Status</th><th></th></tr></thead>
+      <thead><tr><th data-t="th_company">Company + Email</th><th data-t="th_contact">Contact Person</th><th data-t="th_phone">Phone</th><th data-t="th_email">Email Contact</th><th data-t="th_desc">Description</th><th data-t="th_status">Status</th><th></th></tr></thead>
       <tbody id="ld-body"></tbody>
     </table>
   </div></div>
@@ -592,8 +604,8 @@ textarea.inp{resize:vertical;line-height:1.6}
 <!-- ═══ LOG ═══ -->
 <div id="pg-log" class="pg">
   <div class="ph">
-    <div><div class="ph-t" data-t="log_title">Aktivitätslog</div></div>
-    <button class="btn btn-sm btn-r" onclick="clearLog()" data-t="log_clear">Log leeren</button>
+    <div><div class="ph-t" data-t="log_title">Activity Log</div></div>
+    <button class="btn btn-sm btn-r" onclick="clearLog()" data-t="log_clear">Clear Log</button>
   </div>
   <div class="pn"><div class="pn-b" id="log-body" style="max-height:560px;overflow-y:auto;padding:0 16px"></div></div>
 </div>
@@ -603,35 +615,35 @@ textarea.inp{resize:vertical;line-height:1.6}
   <div class="ph">
     <div>
       <div class="ph-t" data-t="linkedin_title">LinkedIn Prospecting</div>
-      <div class="ph-s" data-t="linkedin_subtitle">Kontakte in gefundenen Firmen suchen via Apollo.io</div>
+      <div class="ph-s" data-t="linkedin_subtitle">Find contacts in discovered companies via Apollo.io</div>
     </div>
   </div>
   <div id="li-alrt" style="display:none" class="alrt"></div>
 
   <!-- SEARCH CONFIG -->
   <div class="pn" style="margin-bottom:14px">
-    <div class="pn-h"><span class="pn-ht" data-t="linkedin_search_config">Kontaktsuche konfigurieren</span></div>
+    <div class="pn-h"><span class="pn-ht" data-t="linkedin_search_config">Configure Contact Search</span></div>
     <div class="pn-b">
       <div class="fg">
-        <label data-t="linkedin_jobtitle">Zielgruppe / Jobtitel</label>
-        <input class="inp" id="li-jobtitle" placeholder="z.B. CIO, IT-Leiter, Head of Compliance, CTO" data-tp="ph_li_jobtitle">
+        <label data-t="linkedin_jobtitle">Target Audience / Job Title</label>
+        <input class="inp" id="li-jobtitle" placeholder="e.g. CIO, IT Director, Head of Compliance, CTO" data-tp="ph_li_jobtitle">
       </div>
       <div class="fg">
         <label data-t="linkedin_region">Region</label>
         <select class="inp" id="li-region">
-          <option value="Deutschland">Deutschland</option>
+          <option value="Germany">Germany</option>
           <option value="DACH">DACH (DE/AT/CH)</option>
-          <option value="Bayern">Bayern</option>
-          <option value="NRW">Nordrhein-Westfalen</option>
+          <option value="Bavaria">Bavaria</option>
+          <option value="North Rhine-Westphalia">North Rhine-Westphalia</option>
           <option value="Baden-Württemberg">Baden-Württemberg</option>
-          <option value="Hessen">Hessen (Frankfurt)</option>
+          <option value="Hesse">Hesse (Frankfurt)</option>
           <option value="Berlin">Berlin</option>
           <option value="Hamburg">Hamburg</option>
         </select>
       </div>
       <div style="display:flex;gap:8px;margin-top:4px">
-        <button class="btn btn-g" id="li-search-btn" onclick="searchSelectedContacts()" data-t="linkedin_search_contacts">Kontakte suchen</button>
-        <button class="btn btn-sm btn-purple" id="li-enrich-btn" onclick="enrichAllLeads()" data-t="linkedin_enrich_all">Alle anreichern</button>
+        <button class="btn btn-g" id="li-search-btn" onclick="searchSelectedContacts()" data-t="linkedin_search_contacts">Find Contacts</button>
+        <button class="btn btn-sm btn-purple" id="li-enrich-btn" onclick="enrichAllLeads()" data-t="linkedin_enrich_all">Enrich All</button>
       </div>
     </div>
   </div>
@@ -639,12 +651,12 @@ textarea.inp{resize:vertical;line-height:1.6}
   <!-- COMPANY LIST -->
   <div class="pn">
     <div class="pn-h">
-      <span class="pn-ht" data-t="linkedin_companies">Firmen</span>
+      <span class="pn-ht" data-t="linkedin_companies">Companies</span>
       <div style="display:flex;align-items:center;gap:8px">
         <span id="li-counter" style="font-size:11px;color:var(--t3)"></span>
         <label style="font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px;cursor:pointer">
           <input type="checkbox" id="li-select-all" onchange="toggleSelectAll(this.checked)" style="width:13px;height:13px;accent-color:var(--green)">
-          <span data-t="linkedin_select_all">Alle</span>
+          <span data-t="linkedin_select_all">All</span>
         </label>
       </div>
     </div>
@@ -654,47 +666,47 @@ textarea.inp{resize:vertical;line-height:1.6}
   </div>
 </div>
 
-<!-- ═══ TEAM & BENUTZER ═══ -->
+<!-- ═══ TEAM & USERS ═══ -->
 <div id="pg-team" class="pg">
   <div class="ph">
     <div>
-      <div class="ph-t">Team &amp; Benutzer</div>
-      <div class="ph-s" data-t="team_subtitle">Zugänge verwalten · nur für Admins sichtbar</div>
+      <div class="ph-t">Team &amp; Users</div>
+      <div class="ph-s" data-t="team_subtitle">Manage access · admin only</div>
     </div>
-    <button class="btn btn-g btn-sm" onclick="showAddUser()" data-t="team_invite">+ Benutzer einladen</button>
+    <button class="btn btn-g btn-sm" onclick="showAddUser()" data-t="team_invite">+ Invite user</button>
   </div>
   <div id="team-alrt" style="display:none" class="alrt"></div>
 
   <!-- ADD USER FORM -->
   <div id="add-user-panel" class="pn" style="display:none">
-    <div class="pn-h"><span class="pn-ht" data-t="team_add_title">Neuen Benutzer anlegen</span></div>
+    <div class="pn-h"><span class="pn-ht" data-t="team_add_title">Create new user</span></div>
     <div class="pn-b">
       <div class="fr" style="margin-bottom:12px">
         <div class="fg" style="margin-bottom:0">
           <label>Name</label>
-          <input class="inp" id="nu-name" placeholder="Max Müller" data-tp="ph_nu_name">
+          <input class="inp" id="nu-name" placeholder="John Smith" data-tp="ph_nu_name">
         </div>
         <div class="fg" style="margin-bottom:0">
-          <label>E-Mail</label>
-          <input class="inp" id="nu-email" type="email" placeholder="max@firma.de">
+          <label>Email</label>
+          <input class="inp" id="nu-email" type="email" placeholder="max@company.com">
         </div>
       </div>
       <div class="fr" style="margin-bottom:12px">
         <div class="fg" style="margin-bottom:0">
-          <label>Passwort (min. 8 Zeichen)</label>
-          <input class="inp" id="nu-pass" type="password" placeholder="Temporäres Passwort" data-tp="ph_nu_pass">
+          <label>Password (min. 8 characters)</label>
+          <input class="inp" id="nu-pass" type="password" placeholder="Temporary password" data-tp="ph_nu_pass">
         </div>
         <div class="fg" style="margin-bottom:0">
-          <label>Rolle</label>
+          <label>Role</label>
           <select class="inp" id="nu-role">
-            <option value="user" data-t="team_role_user">Mitarbeiter — kann Leads sehen und E-Mails generieren</option>
-            <option value="admin" data-t="team_role_admin">Admin — kann Benutzer verwalten und alles konfigurieren</option>
+            <option value="user" data-t="team_role_user">Employee — can view leads and generate emails</option>
+            <option value="admin" data-t="team_role_admin">Admin — can manage users and configure everything</option>
           </select>
         </div>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="btn btn-g btn-sm" onclick="createUser()" data-t="team_create_btn">Benutzer anlegen</button>
-        <button class="btn btn-sm" onclick="hideAddUser()" data-t="team_cancel">Abbrechen</button>
+        <button class="btn btn-g btn-sm" onclick="createUser()" data-t="team_create_btn">Create user</button>
+        <button class="btn btn-sm" onclick="hideAddUser()" data-t="team_cancel">Cancel</button>
       </div>
     </div>
   </div>
@@ -702,19 +714,19 @@ textarea.inp{resize:vertical;line-height:1.6}
   <!-- USER LIST -->
   <div class="pn">
     <div class="pn-h">
-      <span class="pn-ht" data-t="team_all_users">Alle Benutzer</span>
+      <span class="pn-ht" data-t="team_all_users">All Users</span>
       <span id="team-count" style="font-size:11px;color:var(--t3)"></span>
     </div>
     <div class="pn-b" style="padding:0">
       <table class="tbl" style="width:100%">
         <thead>
           <tr>
-            <th data-t="team_th_user">Benutzer</th>
-            <th data-t="team_th_email">E-Mail</th>
-            <th style="width:120px" data-t="team_th_role">Rolle</th>
-            <th style="width:160px" data-t="team_th_registered">Registriert</th>
-            <th style="width:160px" data-t="team_th_last_login">Letzter Login</th>
-            <th style="width:100px" data-t="team_th_actions">Aktionen</th>
+            <th data-t="team_th_user">User</th>
+            <th data-t="team_th_email">Email</th>
+            <th style="width:120px" data-t="team_th_role">Role</th>
+            <th style="width:160px" data-t="team_th_registered">Registered</th>
+            <th style="width:160px" data-t="team_th_last_login">Last Login</th>
+            <th style="width:100px" data-t="team_th_actions">Actions</th>
           </tr>
         </thead>
         <tbody id="team-body"></tbody>
@@ -724,23 +736,23 @@ textarea.inp{resize:vertical;line-height:1.6}
 
   <!-- CHANGE PASSWORD (own account) -->
   <div class="pn">
-    <div class="pn-h"><span class="pn-ht" data-t="team_change_pw">Eigenes Passwort ändern</span></div>
+    <div class="pn-h"><span class="pn-ht" data-t="team_change_pw">Change own password</span></div>
     <div class="pn-b">
       <div class="fr" style="margin-bottom:12px">
         <div class="fg" style="margin-bottom:0">
-          <label data-t="team_current_pw">Aktuelles Passwort</label>
+          <label data-t="team_current_pw">Current password</label>
           <input class="inp" id="cp-old" type="password" placeholder="••••••••">
         </div>
         <div class="fg" style="margin-bottom:0">
-          <label data-t="team_new_pw">Neues Passwort (min. 8 Zeichen)</label>
+          <label data-t="team_new_pw">New password (min. 8 characters)</label>
           <input class="inp" id="cp-new" type="password" placeholder="••••••••">
         </div>
         <div class="fg" style="margin-bottom:0">
-          <label data-t="team_repeat_pw">Wiederholen</label>
+          <label data-t="team_repeat_pw">Repeat</label>
           <input class="inp" id="cp-new2" type="password" placeholder="••••••••">
         </div>
       </div>
-      <button class="btn btn-sm btn-ok" onclick="changeOwnPassword()" data-t="team_change_pw_btn">Passwort ändern</button>
+      <button class="btn btn-sm btn-ok" onclick="changeOwnPassword()" data-t="team_change_pw_btn">Change password</button>
     </div>
   </div>
 </div>
@@ -754,277 +766,12 @@ let leads   = [];
 let pending = [];
 let inbox   = [];
 let logs    = [];
-let cfg = { name:'Daria', role:'Lead AI Architect', co:'', sig:'Beste Grüße', gFrom:'', gName:'', lang:'de' };
+let cfg = { name:'Daria', role:'Lead AI Architect', co:'', sig:'Best regards', gFrom:'', gName:'' };
 let envDefaults = {}; // { apolloKey: boolean, perplexityKey: boolean } — from GET /api/config
 let agentOn = false, abort = false;
 
 // ─── I18N ────────────────────────────────────────────────────────────────────
 const I18N = {
-  de: {
-    // Login
-    email: 'E-Mail', password: 'Passwort', login: 'Einloggen',
-    create_account: 'Neuen Account erstellen →', name: 'Name',
-    password_min8: 'Passwort (min. 8 Zeichen)', password_repeat: 'Passwort wiederholen',
-    register: 'Account erstellen', back_to_login: '← Zurück zum Login',
-    // Top
-    subtitle: 'Autonomer B2B Sales-Agent · Bankensektor Deutschland',
-    // Nav
-    nav_agent_sec: 'Agent', nav_agent: 'Agent & Suche', nav_linkedin: 'LinkedIn Prospecting',
-    nav_emails_sec: 'E-Mails', nav_emailgen: 'E-Mails generieren', nav_approve: 'Freigabe',
-    nav_inbox: 'Inbox / Antworten', nav_data_sec: 'Daten', nav_leads: 'Lead-Datenbank',
-    nav_log: 'Aktivitätslog', nav_system_sec: 'System', nav_config: 'Konfiguration',
-    nav_team: 'Team & Benutzer',
-    // Agent
-    agent_title: 'Agent & Firmensuche',
-    agent_subtitle: 'Agent recherchiert Firmen und speichert sie als Leads — E-Mails werden separat generiert',
-    agent_stop: '⬛ Stopp', agent_start: '▶ Agent starten',
-    agent_search_prompt: 'Suchauftrag / Prompt', agent_search_label: 'Was soll der Agent suchen?',
-    agent_lead_count: 'Anzahl neue Leads',
-    agent_5leads: '5 Leads', agent_8leads: '8 Leads', agent_10leads: '10 Leads', agent_15leads: '15 Leads',
-    agent_after_search: 'Nach Suche', agent_save_only: 'Nur Leads speichern',
-    agent_goto_emails: 'Direkt zu E-Mails generieren',
-    agent_steps: 'Schritte', agent_step1: 'Firmen recherchieren', agent_step2: 'Leads speichern',
-    agent_step3: 'Fertig', agent_waiting: 'Wartet…',
-    stats: 'Statistik', stat_total_leads: 'Leads gesamt', stat_pending: 'Pending Freigaben',
-    stat_approved_emails: 'E-Mails genehmigt', stat_replies: 'Antworten',
-    terminal: 'Terminal', clear: 'Leeren',
-    terminal_ready: '// LeadOS Agent bereit. Starte die Firmensuche oben.',
-    // Email gen
-    emailgen_title: 'E-Mails generieren',
-    emailgen_subtitle: 'Dein Produkt-Prompt → Kategorie wählen → Leads auswählen → KI generiert personalisierte E-Mails',
-    emailgen_run: '⚡ E-Mails generieren',
-    eg_step1: '① Profil deines Unternehmens',
-    eg_step1_hint: 'Wird bei jeder E-Mail-Generierung verwendet — einmal ausfüllen, immer nutzen',
-    eg_product_name: 'Produktname / Angebotsbezeichnung',
-    eg_target: 'Zielgruppe / Ansprechpartner',
-    eg_what: 'Was wir machen (2-3 Sätze)', eg_problems: 'Welche Probleme lösen wir?',
-    eg_usp: 'USP — Was macht uns einzigartig?', eg_roi: 'ROI / konkrete Kennzahlen',
-    eg_pricing: 'Preise / Pakete (optional)', eg_refs: 'Referenzen / Kunden-Beispiele',
-    eg_context: 'Zusätzlicher Kontext (optional) — Besonderheiten, aktuelle Aktionen, Sprache',
-    eg_preview_label: 'Vorschau — was Claude sieht:',
-    eg_save_profile: '💾 Profil speichern', eg_load_profile: '📂 Gespeichertes laden',
-    eg_preview: '👁 Vorschau',
-    eg_step2: '② E-Mail-Kategorie wählen', eg_step2_hint: 'Bestimmt Stil, Ton und Ziel der E-Mail',
-    eg_tone: 'Tonalität',
-    tone_professional: 'Professionell & direkt', tone_casual: 'Locker & persönlich',
-    tone_formal: 'Formell (Sie-Form)', tone_curious: 'Neugierig & fragend',
-    eg_length: 'E-Mail-Länge',
-    len_short: 'Kurz (3–4 Sätze)', len_medium: 'Mittel (5–6 Sätze)', len_long: 'Ausführlich (7–9 Sätze)',
-    eg_cta: 'Call-to-Action',
-    cta_call: '15-Min Discovery Call', cta_demo: 'Kurze Demo', cta_info: 'Infomaterial senden',
-    cta_roi: 'ROI-Analyse anbieten', cta_pilot: 'Pilot-Projekt vorschlagen',
-    eg_extra: 'Zusätzliche Anweisungen (optional)',
-    eg_step3: '③ Leads auswählen',
-    eg_all_new: 'Alle Neu', eg_all_cold: 'Alle Kalt', eg_all: 'Alle', eg_none: 'Keine',
-    eg_step4: '④ Freigabe-Modus', eg_mode: 'Modus',
-    mode_review: 'Ich prüfe jede E-Mail vor dem Senden',
-    mode_auto: 'Auto-Approve — sofort senden (simuliert)',
-    eg_test_email: 'Test-E-Mail (optional)', eg_test_preview: 'Test-E-Mail Vorschau',
-    eg_subject: 'Betreff:', eg_generating: 'Generierung läuft',
-    // Approve
-    approve_title: 'Freigabe',
-    approve_subtitle: 'Alle generierten E-Mails prüfen · bearbeiten · freigeben zum Versand',
-    all: 'Alle', pending: 'Ausstehend', sent: 'Gesendet', rejected: 'Abgelehnt',
-    cards: '☰ Karten', table: '⊞ Tabelle',
-    approve_all: '✓ Alle freigeben', reject_all: '✕ Alle ablehnen',
-    total: 'Gesamt', stat_pending_label: 'Ausstehend', approved: 'Freigegeben',
-    stat_rejected_label: 'Abgelehnt',
-    no_emails_yet: 'Noch keine E-Mails generiert.',
-    go_to_emailgen: 'Gehe zu "E-Mails generieren" um Kampagnen zu starten.',
-    // Inbox
-    inbox_title: 'Inbox / Antworten', inbox_subtitle: 'Agent antwortet kontextbasiert — immer mit Produkt-Kontext',
-    inbox_simulate: '+ Antwort simulieren', inbox_empty: 'Keine Antworten.',
-    // Leads
-    leads_title: 'Lead-Datenbank', leads_csv: '↓ CSV', leads_json: '↓ JSON',
-    leads_import: '↑ Import', leads_clear: 'DB leeren', leads_all_status: 'Alle Status',
-    th_company: 'Firma + E-Mail', th_contact: 'Ansprechpartner', th_phone: 'Telefon',
-    th_email: 'E-Mail Kontakt', th_desc: 'Beschreibung', th_status: 'Status',
-    // Log
-    log_title: 'Aktivitätslog', log_clear: 'Log leeren',
-    // Config
-    config_title: 'Konfiguration', config_subtitle: 'API-Keys, Apollo.io, Absender-Profil, Webhook',
-    save: 'Speichern', ai_provider: 'KI-Anbieter', choose_provider: 'Anbieter wählen',
-    model: 'Modell', test: 'Testen', backend_url: 'Backend URL',
-    backend_hint: 'Leer lassen = lokaler Modus (Daten im Browser). Mit Backend-URL = Server-Modus (Daten in PostgreSQL).',
-    sender_profile: 'Absender-Profil', role: 'Rolle', company: 'Unternehmen', signature: 'Signatur',
-    gmail_email: 'Gmail / E-Mail', sender_email: 'Absender-E-Mail', display_name: 'Anzeigename',
-    webhook_crm: 'Webhook / CRM', data: 'Daten',
-    json_export: 'JSON Export', json_import: 'JSON Import', delete_data: 'Meine Daten löschen',
-    user_mgmt: 'Nutzer-Verwaltung',
-    user_mgmt_hint: 'Neue Nutzer registrieren sich selbst über den Login-Screen. Als Admin kannst du alle Accounts sehen und löschen.',
-    lang_title: 'Sprache / Language',
-    // LinkedIn Prospecting
-    linkedin_title: 'LinkedIn Prospecting',
-    linkedin_subtitle: 'Kontakte in gefundenen Firmen suchen via Apollo.io',
-    linkedin_enrich_all: 'Alle anreichern',
-    linkedin_search_config: 'Kontaktsuche konfigurieren',
-    linkedin_jobtitle: 'Zielgruppe / Jobtitel', linkedin_region: 'Region',
-    linkedin_companies: 'Firmen', linkedin_select_all: 'Alle',
-    linkedin_search_contacts: 'Kontakte suchen',
-    linkedin_no_leads: 'Keine Firmen. Starte zuerst den Agent um Firmen zu finden.',
-    linkedin_needs_contacts: 'Kontakte fehlen',
-    linkedin_complete: 'Vollständig', linkedin_complete_short: 'vollständig',
-    linkedin_save_url: 'LinkedIn URL speichern', linkedin_invalid_url: 'Ungültige LinkedIn URL.',
-    linkedin_no_api: 'Apollo API-Key fehlt. Bitte in der Server-.env eintragen.',
-    linkedin_no_targets: 'Keine Firmen zum Durchsuchen.',
-    linkedin_searching: 'Suche läuft…', linkedin_contacts_found: 'Kontakte gefunden',
-    // Placeholders
-    ph_email_login: 'daria@firma.de', ph_reg_name: 'Max Müller', ph_reg_email: 'max@firma.de',
-    ph_prodname: 'z.B. AI-Prozessautomatisierung für Banken',
-    ph_target: 'z.B. CIO, IT-Leiter, Compliance-Chef',
-    ph_what: 'Wir entwickeln KI-Agenten die Vertriebsprozesse automatisieren — von der Lead-Recherche bis zur E-Mail-Generierung. Unsere Lösung reduziert den manuellen Aufwand im B2B-Vertrieb um 60%.',
-    ph_problems: 'Vertriebsteams verlieren zu viel Zeit mit manueller Recherche und copy-paste E-Mails. CRM-Daten sind unvollständig. Follow-ups werden vergessen.',
-    ph_usp: 'z.B. Setup in 2 Wochen, kein IT-Team nötig, nachweisbar 40% Zeitersparnis',
-    ph_roi: 'z.B. ROI nach 8 Monaten, 15h/Woche gespart, +23% Conversion',
-    ph_pricing: 'z.B. ab 2.900 €/Monat, Setup einmalig 5.000 €, kostenlose Pilotphase',
-    ph_refs: 'z.B. 3 Sparkassen in Bayern, FinTech-Startup Berlin, 200-MA IT-Dienstleister',
-    ph_context: 'z.B. Wir haben gerade eine Case Study mit Commerzbank veröffentlicht. Aktuell bieten wir bis Ende Q1 eine kostenlose Pilotphase an. Schreib immer auf Deutsch, Sie-Form.',
-    ph_extra: 'z.B. Erwähne DORA-Regulierung. Vermeide das Wort \'revolutionär\'. Beziehe dich auf aktuelle BaFin-Anforderungen.',
-    ph_lead_filter: 'Leads filtern…', ph_test_lead: 'Lead-Name für Test…',
-    ph_search: 'Suchen…',
-    ph_backend: 'http://localhost:3000 oder https://your-app.railway.app',
-    ph_company: 'Meine GmbH', ph_sig: 'Beste Grüße, Daria',
-    ph_li_jobtitle: 'z.B. CIO, IT-Leiter, Head of Compliance, CTO',
-    ph_li_linkedin: 'linkedin.com/in/...',
-    ph_nu_name: 'Max Müller', ph_nu_pass: 'Temporäres Passwort',
-    ph_subject: 'Betreff', ph_reply: 'Deine Antwort…',
-    ph_lead_desc: 'Was macht die Firma? Spezialisierung, Kunden, Produkte…',
-    // Alerts — Email Gen
-    msg_choose_cat: '② Bitte erst eine E-Mail-Kategorie wählen.',
-    msg_fill_prompt: '① Bitte erst den Produkt-Prompt ausfüllen.',
-    msg_select_leads: '③ Bitte mindestens einen Lead auswählen.',
-    msg_no_backend: 'Backend nicht erreichbar. Bitte den Administrator kontaktieren.',
-    msg_fill_product: 'Bitte mindestens Produktname oder Beschreibung ausfüllen.',
-    msg_profile_saved: 'Unternehmensprofil gespeichert.',
-    msg_no_profile: 'Kein gespeichertes Profil gefunden.',
-    msg_profile_loaded: 'Unternehmensprofil geladen.',
-    msg_choose_cat_test: 'Bitte erst eine Kategorie wählen.',
-    msg_test_generated: 'Test-E-Mail generiert für: ',
-    // Alerts — Config
-    msg_config_saved: 'Konfiguration gespeichert.',
-    msg_backend_enter: 'Backend URL eingeben.',
-    msg_backend_connected: '✓ Backend verbunden! Auth-Modus wird beim nächsten Laden aktiviert.',
-    msg_backend_bad: 'Backend antwortet nicht korrekt (HTTP ',
-    msg_backend_unreachable: 'Backend nicht erreichbar: ',
-    msg_webhook_ok: 'Webhook OK!',
-    msg_webhook_fail: 'Webhook nicht erreichbar.',
-    msg_claude_ok: 'Claude API verbunden!',
-    msg_openai_ok: 'OpenAI verbunden!',
-    msg_gemini_ok: 'Gemini verbunden!',
-    msg_invalid_key: 'Ungültiger Key (HTTP ',
-    msg_server_error: 'Server-Fehler (HTTP ',
-    msg_empty_response: 'Server gab leere Antwort (HTTP ',
-    msg_conn_error: 'Verbindungsfehler: ',
-    // Alerts — LinkedIn
-    msg_li_load_leads: 'Bitte erst Leads laden oder einen Jobtitel eingeben.',
-    msg_li_select: 'Bitte Leads auswählen.',
-    msg_li_enriched: ' Leads angereichert.',
-    msg_li_complete: 'Alle Leads bereits vollständig.',
-    msg_li_enrich_done: 'Anreicherung abgeschlossen.',
-    msg_li_queries: ' LinkedIn-Suchanfragen generiert. Klicke die Links um Profile zu finden.',
-    msg_li_enter_data: 'Firma oder Name eingeben.',
-    msg_apollo_enter: 'Apollo API-Key eingeben.',
-    msg_apollo_ok: 'Apollo API verbunden!',
-    apollo_title: 'Apollo.io (Kontaktsuche)',
-    apollo_config_hint: 'Apollo.io API Key wird unter Konfiguration eingestellt.',
-    // Alerts — Team
-    msg_enter_name: 'Name eingeben.',
-    msg_enter_email: 'Gültige E-Mail eingeben.',
-    msg_pass_min8: 'Passwort min. 8 Zeichen.',
-    msg_email_taken: 'Diese E-Mail ist bereits registriert.',
-    msg_user_created: '✓ Benutzer wurde angelegt.',
-    msg_pass_reset: 'Passwort wurde zurückgesetzt.',
-    msg_user_deleted: 'Benutzer gelöscht.',
-    msg_enter_old_pass: 'Aktuelles Passwort eingeben.',
-    msg_new_pass_min8: 'Neues Passwort min. 8 Zeichen.',
-    msg_pass_mismatch: 'Passwörter stimmen nicht überein.',
-    msg_pass_changed: 'Passwort erfolgreich geändert.',
-    msg_old_pass_wrong: 'Aktuelles Passwort ist falsch.',
-    msg_error: 'Fehler',
-    msg_error_prefix: 'Fehler: ',
-    msg_load_error: 'Fehler beim Laden: ',
-    // Team render
-    team_no_other_users: 'Keine weiteren Nutzer.',
-    team_no_users: 'Keine Benutzer.',
-    team_count_suffix: ' Benutzer',
-    team_you: '(du)',
-    team_employee: '● MITARBEITER',
-    team_demote: 'Zu Mitarbeiter machen',
-    team_promote: 'Zu Admin machen',
-    team_demote_btn: '↓ User',
-    team_promote_btn: '↑ Admin',
-    team_reset_pw: 'Passwort zurücksetzen',
-    team_delete: 'Löschen',
-    team_confirm_delete: 'Nutzer löschen?',
-    // Model labels
-    model_recommended: '(empfohlen)',
-    model_fast: '(schnell)',
-    model_fast_cheap: '(schnell & günstig)',
-    model_recommended_free: '(empfohlen · kostenlos)',
-    // Agent status
-    agent_online: '● AGENT AKTIV', agent_offline: '● AGENT OFFLINE',
-    agent_already_running: 'Agent läuft bereits.',
-    agent_saving_leads: 'Speichere Leads…', agent_stop_msg: 'Stopp…',
-    backend_not_connected_llm: 'Backend nicht verbunden – LLM-Proxy benötigt Backend.',
-    // Team page
-    team_subtitle: 'Zugänge verwalten · nur für Admins sichtbar',
-    team_add_title: 'Neuen Benutzer anlegen', team_invite: '+ Benutzer einladen',
-    team_role_user: 'Mitarbeiter — kann Leads sehen und E-Mails generieren',
-    team_role_admin: 'Admin — kann Benutzer verwalten und alles konfigurieren',
-    team_create_btn: 'Benutzer anlegen', team_cancel: 'Abbrechen',
-    team_all_users: 'Alle Benutzer',
-    team_th_user: 'Benutzer', team_th_email: 'E-Mail', team_th_role: 'Rolle',
-    team_th_registered: 'Registriert', team_th_last_login: 'Letzter Login', team_th_actions: 'Aktionen',
-    team_change_pw: 'Eigenes Passwort ändern', team_current_pw: 'Aktuelles Passwort',
-    team_new_pw: 'Neues Passwort (min. 8 Zeichen)', team_repeat_pw: 'Wiederholen',
-    team_change_pw_btn: 'Passwort ändern', team_admin_badge: '● ADMIN',
-    team_logged_in_as: 'Eingeloggt als', team_pw_change_err: 'Fehler beim Ändern.',
-    // Profile save/load
-    profile_saved_prefix: '✓ Gespeichert: ', profile_loaded_prefix: '✓ Geladen: ',
-    profile_last_saved: 'Zuletzt gespeichert: ',
-    log_profile_saved: 'Produkt-Profil gespeichert: ',
-    // LinkedIn
-    li_saved: 'Gespeichert', li_created: 'Erstellt',
-    log_lead_linkedin: 'Lead aus LinkedIn erstellt: ',
-    log_reply_sent: 'Antwort gesendet: ',
-    // Password
-    log_pw_changed: 'Eigenes Passwort geändert',
-    // Lead statuses (display)
-    status_neu: 'Neu', status_kontaktiert: 'Kontaktiert', status_warm: 'Warm',
-    status_geantwortet: 'Geantwortet', status_kalt: 'Kalt',
-    // Lead UI
-    no_leads_hint: 'Keine Leads. Erst Agent starten oder Leads manuell hinzufügen.',
-    leads_selected: 'ausgewählt',
-    no_contact: 'kein Ansprechpartner', no_phone: 'kein Telefon',
-    no_contacted_leads: 'Keine kontaktierten Leads. Erst E-Mails senden.',
-    lead_edit: 'Bearbeiten', lead_ai_fill: 'KI auto-ausfüllen', lead_delete: 'Löschen',
-    lead_add_desc: '+ Beschreibung', lead_click_edit: 'Klicken zum Bearbeiten',
-    missing: 'fehlt', lead_edit_contact: 'Kontakt bearbeiten',
-    lead_ai_fill_btn: '⚡ KI auto-ausfüllen',
-    leads_entries: 'Einträge', logout_title: 'Ausloggen', logout_confirm: 'Ausloggen?',
-    log_clear_confirm: 'Log leeren?', terminal_cleared: 'Terminal geleert.',
-    // Email categories
-    cat_erstansprache: 'Erstansprache', cat_erstansprache_desc: 'Erste Kontaktaufnahme — präzise, nicht aufdringlich',
-    cat_followup: 'Follow-Up', cat_followup_desc: 'Nachfassen nach keiner Antwort — freundlich, nicht nervig',
-    cat_reaktivierung: 'Reaktivierung', cat_reaktivierung_desc: 'Kalt gewordene Leads wieder aktivieren',
-    cat_demo: 'Demo-Anfrage', cat_demo_desc: 'Einladung zu einer konkreten Produktdemo',
-    cat_roi: 'ROI & Zahlen', cat_roi_desc: 'Konkrete Zahlen und Business Case im Vordergrund',
-    cat_event: 'Event / Webinar', cat_event_desc: 'Einladung zu einem Event, Webinar oder Roundtable',
-    cat_referenz: 'Referenz & Case Study', cat_referenz_desc: 'Konkrete Erfolgsgeschichte aus der Branche teilen',
-    cat_breakup: 'Break-Up E-Mail', cat_breakup_desc: 'Letzte E-Mail — schafft oft überraschend viel Response',
-    cat_custom: 'Eigener Prompt', cat_custom_desc: 'Schreibe deine eigenen E-Mail-Anweisungen',
-    // Approval
-    emails_total: 'E-Mails gesamt',
-    // LinkedIn extra
-    save: 'Speichern',
-    // Config extra
-    apollo_hint_free: 'Free: 50 Anfragen/Tag',
-    user_badge_me: 'ICH', user_since: 'seit',
-    // Leads table empty
-    leads_empty_table: 'Keine Leads. Agent starten oder Leads importieren.',
-    // Team page title
-    team_page_title: 'Team & Benutzer',
-  },
   en: {
     // Login
     email: 'Email', password: 'Password', login: 'Log in',
@@ -1292,8 +1039,8 @@ const I18N = {
   }
 };
 
-const t = (key) => (I18N[cfg.lang || 'de'] || I18N.de)[key] || (I18N.de)[key] || key;
-const loc = () => cfg.lang === 'en' ? 'en-US' : 'de-DE';
+const t = (key) => I18N.en[key] || key;
+const loc = () => 'en-US';
 const STATUS_MAP = {Neu:'status_neu', Kontaktiert:'status_kontaktiert', Warm:'status_warm', Geantwortet:'status_geantwortet', Kalt:'status_kalt'};
 const tStatus = (s) => t(STATUS_MAP[s] || s);
 
@@ -1311,15 +1058,6 @@ const applyLang = () => {
     if (val !== key) el.placeholder = val;
   });
   const lo = $('btn-logout'); if(lo) lo.title = t('logout_title');
-  const lt = $('lang-toggle'); if(lt) lt.value = cfg.lang || 'de';
-};
-
-const switchLang = (lang) => {
-  cfg.lang = lang;
-  save();
-  applyLang();
-  // Re-render dynamic elements that use t()
-  if(typeof renderTeam === 'function') renderTeam();
 };
 
 // Email gen state
@@ -1331,110 +1069,110 @@ const EMAIL_CATS = [
   {
     id: 'erstansprache',
     icon: '👋',
-    name: 'Erstansprache',
-    desc: 'Erste Kontaktaufnahme — präzise, nicht aufdringlich',
+    name: 'First Outreach',
+    desc: 'First contact — precise, not pushy',
     tone: 'professionell',
     len: 'mittel',
     cta: 'call',
-    systemPrompt: `Schreibe eine Kaltakquise-Erstansprache. 
-Regeln: Erster Satz bezieht sich direkt auf die Firma (Fokus/Branche). 
-Kein "Ich hoffe diese E-Mail erreicht Sie gut". 
-Zeige in 1-2 Sätzen warum das Angebot für DIESE Firma relevant ist. 
-Konkrete Kennzahlen wenn vorhanden. Klarer CTA am Ende.`
+    systemPrompt: `Write a cold-outreach first-contact email.
+Rules: The first sentence must refer directly to the company (its focus/industry).
+No "I hope this email finds you well".
+Show in 1-2 sentences why the offer is relevant for THIS company.
+Concrete numbers if available. Clear CTA at the end.`
   },
   {
     id: 'followup',
     icon: '🔁',
     name: 'Follow-Up',
-    desc: 'Nachfassen nach keiner Antwort — freundlich, nicht nervig',
+    desc: 'Following up after no response — friendly, not pushy',
     tone: 'locker',
     len: 'kurz',
     cta: 'call',
-    systemPrompt: `Schreibe ein Follow-Up nach einer unbeantworteten Erstansprache (3-5 Werktage her).
-Regeln: Sehr kurz (3-4 Sätze). Kein Vorwurf. Leicht anders formuliert als die Erstansprache. 
-Stelle eine konkrete Frage oder biete einen neuen Mehrwert. Locker aber professionell.`
+    systemPrompt: `Write a follow-up to an unanswered first-contact email (3-5 business days ago).
+Rules: Very short (3-4 sentences). No blame. Phrase it slightly differently than the first contact.
+Ask a concrete question or offer new value. Casual but professional.`
   },
   {
     id: 'reaktivierung',
     icon: '🔥',
-    name: 'Reaktivierung',
-    desc: 'Kalt gewordene Leads wieder aktivieren',
+    name: 'Reactivation',
+    desc: 'Re-engage leads that have gone cold',
     tone: 'locker',
     len: 'mittel',
     cta: 'call',
-    systemPrompt: `Schreibe eine Reaktivierungs-E-Mail für einen Lead der sich länger nicht gemeldet hat.
-Regeln: Erwähne implizit dass es eine Weile her ist. Biete etwas Neues oder eine aktuelle Entwicklung an. 
-Mache es leicht für sie zu antworten. Kein Druck.`
+    systemPrompt: `Write a reactivation email for a lead who hasn't responded in a while.
+Rules: Implicitly mention that it's been a while. Offer something new or a recent development.
+Make it easy for them to reply. No pressure.`
   },
   {
     id: 'demo',
     icon: '🎯',
-    name: 'Demo-Anfrage',
-    desc: 'Einladung zu einer konkreten Produktdemo',
+    name: 'Demo Request',
+    desc: 'Invitation to a concrete product demo',
     tone: 'professionell',
     len: 'mittel',
     cta: 'demo',
-    systemPrompt: `Schreibe eine E-Mail mit dem Ziel eine konkrete Demo zu vereinbaren.
-Regeln: Erkläre kurz was in der Demo gezeigt wird (spezifisch für ihre Branche). 
-Kommuniziere den konkreten Wert den sie in 20-30 Minuten sehen werden. 
-Schlage 2-3 konkrete Zeitfenster vor oder verweise auf Buchungslink.`
+    systemPrompt: `Write an email aimed at scheduling a concrete demo.
+Rules: Briefly explain what will be shown in the demo (specific to their industry).
+Communicate the concrete value they'll see in 20-30 minutes.
+Suggest 2-3 concrete time slots or point to a booking link.`
   },
   {
     id: 'roi',
     icon: '📊',
-    name: 'ROI & Zahlen',
-    desc: 'Konkrete Zahlen und Business Case im Vordergrund',
+    name: 'ROI & Numbers',
+    desc: 'Concrete numbers and business case front and center',
     tone: 'professionell',
     len: 'mittel',
     cta: 'roi',
-    systemPrompt: `Schreibe eine E-Mail die den Business Case und ROI in den Vordergrund stellt.
-Regeln: Starte mit einer konkreten Zahl oder Statistik. 
-Rechne den potentiellen Nutzen speziell für ihre Firmengröße/Branche hoch. 
-Biete eine kostenlose ROI-Analyse an. Fakten statt Buzzwords.`
+    systemPrompt: `Write an email that puts the business case and ROI front and center.
+Rules: Start with a concrete number or statistic.
+Calculate the potential benefit specifically for their company size/industry.
+Offer a free ROI analysis. Facts over buzzwords.`
   },
   {
     id: 'event',
     icon: '📅',
     name: 'Event / Webinar',
-    desc: 'Einladung zu einem Event, Webinar oder Roundtable',
+    desc: 'Invitation to an event, webinar, or roundtable',
     tone: 'locker',
     len: 'kurz',
     cta: 'info',
-    systemPrompt: `Schreibe eine Event-Einladungs-E-Mail.
-Regeln: Kurz und prägnant. Was ist das Event, wann, warum relevant für sie. 
-Maximal 3-4 Sätze. Direkter Link / CTA zur Anmeldung. Informell aber professionell.`
+    systemPrompt: `Write an event invitation email.
+Rules: Short and to the point. What the event is, when, why it's relevant to them.
+Maximum 3-4 sentences. Direct link / CTA to register. Informal but professional.`
   },
   {
     id: 'referenz',
     icon: '🏆',
-    name: 'Referenz & Case Study',
-    desc: 'Konkrete Erfolgsgeschichte aus der Branche teilen',
+    name: 'Reference & Case Study',
+    desc: 'Share a concrete success story from their industry',
     tone: 'professionell',
     len: 'mittel',
     cta: 'call',
-    systemPrompt: `Schreibe eine E-Mail die eine Referenz oder Case Study aus dem Banking-Umfeld teilt.
-Regeln: Starte mit dem Ergebnis (nicht dem Prozess). 
-Erkläre in 1-2 Sätzen die Parallele zu ihrer Situation. 
-Biete an die vollständige Case Study zu teilen oder darüber zu sprechen.`
+    systemPrompt: `Write an email that shares a reference or case study from the banking sector.
+Rules: Start with the result (not the process).
+Explain in 1-2 sentences the parallel to their situation.
+Offer to share the full case study or discuss it.`
   },
   {
     id: 'breakup',
     icon: '👋',
-    name: 'Break-Up E-Mail',
-    desc: 'Letzte E-Mail — schafft oft überraschend viel Response',
+    name: 'Break-Up Email',
+    desc: 'Last email in the sequence — often surprisingly effective at getting a response',
     tone: 'locker',
     len: 'kurz',
     cta: 'call',
-    systemPrompt: `Schreibe eine "Break-Up" E-Mail — die letzte E-Mail in einer Serie ohne Antwort.
-Regeln: Sehr kurz (2-3 Sätze). Sage implizit dass du nicht mehr schreiben wirst. 
-Keine Frustration zeigen. Offen für zukünftigen Kontakt. 
-Diese E-Mails funktionieren durch ihre Direktheit — halte sie ehrlich und knapp.`
+    systemPrompt: `Write a "break-up" email — the last email in a sequence with no response.
+Rules: Very short (2-3 sentences). Imply that you won't write again.
+Show no frustration. Stay open to future contact.
+These emails work through their directness — keep it honest and brief.`
   },
   {
     id: 'custom',
     icon: '✏️',
-    name: 'Eigener Prompt',
-    desc: 'Schreibe deine eigenen E-Mail-Anweisungen',
+    name: 'Custom Prompt',
+    desc: 'Write your own email instructions',
     tone: 'professionell',
     len: 'mittel',
     cta: 'call',
@@ -1627,34 +1365,34 @@ const runAgent = async () => {
     endAgent(); return;
   }
   if(!envDefaults.apolloKey && !envDefaults.perplexityKey) {
-    tlog('✗ Apollo oder Perplexity API-Key fehlt. Bitte in der Server-.env eintragen.','lr');
+    tlog('✗ Apollo or Perplexity API key missing. Please set it in the server .env file.','lr');
     endAgent(); return;
   }
-  tlog('Firmensuche gestartet…','lg');
-  addLog('Agent-Suche: '+prompt.substring(0,60)+'…','agent');
+  tlog('Company search started…','lg');
+  addLog('Agent search: '+prompt.substring(0,60)+'…','agent');
 
   // ── Step 1: Find companies (Serper+Claude → fallback Apollo) ───────────────
-  step(1,'act'); stepD(1,'Suche Firmen…');
+  step(1,'act'); stepD(1,'Searching companies…');
   const existing = new Set(leads.map(l=>l.name.toLowerCase()));
   let orgs = []; // [{name, industry, city, employees, domain, description}]
 
   // Try Perplexity AI Search (replaces Serper+Claude two-step)
   if(envDefaults.perplexityKey) {
     try {
-      stepD(1,'Firmensuche via Perplexity AI…');
-      tlog('Perplexity-Suche gestartet…','lg');
+      stepD(1,'Searching companies via Perplexity AI…');
+      tlog('Perplexity search started…','lg');
 
       const excl = leads.map(l=>l.name).slice(0,30).join(', ');
-      const searchPrompt = `Finde GENAU ${count} reale deutsche Unternehmen passend zu dieser Suchanfrage:
+      const searchPrompt = `Find EXACTLY ${count} real German companies matching this search request:
 
 "${prompt}"
 
-${excl ? 'Diese Firmen NICHT nennen (bereits vorhanden): ' + excl : ''}
+${excl ? 'Do NOT list these companies (already present): ' + excl : ''}
 
-Für jede Firma gib an: Firmenname (mit Rechtsform), Branche, Stadt, ungefähre Mitarbeiterzahl, Website-Domain, und eine kurze Beschreibung was die Firma macht.
+For each company give: company name (with legal form), industry, city, approximate employee count, website domain, and a short description of what the company does.
 
-Antworte AUSSCHLIESSLICH mit einem JSON-Array, KEIN anderer Text:
-[{"name":"Firmenname GmbH","branche":"IT-Dienstleister","ort":"Berlin","ma":"~100","web":"firma.de","beschreibung":"Was macht die Firma"}]`;
+Reply ONLY with a JSON array, NO other text:
+[{"name":"Company Name GmbH","branche":"IT service provider","ort":"Berlin","ma":"~100","web":"company.de","beschreibung":"What the company does"}]`;
 
       const pplxRes = await authFetch('/api/perplexity/search', {
         method: 'POST',
@@ -1667,7 +1405,7 @@ Antworte AUSSCHLIESSLICH mit einem JSON-Array, KEIN anderer Text:
       const raw = pplxData.choices?.[0]?.message?.content || '';
       const cleaned = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
       const s=cleaned.indexOf('['), e=cleaned.lastIndexOf(']');
-      if(s<0||e<0) throw new Error('Perplexity hat kein JSON zurückgegeben');
+      if(s<0||e<0) throw new Error('Perplexity did not return JSON');
       const parsed = JSON.parse(cleaned.substring(s,e+1));
 
       orgs = parsed
@@ -1675,26 +1413,26 @@ Antworte AUSSCHLIESSLICH mit einem JSON-Array, KEIN anderer Text:
         .slice(0, count)
         .map(o => ({ name: o.name, industry: o.branche||'', city: o.ort||'', employees: o.ma||'', domain: o.web||'', description: o.beschreibung||'', raw: null }));
 
-      if(orgs.length) tlog(orgs.length+' Firmen via Perplexity gefunden','lg');
+      if(orgs.length) tlog(orgs.length+' companies found via Perplexity','lg');
     } catch(e) {
-      tlog('✗ Perplexity-Fehler: '+e.message,'lr'); addLog('Perplexity-Fehler: '+e.message,'err');
+      tlog('✗ Perplexity error: '+e.message,'lr'); addLog('Perplexity error: '+e.message,'err');
     }
   }
 
   // Fallback: Apollo Organization Search (with pagination)
   if(!orgs.length && envDefaults.apolloKey) {
     try {
-      stepD(1,'Suche Firmen via Apollo…');
+      stepD(1,'Searching companies via Apollo…');
       const perPage = 25;
       const maxPages = Math.ceil((count * 2) / perPage) + 1;
       for(let pg = 1; pg <= maxPages && orgs.length < count; pg++) {
-        if(pg > 1) { stepD(1,`Suche Firmen via Apollo (Seite ${pg})…`); await new Promise(r=>setTimeout(r,300)); }
+        if(pg > 1) { stepD(1,`Searching companies via Apollo (page ${pg})…`); await new Promise(r=>setTimeout(r,300)); }
         const res = await authFetch('/api/apollo/organizations', {
           method: 'POST',
           body: JSON.stringify({ q_keywords: prompt, page: pg, per_page: perPage })
         });
         const data = await res.json();
-        if (!res.ok) { addLog('Apollo Org-Suche: HTTP '+res.status,'warn'); break; }
+        if (!res.ok) { addLog('Apollo org search: HTTP '+res.status,'warn'); break; }
         const items = (data.organizations || data.accounts || []);
         if(!items.length) break;
         const mapped = items
@@ -1704,18 +1442,18 @@ Antworte AUSSCHLIESSLICH mit einem JSON-Array, KEIN anderer Text:
         const pagination = data.pagination || {};
         if(pg >= (pagination.total_pages || pg)) break;
       }
-      if(orgs.length) tlog(orgs.length+' Firmen von Apollo gefunden','lg');
-    } catch(e) { addLog('Apollo Org-Suche Fehler: '+e.message,'warn'); }
+      if(orgs.length) tlog(orgs.length+' companies found via Apollo','lg');
+    } catch(e) { addLog('Apollo org search error: '+e.message,'warn'); }
   }
 
   if(!orgs.length) {
-    tlog('Keine Firmen gefunden. Prüfe API-Keys und Keywords.','ly');
+    tlog('No companies found. Check API keys and keywords.','ly');
     endAgent(); return;
   }
-  step(1,'done'); stepD(1, orgs.length+' Firmen gefunden');
+  step(1,'done'); stepD(1, orgs.length+' companies found');
 
   // ── Step 2: Enrich each org with People Search ─────────────────────────────
-  step(2,'act'); stepD(2,'Kontakte suchen via Apollo…');
+  step(2,'act'); stepD(2,'Searching contacts via Apollo…');
   const newLeads = [];
   for (const org of orgs) {
     if(abort) { endAgent(); return; }
@@ -1757,13 +1495,13 @@ Antworte AUSSCHLIESSLICH mit einem JSON-Array, KEIN anderer Text:
           }
         }
         await slp(300);
-      } catch(e) { addLog('People-Suche Fehler für '+lead.name+': '+e.message, 'err'); }
+      } catch(e) { addLog('People search error for '+lead.name+': '+e.message, 'err'); }
     }
 
     newLeads.push(lead);
     tlog('  + '+lead.name + (lead.vorname ? ' · '+lead.vorname+' '+lead.nachname : ''),'lw');
   }
-  step(2,'done'); stepD(2, newLeads.length+' Kontakte gesucht');
+  step(2,'done'); stepD(2, newLeads.length+' contacts searched');
 
   // ── Step 3: Save leads ─────────────────────────────────────────────────────
   step(3,'act'); stepD(3,t('agent_saving_leads'));
@@ -1774,14 +1512,14 @@ Antworte AUSSCHLIESSLICH mit einem JSON-Array, KEIN anderer Text:
     leads.unshift(l);
   }
   save(); ui();
-  step(3,'done'); stepD(3, newLeads.length+' Leads gespeichert');
-  addLog(newLeads.length+' Leads gespeichert (Apollo)','ok');
+  step(3,'done'); stepD(3, newLeads.length+' leads saved');
+  addLog(newLeads.length+' leads saved (Apollo)','ok');
 
-  tlog('Suche abgeschlossen. '+newLeads.length+' neue Leads mit echten Daten.','lg');
+  tlog('Search complete. '+newLeads.length+' new leads with real data.','lg');
   endAgent();
 
   if(after==='emailgen') {
-    tlog('→ Weiter zu E-Mails generieren…','lp');
+    tlog('→ Continuing to Generate Emails…','lp');
     setTimeout(() => { nav('emailgen'); renderLeadPicker(); }, 600);
   }
 };
@@ -1902,16 +1640,16 @@ const togglePromptPreview = () => {
 const buildProductContext = () => {
   const parts = [];
   const v = id => ($(id)?.value||'').trim();
-  if(v('eg-prodname'))  parts.push('Produkt: ' + v('eg-prodname'));
-  if(v('eg-target'))    parts.push('Zielgruppe: ' + v('eg-target'));
-  if(v('eg-what'))      parts.push('Was wir machen:\n' + v('eg-what'));
-  if(v('eg-problems'))  parts.push('Probleme die wir lösen:\n' + v('eg-problems'));
+  if(v('eg-prodname'))  parts.push('Product: ' + v('eg-prodname'));
+  if(v('eg-target'))    parts.push('Target audience: ' + v('eg-target'));
+  if(v('eg-what'))      parts.push('What we do:\n' + v('eg-what'));
+  if(v('eg-problems'))  parts.push('Problems we solve:\n' + v('eg-problems'));
   if(v('eg-usp'))       parts.push('USP: ' + v('eg-usp'));
-  if(v('eg-roi'))       parts.push('ROI / Kennzahlen: ' + v('eg-roi'));
-  if(v('eg-pricing'))   parts.push('Preise: ' + v('eg-pricing'));
-  if(v('eg-refs'))      parts.push('Referenzen: ' + v('eg-refs'));
-  if(v('eg-prompt'))    parts.push('Zusätzlicher Kontext:\n' + v('eg-prompt'));
-  return parts.join('\n\n') || '(noch nichts ausgefüllt)';
+  if(v('eg-roi'))       parts.push('ROI / metrics: ' + v('eg-roi'));
+  if(v('eg-pricing'))   parts.push('Pricing: ' + v('eg-pricing'));
+  if(v('eg-refs'))      parts.push('References: ' + v('eg-refs'));
+  if(v('eg-prompt'))    parts.push('Additional context:\n' + v('eg-prompt'));
+  return parts.join('\n\n') || '(nothing filled in yet)';
 };
 
 // ─── LEAD PICKER ─────────────────────────────────────────────────────────────
@@ -1962,53 +1700,53 @@ const buildEmailPrompt = (lead, catId) => {
   const catExtra   = catId === 'custom' ? extra : cat.systemPrompt;
 
   const toneMap = {
-    professionell: 'professionell und direkt, du-Form, auf Augenhöhe',
-    locker: 'locker, persönlich und sympathisch, du-Form',
-    formell: 'formell und konservativ, Sie-Form',
-    neugierig: 'neugierig und fragend, stelle Fragen statt zu pitchen'
+    professionell: 'professional and direct, first-name basis, as an equal',
+    locker: 'casual, personal and friendly, first-name basis',
+    formell: 'formal and conservative, last-name basis',
+    neugierig: 'curious and inquisitive, ask questions instead of pitching'
   };
-  const lenMap = { kurz:'3–4 Sätze', mittel:'5–6 Sätze', lang:'7–9 Sätze' };
+  const lenMap = { kurz:'3–4 sentences', mittel:'5–6 sentences', lang:'7–9 sentences' };
   const ctaMap = {
-    call:'Schlage konkret vor sich 15 Minuten für einen Discovery Call Zeit zu nehmen',
-    demo:'Lade zu einer kurzen, auf ihre Situation zugeschnittenen Demo ein',
-    info:'Biete an, relevante Fallstudien oder ein Whitepaper zu schicken',
-    roi:'Biete eine kostenlose ROI-Analyse an',
-    pilot:'Schlage ein kostenloses Pilot-Projekt vor'
+    call:'Explicitly suggest a 15-minute discovery call',
+    demo:'Invite them to a short demo tailored to their situation',
+    info:'Offer to send relevant case studies or a whitepaper',
+    roi:'Offer a free ROI analysis',
+    pilot:'Suggest a free pilot project'
   };
 
-  return `Du bist ${cfg.name||'Daria'}${cfg.role?', '+cfg.role:''}${cfg.co?', '+cfg.co:''}.
+  return `You are ${cfg.name||'Daria'}${cfg.role?', '+cfg.role:''}${cfg.co?', '+cfg.co:''}.
 
-═══ DEIN UNTERNEHMEN & ANGEBOT ═══
-${prodPrompt || 'Kein Unternehmensprofil definiert — bitte unter ① ausfüllen.'}
+═══ YOUR COMPANY & OFFER ═══
+${prodPrompt || 'No company profile defined — please fill it in under ①.'}
 
-═══ EMPFÄNGER ═══
-Firma: ${lead.name}
-Branche: ${lead.branche||'IT/Fintech'}
-Standort: ${lead.ort||''} · ${lead.ma||'?'} Mitarbeiter
-Firmenfokus: ${lead.fokus||'Bankensektor'}
+═══ RECIPIENT ═══
+Company: ${lead.name}
+Industry: ${lead.branche||'IT/Fintech'}
+Location: ${lead.ort||''} · ${lead.ma||'?'} employees
+Company focus: ${lead.fokus||'Banking sector'}
 ${lead.beschreibung?'Company Background: '+lead.beschreibung:''}
-Ansprechpartner: ${lead.vorname||''} ${lead.nachname||lead.kontakt||'Geschäftsführung'}, ${lead.rolle||''}
-Direkte E-Mail: ${lead.kontaktEmail||lead.email||''}
-Telefon: ${lead.telefon||''}
+Contact: ${lead.vorname||''} ${lead.nachname||lead.kontakt||'Management'}, ${lead.rolle||''}
+Direct email: ${lead.kontaktEmail||lead.email||''}
+Phone: ${lead.telefon||''}
 
-═══ E-MAIL-ANFORDERUNGEN ═══
-Kategorie: ${cat.name}
+═══ EMAIL REQUIREMENTS ═══
+Category: ${cat.name}
 ${catExtra}
 
-Stilregeln:
-- Tonalität: ${toneMap[tone]||toneMap.professionell}
-- Länge: ${lenMap[len]||lenMap.mittel} reiner Fließtext
-- Call-to-Action: ${ctaMap[cta]||ctaMap.call}
-- Ersten Satz IMMER auf diese Firma beziehen — keine generischen Einstiege
-- Keine Bullet-Points im Text
-- Keine Superlative ohne Beleg
-- Signatur: ${cfg.sig||'Beste Grüße'}, ${cfg.name||'Daria'}${cfg.role?'\n'+cfg.role:''}${cfg.co?'\n'+cfg.co:''}
-${extra && catId!=='custom'?'\nZusätzlich: '+extra:''}
+Style rules:
+- Tone: ${toneMap[tone]||toneMap.professionell}
+- Length: ${lenMap[len]||lenMap.mittel} of plain body text
+- Call to action: ${ctaMap[cta]||ctaMap.call}
+- ALWAYS make the first sentence reference this specific company — no generic openers
+- No bullet points in the text
+- No superlatives without evidence
+- Signature: ${cfg.sig||'Best regards'}, ${cfg.name||'Daria'}${cfg.role?'\n'+cfg.role:''}${cfg.co?'\n'+cfg.co:''}
+${extra && catId!=='custom'?'\nAdditionally: '+extra:''}
 
-Antworte AUSSCHLIESSLICH in diesem Format:
-BETREFF: [Betreff hier]
+Reply ONLY in this format:
+SUBJECT: [subject here]
 ---
-[E-Mail-Text hier]`;
+[email body here]`;
 };
 
 // ─── TEST EMAIL ───────────────────────────────────────────────────────────────
@@ -2019,7 +1757,7 @@ const runTestEmail = async () => {
   const testName = V('eg-test-lead').trim();
   const testLead = testName
     ? (leads.find(l=>l.name.toLowerCase().includes(testName.toLowerCase())) || {id:0,name:testName,branche:'IT/Fintech',fokus:'Bankensektor',kontakt:'',ort:'',ma:'~100'})
-    : (leads[0] || {id:0,name:'Beispiel GmbH',branche:'IT-Dienstleister',fokus:'Sparkassen-Software',kontakt:'Max Müller, CEO',ort:'Frankfurt',ma:'~80'});
+    : (leads[0] || {id:0,name:'Example Corp',branche:'IT service provider',fokus:'Savings-bank software',kontakt:'John Smith, CEO',ort:'Frankfurt',ma:'~80'});
 
   $('eg-test-sp').style.display='inline-block';
   document.querySelector('.btn-purple').disabled=true;
@@ -2029,11 +1767,11 @@ const runTestEmail = async () => {
     const prompt = buildEmailPrompt(testLead, selectedCat);
     const raw = await claude(prompt, 900);
     const parts = raw.split('---');
-    $('eg-test-subj').textContent = parts[0].replace('BETREFF:','').trim();
+    $('eg-test-subj').textContent = parts[0].replace('SUBJECT:','').trim();
     $('eg-test-body').textContent = parts[1]?parts[1].trim():raw;
     $('eg-test-result').style.display='';
     showAlert('eg-alrt',t('msg_test_generated')+testLead.name,'ok');
-  } catch(e) { showAlert('eg-alrt','Fehler: '+e.message,'err'); }
+  } catch(e) { showAlert('eg-alrt','Error: '+e.message,'err'); }
 
   $('eg-test-sp').style.display='none';
   document.querySelector('.btn-purple').disabled=false;
@@ -2062,8 +1800,8 @@ const runEmailGen = async () => {
     el.appendChild(d); el.scrollTop=el.scrollHeight;
   };
 
-  plog('Starte: "'+cat.name+'" → '+targetLeads.length+' Leads', 'var(--green)');
-  addLog('E-Mail-Kampagne: '+cat.name+' · '+targetLeads.length+' Leads','agent');
+  plog('Starting: "'+cat.name+'" → '+targetLeads.length+' leads', 'var(--green)');
+  addLog('Email campaign: '+cat.name+' · '+targetLeads.length+' leads','agent');
 
   let ok=0, err=0;
   for(let i=0; i<targetLeads.length; i++) {
@@ -2073,7 +1811,7 @@ const runEmailGen = async () => {
       const prompt = buildEmailPrompt(lead, selectedCat);
       const raw = await claude(prompt, 900);
       const parts = raw.split('---');
-      const subject = parts[0].replace('BETREFF:','').trim();
+      const subject = parts[0].replace('SUBJECT:','').trim();
       const body    = parts[1]?parts[1].trim():raw;
 
       const entry = {
@@ -2091,7 +1829,7 @@ const runEmailGen = async () => {
     } catch(e) {
       err++;
       plog('  ✗ '+lead.name+': '+e.message, 'var(--red)');
-      addLog('Fehler '+lead.name+': '+e.message,'err');
+      addLog('Error '+lead.name+': '+e.message,'err');
     }
     const pct = Math.round((i+1)/targetLeads.length*100);
     $('eg-prog-bar').style.width=pct+'%';
@@ -2100,9 +1838,9 @@ const runEmailGen = async () => {
     await slp(280);
   }
 
-  plog('Fertig: '+ok+' E-Mails generiert, '+err+' Fehler.', ok>0?'var(--green)':'var(--red)');
-  if(!autoMode && ok>0) plog('→ Gehe zu "Freigabe" um E-Mails zu prüfen.', 'var(--yellow)');
-  addLog('Kampagne fertig: '+ok+' E-Mails ('+cat.name+')','ok');
+  plog('Done: '+ok+' emails generated, '+err+' errors.', ok>0?'var(--green)':'var(--red)');
+  if(!autoMode && ok>0) plog('→ Go to "Approval" to review emails.', 'var(--yellow)');
+  addLog('Campaign done: '+ok+' emails ('+cat.name+')','ok');
 
   $('eg-run-btn').disabled=false;
   if(!autoMode && ok>0) setTimeout(() => nav('approve'), 1200);
@@ -2115,15 +1853,15 @@ const doSend = async (entry, lead) => {
       const res = await authFetch('/api/emails/' + entry.id + '/approve', { method: 'POST' });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        addLog('Fehler beim Senden: ' + (data.error || 'HTTP ' + res.status), 'err');
+        addLog('Send error: ' + (data.error || 'HTTP ' + res.status), 'err');
         return;
       }
-      addLog('E-Mail gesendet via Resend: ' + (entry.leadName || entry.lead_name), 'ok');
+      addLog('Email sent via Resend: ' + (entry.leadName || entry.lead_name), 'ok');
       const l = leads.find(x => x.id === (entry.leadId || entry.lead_id));
       if (l) l.status = 'Kontaktiert';
       ui(); renderApprove(); renderLeads();
     } catch (e) {
-      addLog('Sendefehler: ' + e.message, 'err');
+      addLog('Send error: ' + e.message, 'err');
     }
     return;
   }
@@ -2133,7 +1871,7 @@ const doSend = async (entry, lead) => {
   if (to) {
     window.open('https://mail.google.com/mail/?view=cm&to=' + to + '&su=' + sub + '&body=' + bod, '_blank');
   } else {
-    addLog('Hinweis: Keine E-Mail-Adresse für ' + entry.leadName + ' — Gmail ohne Empfänger geöffnet', 'warn');
+    addLog('Note: No email address for ' + entry.leadName + ' — Gmail opened without recipient', 'warn');
     window.open('https://mail.google.com/mail/?view=cm&su=' + sub + '&body=' + bod, '_blank');
   }
   const l = leads.find(x => x.id === entry.leadId);
@@ -2198,13 +1936,13 @@ const renderApprove = () => {
       <div style="overflow-x:auto">
       <table class="tbl" style="table-layout:fixed;width:100%">
         <thead><tr>
-          <th style="width:160px">Firma</th>
-          <th style="width:130px">Ansprechpartner</th>
-          <th style="width:90px">Kategorie</th>
-          <th style="width:200px">Betreff</th>
-          <th>E-Mail Text</th>
+          <th style="width:160px">Company</th>
+          <th style="width:130px">Contact</th>
+          <th style="width:90px">Category</th>
+          <th style="width:200px">Subject</th>
+          <th>Email Body</th>
           <th style="width:90px">Status</th>
-          <th style="width:130px">Aktionen</th>
+          <th style="width:130px">Actions</th>
         </tr></thead>
         <tbody>
           ${list.map(p => `
@@ -2229,10 +1967,10 @@ const renderApprove = () => {
               <td style="padding:10px 12px">${statusBadge(p.status)}</td>
               <td style="padding:8px 10px;white-space:nowrap">
                 ${p.status==='pending' ? `
-                  <button class="btn btn-sm btn-ok" style="margin-bottom:4px;display:block;width:100%" onclick="event.stopPropagation();approveOne('${p.id}')">✓ Senden</button>
-                  <button class="btn btn-sm btn-rej" style="display:block;width:100%" onclick="event.stopPropagation();rejectOne('${p.id}')">✕ Ablehnen</button>
+                  <button class="btn btn-sm btn-ok" style="margin-bottom:4px;display:block;width:100%" onclick="event.stopPropagation();approveOne('${p.id}')">✓ Send</button>
+                  <button class="btn btn-sm btn-rej" style="display:block;width:100%" onclick="event.stopPropagation();rejectOne('${p.id}')">✕ Reject</button>
                 ` : p.status==='rejected' ? `
-                  <button class="btn btn-sm" onclick="event.stopPropagation();resetTopending('${p.id}')">↩ Zurück</button>
+                  <button class="btn btn-sm" onclick="event.stopPropagation();resetTopending('${p.id}')">↩ Back</button>
                 ` : `
                   <button class="btn btn-sm" style="color:var(--t3)" onclick="event.stopPropagation();openGmail('${p.id}')">Gmail ↗</button>
                 `}
@@ -2243,23 +1981,23 @@ const renderApprove = () => {
               <td colspan="7" style="padding:16px 20px">
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
                   <div>
-                    <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Betreff</div>
+                    <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Subject</div>
                     <input class="inp" id="ed-subj-${p.id}" value="${esc(p.subject)}"
                       style="font-size:12px;font-weight:700;padding:7px 10px;margin-bottom:10px"
                       oninput="livePreview('${p.id}')" ${p.status!=='pending'?'disabled':''}>
-                    <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">E-Mail Text</div>
+                    <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Email Body</div>
                     <textarea class="inp" id="ed-${p.id}"
                       style="min-height:200px;font-size:12px;line-height:1.7;padding:10px 12px"
                       oninput="livePreview('${p.id}')" ${p.status!=='pending'?'disabled':''}>${esc(p.body)}</textarea>
                     ${p.status==='pending'?`
                       <div style="display:flex;gap:8px;margin-top:8px">
-                        <button class="btn btn-ok" onclick="approveOne('${p.id}')">✓ Freigeben & Senden</button>
-                        <button class="btn btn-sm btn-rej" onclick="rejectOne('${p.id}')">✕ Ablehnen</button>
-                        <button class="btn btn-sm" onclick="expandTableRow('${p.id}')">Schließen</button>
-                      </div>`:'<div style="margin-top:8px"><button class="btn btn-sm" onclick="expandTableRow(\''+p.id+'\')">Schließen</button></div>'}
+                        <button class="btn btn-ok" onclick="approveOne('${p.id}')">✓ Approve & Send</button>
+                        <button class="btn btn-sm btn-rej" onclick="rejectOne('${p.id}')">✕ Reject</button>
+                        <button class="btn btn-sm" onclick="expandTableRow('${p.id}')">Close</button>
+                      </div>`:'<div style="margin-top:8px"><button class="btn btn-sm" onclick="expandTableRow(\''+p.id+'\')">Close</button></div>'}
                   </div>
                   <div>
-                    <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Kontaktdaten</div>
+                    <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Contact Details</div>
                     <div style="background:var(--s1);border:var(--bd);border-radius:3px;padding:12px;font-size:12px;line-height:2">
                       <div>👤 <strong>${esc(p.contactName||'—')}</strong>${p.contactRole?' · '+esc(p.contactRole):''}</div>
                       ${p.leadEmail?`<div>✉ <a href="mailto:${esc(p.leadEmail)}" style="color:var(--blue)">${esc(p.leadEmail)}</a></div>`:''}
@@ -2273,7 +2011,7 @@ const renderApprove = () => {
         </tbody>
       </table>
       </div>`;
-    $('app-list').innerHTML = list.length ? tableHTML : (total > 0 ? `<div style="text-align:center;padding:40px;color:var(--t3)">Keine E-Mails in dieser Ansicht.</div>` : '');
+    $('app-list').innerHTML = list.length ? tableHTML : (total > 0 ? `<div style="text-align:center;padding:40px;color:var(--t3)">No emails in this view.</div>` : '');
     ui();
     return;
   }
@@ -2301,41 +2039,41 @@ const renderApprove = () => {
         <!-- ACTION BUTTONS top-right -->
         <div style="display:flex;gap:6px;align-items:flex-start;flex-shrink:0">
           ${p.status==='rejected' ? `
-            <button class="btn btn-sm" onclick="resetTopending('${p.id}')">↩ Zurück</button>
+            <button class="btn btn-sm" onclick="resetTopending('${p.id}')">↩ Back</button>
           ` : p.status==='approved' ? `
             <button class="btn btn-sm" style="color:var(--t3)" onclick="openGmail('${p.id}')">Gmail ↗</button>
           ` : ''}
         </div>
       </div>
 
-      <!-- BETREFF -->
+      <!-- SUBJECT -->
       <div style="background:var(--s2);border-radius:3px;padding:8px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px">
-        <span style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;flex-shrink:0">Betreff</span>
+        <span style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;flex-shrink:0">Subject</span>
         <span class="eml-subj-text" style="font-size:12px;font-weight:700;color:var(--t1)">${esc(p.subject)}</span>
       </div>
 
       <!-- EMAIL BODY -->
       <div class="eml-prev" id="eprev-${p.id}" style="max-height:none;white-space:pre-wrap;line-height:1.75;font-size:12px">${esc(p.body)}</div>
 
-      <!-- EDIT (nur bei pending) -->
+      <!-- EDIT (only when pending) -->
       ${p.status==='pending' ? `
         <div style="margin-top:12px;border-top:1px solid var(--s3);padding-top:12px">
           <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">
-            ✏ Betreff &amp; Text vor dem Senden anpassen:
+            ✏ Adjust subject &amp; body before sending:
           </div>
           <input class="inp" id="ed-subj-${p.id}" value="${esc(p.subject)}"
             style="font-size:12px;padding:8px 12px;margin-bottom:8px;font-weight:700"
-            placeholder="Betreff" oninput="livePreview('${p.id}')">
+            placeholder="Subject" oninput="livePreview('${p.id}')">
           <textarea class="inp" id="ed-${p.id}"
             style="min-height:180px;font-size:12px;line-height:1.75;padding:10px 12px"
             oninput="livePreview('${p.id}')">${esc(p.body)}</textarea>
           <div style="display:flex;gap:8px;margin-top:10px">
-            <button class="btn btn-ok" onclick="approveOne('${p.id}')">✓ Freigeben &amp; Senden</button>
-            <button class="btn btn-rej btn-sm" onclick="rejectOne('${p.id}')">✕ Ablehnen</button>
+            <button class="btn btn-ok" onclick="approveOne('${p.id}')">✓ Approve &amp; Send</button>
+            <button class="btn btn-rej btn-sm" onclick="rejectOne('${p.id}')">✕ Reject</button>
           </div>
         </div>
       ` : ''}
-    </div>`).join('') || (total > 0 ? `<div style="text-align:center;padding:40px;color:var(--t3)">Keine E-Mails in dieser Ansicht.</div>` : '');
+    </div>`).join('') || (total > 0 ? `<div style="text-align:center;padding:40px;color:var(--t3)">No emails in this view.</div>` : '');
 
   ui();
 };
@@ -2381,11 +2119,11 @@ const approveOne = async (id) => {
   p.status = 'approved';
   doSend(p, leads.find(x=>x.id===p.leadId));
   save(); ui(); renderApprove();
-  addLog('✓ E-Mail freigegeben: '+p.leadName+' ('+p.catName+')','ok');
+  addLog('✓ Email approved: '+p.leadName+' ('+p.catName+')','ok');
 };
 const rejectOne = async id => {
   const p=pending.find(x=>x.id===id);
-  if(p) { await apiSave('/api/emails/'+id+'/reject','POST'); p.status='rejected'; save(); ui(); renderApprove(); addLog('E-Mail abgelehnt: '+(p.leadName||p.lead_name),'warn'); }
+  if(p) { await apiSave('/api/emails/'+id+'/reject','POST'); p.status='rejected'; save(); ui(); renderApprove(); addLog('Email rejected: '+(p.leadName||p.lead_name),'warn'); }
 };
 const approveAll = () => { pending.filter(p=>p.status==='pending').forEach(p=>approveOne(p.id)); };
 const rejectAll = async () => { for(const p of pending.filter(p=>p.status==='pending')){ await apiSave('/api/emails/'+p.id+'/reject','POST'); p.status='rejected'; } save();ui();renderApprove(); };
@@ -2405,34 +2143,34 @@ const renderInbox = () => {
           </div>
         </div>
         <div style="display:flex;gap:8px;align-items:center">
-          ${item.replied?'<span class="pill pill-on">BEANTWORTET</span>':'<span class="pill pill-warn">OFFEN</span>'}
+          ${item.replied?'<span class="pill pill-on">REPLIED</span>':'<span class="pill pill-warn">OPEN</span>'}
           <span style="font-size:10px;color:var(--t3)">${new Date(item.time).toLocaleString(loc(),{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>
         </div>
       </div>
       <div class="eml-prev" style="max-height:90px">${esc(item.body)}</div>
       ${!item.replied?`
         <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-sm btn-purple" onclick="genReply('${item.id}')">⚡ KI-Antwort generieren</button>
-          <button class="btn btn-sm" onclick="toggleBox('${item.id}')">Manuell schreiben</button>
+          <button class="btn btn-sm btn-purple" onclick="genReply('${item.id}')">⚡ Generate AI Reply</button>
+          <button class="btn btn-sm" onclick="toggleBox('${item.id}')">Write manually</button>
         </div>
         <div id="rbox-${item.id}" style="display:none;margin-top:10px">
-          <textarea class="inp" id="rt-${item.id}" style="min-height:80px" placeholder="Deine Antwort…"></textarea>
-          <div style="margin-top:6px"><button class="btn btn-sm btn-ok" onclick="sendManualReply('${item.id}')">Senden</button></div>
+          <textarea class="inp" id="rt-${item.id}" style="min-height:80px" placeholder="Your reply…"></textarea>
+          <div style="margin-top:6px"><button class="btn btn-sm btn-ok" onclick="sendManualReply('${item.id}')">Send</button></div>
         </div>
         ${item.aiDraft?`
           <div style="margin-top:12px">
-            <div style="font-size:10px;color:var(--purple);margin-bottom:5px;text-transform:uppercase;letter-spacing:.08em">⚡ KI-Entwurf — bitte prüfen</div>
-            <div class="eml-prev" style="border-color:rgba(168,85,247,.3)">${esc(item.aiDraft)}</div>
+            <div style="font-size:10px;color:var(--purple);margin-bottom:5px;text-transform:uppercase;letter-spacing:.08em">⚡ AI draft — please review</div>
+            <div class="eml-prev" style="border-color:rgba(92,74,122,.4)">${esc(item.aiDraft)}</div>
             <div style="display:flex;gap:8px;margin-top:6px">
-              <button class="btn btn-sm btn-ok" onclick="approveReply('${item.id}')">✓ Genehmigen & Senden</button>
-              <button class="btn btn-sm" onclick="editDraft('${item.id}')">Bearbeiten</button>
-              <button class="btn btn-sm btn-rej" onclick="discardDraft('${item.id}')">Verwerfen</button>
+              <button class="btn btn-sm btn-ok" onclick="approveReply('${item.id}')">✓ Approve & Send</button>
+              <button class="btn btn-sm" onclick="editDraft('${item.id}')">Edit</button>
+              <button class="btn btn-sm btn-rej" onclick="discardDraft('${item.id}')">Discard</button>
             </div>
           </div>`:''}
       `:item.replyBody?`
         <div style="margin-top:10px">
-          <div style="font-size:10px;color:var(--green);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">Gesendete Antwort</div>
-          <div class="eml-prev" style="border-color:rgba(0,212,160,.2)">${esc(item.replyBody)}</div>
+          <div style="font-size:10px;color:var(--green);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">Sent Reply</div>
+          <div class="eml-prev" style="border-color:rgba(46,107,76,.3)">${esc(item.replyBody)}</div>
         </div>`:''}
     </div>`).join('');
 };
@@ -2454,34 +2192,34 @@ const genReply = async id => {
   const savedProd = (() => { try { return JSON.parse(localStorage.getItem('los3_product')||'{}'); } catch(e) { return {}; } })();
   const prodCtx = savedProd.prompt || V('eg-prompt') || '';
 
-  const prompt = `Du bist ${cfg.name||'Daria'}${cfg.role?', '+cfg.role:''}${cfg.co?', '+cfg.co:''}.
+  const prompt = `You are ${cfg.name||'Daria'}${cfg.role?', '+cfg.role:''}${cfg.co?', '+cfg.co:''}.
 
-${prodCtx?'Dein Produkt-Kontext:\n'+prodCtx+'\n':''}
-Du hast ${lead.name} eine E-Mail geschrieben (Kategorie: ${item.catName||'Kaltakquise'}).
-Betreff war: "${item.subject}"
-${item.origBody?'Deine E-Mail: '+item.origBody:''}
+${prodCtx?'Your product context:\n'+prodCtx+'\n':''}
+You wrote an email to ${lead.name} (category: ${item.catName||'Cold outreach'}).
+Subject was: "${item.subject}"
+${item.origBody?'Your email: '+item.origBody:''}
 
-Antwort des Interessenten:
+Prospect's reply:
 "${item.body}"
 
-Schreibe eine kurze, natürliche Follow-up-Antwort auf Deutsch.
-Gehe direkt auf ihre Antwort ein. Schlage einen konkreten nächsten Schritt vor.
-Max. 4–5 Sätze. Keine Bullet-Points.
-Signatur: ${cfg.sig||'Beste Grüße'}, ${cfg.name||'Daria'}${cfg.role?'\n'+cfg.role:''}
+Write a short, natural follow-up reply.
+Address their reply directly. Suggest a concrete next step.
+Max 4-5 sentences. No bullet points.
+Signature: ${cfg.sig||'Best regards'}, ${cfg.name||'Daria'}${cfg.role?'\n'+cfg.role:''}
 
-Nur den E-Mail-Text, kein Betreff:`;
+Only the email body, no subject:`;
 
   try {
     const reply = await claude(prompt, 600);
     item.aiDraft = reply;
     save(); renderInbox();
-    addLog('KI-Antwort für: '+lead.name,'agent');
-  } catch(e) { addLog('Fehler Antwort: '+e.message,'err'); }
+    addLog('AI reply for: '+lead.name,'agent');
+  } catch(e) { addLog('Reply error: '+e.message,'err'); }
   btns.forEach(b=>b.disabled=false);
 };
 
 const approveReply = id => { const item=inbox.find(x=>x.id===id); if(item?.aiDraft) doSendReply(item,item.aiDraft); };
-const sendManualReply = id => { const item=inbox.find(x=>x.id===id); const t=V('rt-'+id); if(!t){alert('Text eingeben');return;} doSendReply(item,t); };
+const sendManualReply = id => { const item=inbox.find(x=>x.id===id); const t=V('rt-'+id); if(!t){alert('Enter text');return;} doSendReply(item,t); };
 const doSendReply = async (item, text) => {
   if (AUTH_MODE === 'backend' && AUTH_API()) {
     try {
@@ -2491,7 +2229,7 @@ const doSendReply = async (item, text) => {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        addLog('Fehler beim Antworten: ' + (data.error || 'HTTP ' + res.status), 'err');
+        addLog('Reply error: ' + (data.error || 'HTTP ' + res.status), 'err');
         return;
       }
       item.replied = true; item.replyBody = text; item.aiDraft = null;
@@ -2500,7 +2238,7 @@ const doSendReply = async (item, text) => {
       ui(); renderInbox(); renderLeads();
       addLog(t('log_reply_sent') + (item.from || item.from_name), 'ok');
     } catch (e) {
-      addLog('Antwortfehler: ' + e.message, 'err');
+      addLog('Reply error: ' + e.message, 'err');
     }
     return;
   }
@@ -2520,11 +2258,11 @@ const simReply = () => {
   const lead = cl[Math.floor(Math.random()*cl.length)];
   const p = pending.find(x=>x.leadId===lead.id&&x.status==='approved');
   const msgs = [
-    'Interessant — können wir uns nächste Woche kurz sprechen?',
-    'Das klingt relevant. Was kostet das und wie lange dauert die Implementierung?',
-    'Wir haben ein ähnliches Projekt geplant. Haben Sie Referenzen aus dem Genossenschaftsbanken-Bereich?',
-    'Bitte schicken Sie mir mehr Informationen. Was unterscheidet Sie von anderen Anbietern?',
-    'Ich leite das an unseren CIO weiter — können Sie kurz die wichtigsten Punkte zusammenfassen?'
+    'Interesting — can we have a quick call next week?',
+    'That sounds relevant. What does it cost and how long does implementation take?',
+    'We have a similar project planned. Do you have references from the cooperative banking sector?',
+    'Please send me more information. What sets you apart from other providers?',
+    'I\'ll forward this to our CIO — can you briefly summarize the key points?'
   ];
   inbox.unshift({
     id:uid(), leadId:lead.id, from:[lead.vorname,lead.nachname].filter(Boolean).join(' ')||lead.kontakt||lead.name,
@@ -2536,7 +2274,7 @@ const simReply = () => {
   });
   lead.status='Geantwortet';
   save(); ui(); renderInbox(); renderLeads(); nav('inbox');
-  addLog('Antwort simuliert von: '+lead.name,'info');
+  addLog('Reply simulated from: '+lead.name,'info');
 };
 
 // ─── LEADS ─────────────────────────────────────────────────────────────────────
@@ -2560,11 +2298,11 @@ const renderLeads = () => {
 
   const incomplete = list.filter(l=>!l.vorname||!l.nachname||!l.kontaktEmail||!l.telefon);
   const hint = incomplete.length
-    ? `<tr><td colspan="8" style="padding:8px 16px;background:rgba(245,194,24,.05);border-bottom:1px solid rgba(245,194,24,.12)">
-        <span style="font-size:11px;color:var(--yellow)">⚠ ${incomplete.length} Leads haben unvollständige Kontaktdaten.</span>
-        <button class="tbtn" style="color:var(--yellow);font-size:11px;margin-left:10px;border:1px solid rgba(245,194,24,.3);border-radius:2px;padding:2px 8px"
-          onclick="autoFillAll()">⚡ Alle auto-ausfüllen</button>
-        <button class="tbtn" style="color:var(--t3);font-size:11px;margin-left:6px" onclick="nav('linkedin')">→ LinkedIn öffnen</button>
+    ? `<tr><td colspan="8" style="padding:8px 16px;background:rgba(122,93,27,.06);border-bottom:1px solid rgba(122,93,27,.15)">
+        <span style="font-size:11px;color:var(--yellow)">⚠ ${incomplete.length} leads have incomplete contact data.</span>
+        <button class="tbtn" style="color:var(--yellow);font-size:11px;margin-left:10px;border:1px solid rgba(122,93,27,.35);border-radius:2px;padding:2px 8px"
+          onclick="autoFillAll()">⚡ Auto-fill all</button>
+        <button class="tbtn" style="color:var(--t3);font-size:11px;margin-left:6px" onclick="nav('linkedin')">→ Open LinkedIn</button>
        </td></tr>` : '';
 
   $('ld-body').innerHTML = hint + list.map(l => {
@@ -2644,22 +2382,22 @@ const renderLeads = () => {
 
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:12px">
           <div>
-            <div class="field-lbl">Vorname *</div>
+            <div class="field-lbl">First name *</div>
             <input class="inp" id="ec-vorname-${l.id}" value="${esc(l.vorname||'')}"
-              placeholder="Max" style="font-size:12px;padding:7px 10px">
+              placeholder="John" style="font-size:12px;padding:7px 10px">
           </div>
           <div>
-            <div class="field-lbl">Nachname *</div>
+            <div class="field-lbl">Last name *</div>
             <input class="inp" id="ec-nachname-${l.id}" value="${esc(l.nachname||'')}"
-              placeholder="Müller" style="font-size:12px;padding:7px 10px">
+              placeholder="Smith" style="font-size:12px;padding:7px 10px">
           </div>
           <div>
-            <div class="field-lbl">Rolle / Position</div>
+            <div class="field-lbl">Role / Position</div>
             <input class="inp" id="ec-rolle-${l.id}" value="${esc(l.rolle||'')}"
-              placeholder="CIO, IT-Leiter, CEO…" style="font-size:12px;padding:7px 10px">
+              placeholder="CIO, IT Director, CEO…" style="font-size:12px;padding:7px 10px">
           </div>
           <div>
-            <div class="field-lbl">LinkedIn Profil</div>
+            <div class="field-lbl">LinkedIn Profile</div>
             <input class="inp" id="ec-linkedin-${l.id}" value="${esc(l.linkedin||'')}"
               placeholder="linkedin.com/in/..." style="font-size:12px;padding:7px 10px">
           </div>
@@ -2667,17 +2405,17 @@ const renderLeads = () => {
 
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
           <div>
-            <div class="field-lbl">📧 E-Mail Ansprechpartner *</div>
+            <div class="field-lbl">📧 Contact Email *</div>
             <input class="inp" id="ec-kemail-${l.id}" value="${esc(l.kontaktEmail||'')}"
-              placeholder="max.mueller@firma.de" type="email" style="font-size:12px;padding:7px 10px">
+              placeholder="max.smith@company.com" type="email" style="font-size:12px;padding:7px 10px">
           </div>
           <div>
-            <div class="field-lbl">🏢 Firmen-E-Mail</div>
+            <div class="field-lbl">🏢 Company Email</div>
             <input class="inp" id="ec-femail-${l.id}" value="${esc(l.firmenEmail||'')}"
-              placeholder="info@firma.de" type="email" style="font-size:12px;padding:7px 10px">
+              placeholder="info@company.com" type="email" style="font-size:12px;padding:7px 10px">
           </div>
           <div>
-            <div class="field-lbl">📞 Telefon direkt / Zentrale</div>
+            <div class="field-lbl">📞 Direct Phone / Main Line</div>
             <input class="inp" id="ec-telefon-${l.id}" value="${esc(l.telefon||'')}"
               placeholder="+49 30 12345678" style="font-size:12px;padding:7px 10px">
           </div>
@@ -2685,34 +2423,34 @@ const renderLeads = () => {
 
         <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin-bottom:12px">
           <div>
-            <div class="field-lbl">📝 Company Beschreibung</div>
+            <div class="field-lbl">📝 Company Description</div>
             <textarea class="inp" id="ec-beschr-${l.id}"
-              placeholder="Was macht die Firma? Spezialisierung, Kunden, Produkte…"
+              placeholder="What does the company do? Specialization, customers, products…"
               style="font-size:11px;padding:7px 10px;min-height:75px;line-height:1.5">${esc(l.beschreibung||'')}</textarea>
           </div>
           <div>
             <div class="field-lbl">Website</div>
             <input class="inp" id="ec-web-${l.id}" value="${esc(l.web||'')}"
-              placeholder="firma.de" style="font-size:12px;padding:7px 10px;margin-bottom:8px">
-            <div class="field-lbl">Standort</div>
+              placeholder="company.com" style="font-size:12px;padding:7px 10px;margin-bottom:8px">
+            <div class="field-lbl">Location</div>
             <input class="inp" id="ec-ort-${l.id}" value="${esc(l.ort||'')}"
               placeholder="Berlin" style="font-size:12px;padding:7px 10px">
           </div>
           <div>
-            <div class="field-lbl">Firmenfokus / USP</div>
+            <div class="field-lbl">Company Focus / USP</div>
             <textarea class="inp" id="ec-fokus-${l.id}"
-              placeholder="z.B. liefert für Sparkassen, RegTech-Spezialist…"
+              placeholder="e.g. serves savings banks, RegTech specialist…"
               style="font-size:11px;padding:7px 10px;min-height:75px;line-height:1.5">${esc(l.fokus||'')}</textarea>
           </div>
         </div>
 
         <div style="display:flex;gap:8px;align-items:center">
-          <button class="btn btn-ok btn-sm" onclick="saveContact(${l.id})">💾 Speichern</button>
-          <button class="btn btn-sm" onclick="editContact(${l.id})">Abbrechen</button>
+          <button class="btn btn-ok btn-sm" onclick="saveContact(${l.id})">💾 Save</button>
+          <button class="btn btn-sm" onclick="editContact(${l.id})">Cancel</button>
         </div>
       </td>
     </tr>`;
-  }).join('') || '<tr><td colspan="7" style="text-align:center;padding:36px;color:var(--t3)">Keine Leads. Agent starten oder Leads importieren.</td></tr>';
+  }).join('') || '<tr><td colspan="7" style="text-align:center;padding:36px;color:var(--t3)">No leads. Start the agent or import leads.</td></tr>';
 };
 
 const editContact = id => {
@@ -2740,40 +2478,40 @@ const saveContact = id => {
   l.kontakt = [l.vorname, l.nachname].filter(Boolean).join(' ') + (l.rolle ? ', '+l.rolle : '');
   l.email   = l.kontaktEmail || l.firmenEmail || l.email;
   save(); renderLeads(); renderLeadPicker(); renderCompanyList();
-  addLog(`Kontakt gespeichert: ${l.name} · ${l.vorname} ${l.nachname} (${l.rolle||''})`, 'ok');
+  addLog(`Contact saved: ${l.name} · ${l.vorname} ${l.nachname} (${l.rolle||''})`, 'ok');
 };
 
 // KI auto-fill ONE lead
 const autoFillLead = async (id) => {
   const l = leads.find(x=>x.id===id); if(!l) return;
   const btn = $('af-btn-'+id), st = $('af-status-'+id);
-  if(btn){ btn.disabled=true; btn.innerHTML='<span class="sp"></span>läuft…'; }
+  if(btn){ btn.disabled=true; btn.innerHTML='<span class="sp"></span>running…'; }
   if(st){ st.textContent=''; st.style.color='var(--t3)'; }
 
   // open edit row
   const row = $('lre-'+id);
   if(row) row.style.display='';
 
-  const prompt = `Du bist ein B2B-Recherche-Assistent. Fülle fehlende Kontaktdaten für dieses Unternehmen aus.
+  const prompt = `You are a B2B research assistant. Fill in missing contact data for this company.
 
-Firma: ${l.name}
-Branche: ${l.branche||''}
-Ort: ${l.ort||''}
+Company: ${l.name}
+Industry: ${l.branche||''}
+Location: ${l.ort||''}
 Website: ${l.web||''}
-Mitarbeiter: ${l.ma||''}
-Bekannter Fokus: ${l.fokus||''}
-Bereits bekannt: ${l.vorname?'Vorname: '+l.vorname:''}${l.nachname?' Nachname: '+l.nachname:''}${l.rolle?' Rolle: '+l.rolle:''}
+Employees: ${l.ma||''}
+Known focus: ${l.fokus||''}
+Already known: ${l.vorname?'First name: '+l.vorname:''}${l.nachname?' Last name: '+l.nachname:''}${l.rolle?' Role: '+l.rolle:''}
 
-Recherchiere / schätze:
-1. Vorname des Ansprechpartners (CEO/GF/CTO/IT-Leiter)
-2. Nachname des Ansprechpartners
-3. Genaue Rolle/Position (z.B. "Geschäftsführer", "CIO", "Head of IT")
-4. Direkte E-Mail des Ansprechpartners (gängiges Format: vorname.nachname@domain oder v.nachname@domain)
-5. Firmen-E-Mail (info@domain oder kontakt@domain)
-6. Telefon (Zentrale oder direkt, +49 Format)
-7. Company Beschreibung (2-3 präzise Sätze: Was macht die Firma, welche Bankenkunden, welche Hauptprodukte)
+Research / estimate:
+1. First name of the contact person (CEO/Managing Director/CTO/IT Director)
+2. Last name of the contact person
+3. Exact role/position (e.g. "Geschäftsführer", "CIO", "Head of IT")
+4. Direct email of the contact person (common format: firstname.lastname@domain or f.lastname@domain)
+5. Company email (info@domain or kontakt@domain)
+6. Phone (main line or direct, +49 format)
+7. Company description (2-3 precise sentences: what the company does, which banking customers, main products)
 
-Antworte NUR als JSON (kein Text davor/danach):
+Reply ONLY as JSON (no text before/after):
 {
   "vorname": "",
   "nachname": "",
@@ -2788,7 +2526,7 @@ Antworte NUR als JSON (kein Text davor/danach):
     const raw = await claude(prompt, 700);
     const cleaned2 = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
     const s=cleaned2.indexOf('{'), e=cleaned2.lastIndexOf('}');
-    if(s<0||e<0) throw new Error('Kein JSON in Antwort');
+    if(s<0||e<0) throw new Error('No JSON in response');
     const d = JSON.parse(cleaned2.substring(s,e+1));
 
     const fill = (fieldId, val, existing) => {
@@ -2802,11 +2540,11 @@ Antworte NUR als JSON (kein Text davor/danach):
     fill('ec-telefon-'+id,   d.telefon,      l.telefon);
     if(d.beschreibung){ const el=$('ec-beschr-'+id); if(el) el.value=d.beschreibung; }
 
-    if(st){ st.textContent='✓ Ausgefüllt — bitte prüfen & speichern'; st.style.color='var(--green)'; }
-    addLog(`Auto-Fill: ${l.name} · ${d.vorname||''} ${d.nachname||''}`, 'agent');
+    if(st){ st.textContent='✓ Filled in — please review & save'; st.style.color='var(--green)'; }
+    addLog(`Auto-fill: ${l.name} · ${d.vorname||''} ${d.nachname||''}`, 'agent');
   } catch(err) {
-    if(st){ st.textContent='Fehler: '+err.message; st.style.color='var(--red)'; }
-    addLog('Auto-Fill Fehler '+l.name+': '+err.message, 'err');
+    if(st){ st.textContent='Error: '+err.message; st.style.color='var(--red)'; }
+    addLog('Auto-fill error '+l.name+': '+err.message, 'err');
   }
   if(btn){ btn.disabled=false; btn.textContent=t('lead_ai_fill_btn'); }
 };
@@ -2819,12 +2557,12 @@ const autoFillAll = async () => {
     await autoFillLead(l.id);
     await slp(400);
   }
-  addLog(`Auto-Fill Batch: ${incomplete.length} Leads verarbeitet`, 'ok');
+  addLog(`Auto-fill batch: ${incomplete.length} leads processed`, 'ok');
 };
 
 const setStatus=async(id,st)=>{ const l=leads.find(x=>x.id===id); if(l){l.status=st; await apiSave('/api/leads/'+id,'PUT',{status:st}); save();renderLeads();ui();} };
-const delLead=async(id)=>{ const l=leads.find(x=>x.id===id); if(l&&confirm('"'+l.name+'" löschen?')){await apiSave('/api/leads/'+id,'DELETE'); leads=leads.filter(x=>x.id!==id);save();renderLeads();ui();} };
-const clearLeads=()=>{ if(confirm('Alle Leads löschen?')){leads=[];save();renderLeads();ui();addLog('Alle Leads gelöscht','warn');} };
+const delLead=async(id)=>{ const l=leads.find(x=>x.id===id); if(l&&confirm('Delete "'+l.name+'"?')){await apiSave('/api/leads/'+id,'DELETE'); leads=leads.filter(x=>x.id!==id);save();renderLeads();ui();} };
+const clearLeads=()=>{ if(confirm('Delete all leads?')){leads=[];save();renderLeads();ui();addLog('All leads deleted','warn');} };
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 const applyCfg = () => {
@@ -2848,17 +2586,17 @@ const expCSV = async () => {
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
         dl('leads_'+ds()+'.csv', url);
-        addLog('CSV exportiert (Server)');
+        addLog('CSV exported (server)');
         return;
       }
     } catch(e) {}
   }
-  const h='Firma,Branche,MA,Ort,Vorname,Nachname,Rolle,Telefon,E-Mail Kontakt,Firmen-E-Mail,LinkedIn,Beschreibung,Fokus,Website,Status';
+  const h='Company,Industry,Employees,Location,First Name,Last Name,Role,Phone,Contact Email,Company Email,LinkedIn,Description,Focus,Website,Status';
   const rows=leads.map(l=>[l.name,l.branche,l.ma,l.ort,l.vorname,l.nachname,l.rolle,l.telefon,l.kontaktEmail||l.kontakt_email,l.firmenEmail||l.firmen_email,l.linkedin,l.beschreibung,l.fokus,l.web,l.status].map(x=>`"${(x||'').replace(/"/g,'""')}"`).join(','));
   dl('leads_'+ds()+'.csv','data:text/csv;charset=utf-8,'+encodeURIComponent(h+'\n'+rows.join('\n')));
-  addLog('CSV exportiert');
+  addLog('CSV exported');
 };
-const expJSON = () => { dl('leados_'+ds()+'.json','data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify({leads,pending,inbox,logs,cfg,exported:new Date().toISOString()},null,2))); addLog('JSON exportiert'); };
+const expJSON = () => { dl('leados_'+ds()+'.json','data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify({leads,pending,inbox,logs,cfg,exported:new Date().toISOString()},null,2))); addLog('JSON exported'); };
 const impJSON = () => {
   const inp=document.createElement('input');inp.type='file';inp.accept='.json';
   inp.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
@@ -2874,17 +2612,17 @@ const impJSON = () => {
       if(d.pending)pending=d.pending;if(d.inbox)inbox=d.inbox;if(d.logs)logs=d.logs;
       if(d.cfg)cfg={...cfg,...d.cfg};
       save();applyCfg();ui();renderLeads();renderApprove();renderInbox();renderLog();renderCatGrid();renderLeadPicker();
-      alert('Import OK: '+leads.length+' Leads');addLog('Import: '+leads.length+' Leads','ok');
-    }catch(e){alert('Fehler: '+e.message);}};r.readAsText(f);};inp.click();
+      alert('Import OK: '+leads.length+' leads');addLog('Import: '+leads.length+' leads','ok');
+    }catch(e){alert('Error: '+e.message);}};r.readAsText(f);};inp.click();
 };
 const deleteUserAccount = (userId) => {
   const users = getUsers();
   const user = users.find(u=>u.id===userId);
   if(!user) return;
-  if(!confirm('Nutzer "'+user.name+'" ('+user.email+') löschen?')) return;
+  if(!confirm('Delete user "'+user.name+'" ('+user.email+')?')) return;
   saveUsers(users.filter(u=>u.id!==userId));
   renderTeam();
-  addLog('Nutzer gelöscht: '+user.name, 'warn');
+  addLog('User deleted: '+user.name, 'warn');
 };
 
 // ─── CLOCK ────────────────────────────────────────────────────────────────────
@@ -2942,7 +2680,7 @@ const renderCompanyCard = (l, isComplete) => {
 
   // Contact person block
   if(hasContact) {
-    html += `<div style="margin-top:6px;padding:6px 10px;background:rgba(75,200,130,.08);border:1px solid rgba(75,200,130,.2);border-radius:3px">
+    html += `<div style="margin-top:6px;padding:6px 10px;background:rgba(46,107,76,.06);border:1px solid rgba(46,107,76,.2);border-radius:3px">
       <div style="font-size:11px;font-weight:600;color:var(--t1)">&#x1f464; ${esc(l.vorname||'')} ${esc(l.nachname||'')}${l.rolle?'<span style="color:var(--t3);font-weight:400"> — '+esc(l.rolle)+'</span>':''}</div>
       <div style="display:flex;gap:12px;margin-top:3px;flex-wrap:wrap;font-size:10px">
         ${l.kontaktEmail?`<span style="color:var(--green)">&#x2709; ${esc(l.kontaktEmail)}</span>`:`<span style="color:var(--red)">&#x2709; ${t('missing')}</span>`}
@@ -3075,11 +2813,11 @@ const searchSelectedContacts = async () => {
           addLog('Apollo+: ' + lead.name + ' → ' + p.kontakt + ' · ' + (p.email || ''), 'ok');
         }
       } else {
-        addLog('Apollo: ' + lead.name + ' → keine Kontakte gefunden', 'warn');
+        addLog('Apollo: ' + lead.name + ' → no contacts found', 'warn');
       }
       await slp(300);
     } catch(e) {
-      addLog('Apollo-Fehler: ' + lead.name + ' — ' + e.message, 'err');
+      addLog('Apollo error: ' + lead.name + ' — ' + e.message, 'err');
       // Stop on auth/limit errors — no point retrying
       if(e.message.includes('403')) {
         showAlert('li-alrt', e.message, 'err');
@@ -3151,7 +2889,7 @@ const enrichOneLead = async (id) => {
           addLog('Apollo+: ' + lead.name + ' → ' + p.kontakt + ' · ' + (p.email || ''), 'ok');
         }
       }
-    } catch (e) { addLog('Apollo-Fehler: ' + e.message, 'err'); }
+    } catch (e) { addLog('Apollo error: ' + e.message, 'err'); }
   }
 
   save(); renderCompanyList(); renderLeads(); renderLeadPicker();
@@ -3199,7 +2937,7 @@ const apolloSearch = async (lead) => {
   const data = await res.json();
   if (!res.ok) {
     const detail = data.details?.message || data.error || ('HTTP ' + res.status);
-    if (res.status === 403) throw new Error('Apollo 403: API-Key ungültig oder Limit erreicht. ' + detail);
+    if (res.status === 403) throw new Error('Apollo 403: API key invalid or limit reached. ' + detail);
     throw new Error('Apollo: ' + detail);
   }
   const people = data.people || [];
@@ -3308,7 +3046,7 @@ const showRegErr    = (msg) => { const e=$('reg-err');   e.textContent=msg; e.st
 const doLogin = async () => {
   const email = ($('li-email').value||'').trim().toLowerCase();
   const pass  = $('li-pass').value||'';
-  if(!email || !pass) { showLoginErr('Bitte E-Mail und Passwort eingeben.'); return; }
+  if(!email || !pass) { showLoginErr('Please enter email and password.'); return; }
 
   const btn = $('li-btn');
   btn.disabled=true; btn.textContent='...';
@@ -3323,8 +3061,8 @@ const doLogin = async () => {
       });
       const data = await res.json();
       if(!res.ok) {
-        showLoginErr(data.error || 'Login fehlgeschlagen ('+res.status+')');
-        btn.disabled=false; btn.textContent='Einloggen'; return;
+        showLoginErr(data.error || 'Login failed ('+res.status+')');
+        btn.disabled=false; btn.textContent='Log in'; return;
       }
       saveToken(data.token);
       await onLoginSuccess(data.user);
@@ -3340,14 +3078,14 @@ const doLogin = async () => {
         return;
       }
       const user = users.find(u => u.email === email);
-      if(!user) { showLoginErr('E-Mail nicht gefunden.'); btn.disabled=false; btn.textContent='Einloggen'; return; }
+      if(!user) { showLoginErr('Email not found.'); btn.disabled=false; btn.textContent='Log in'; return; }
       const hash = await hashPass(pass);
-      if(hash !== user.passHash) { showLoginErr('Falsches Passwort.'); btn.disabled=false; btn.textContent='Einloggen'; return; }
+      if(hash !== user.passHash) { showLoginErr('Incorrect password.'); btn.disabled=false; btn.textContent='Log in'; return; }
       await onLoginSuccess(user);
     }
   } catch(err) {
-    showLoginErr('Verbindungsfehler: ' + err.message);
-    btn.disabled=false; btn.textContent='Einloggen';
+    showLoginErr('Connection error: ' + err.message);
+    btn.disabled=false; btn.textContent='Log in';
   }
 };
 
@@ -3358,10 +3096,10 @@ const doRegister = async () => {
   const pass  = $('reg-pass').value||'';
   const pass2 = $('reg-pass2').value||'';
 
-  if(!name)                         { showRegErr('Name eingeben.'); return; }
-  if(!email||!email.includes('@'))  { showRegErr('Gültige E-Mail eingeben.'); return; }
-  if(pass.length < 8)               { showRegErr('Passwort min. 8 Zeichen.'); return; }
-  if(pass !== pass2)                { showRegErr('Passwörter stimmen nicht überein.'); return; }
+  if(!name)                         { showRegErr('Enter a name.'); return; }
+  if(!email||!email.includes('@'))  { showRegErr('Enter a valid email.'); return; }
+  if(pass.length < 8)               { showRegErr('Password must be at least 8 characters.'); return; }
+  if(pass !== pass2)                { showRegErr('Passwords do not match.'); return; }
 
   const btn = $('reg-btn');
   btn.disabled=true; btn.textContent='...';
@@ -3376,23 +3114,23 @@ const doRegister = async () => {
       });
       const data = await res.json();
       if(!res.ok) {
-        showRegErr(data.error || 'Registrierung fehlgeschlagen ('+res.status+')');
-        btn.disabled=false; btn.textContent='Account erstellen'; return;
+        showRegErr(data.error || 'Registration failed ('+res.status+')');
+        btn.disabled=false; btn.textContent='Create account'; return;
       }
       saveToken(data.token);
       await onLoginSuccess(data.user);
     } else {
       // ── Local register ─────────────────────────────────────────────────
       const users = getUsers();
-      if(users.find(u=>u.email===email)) { showRegErr('Diese E-Mail ist bereits registriert.'); btn.disabled=false; btn.textContent='Account erstellen'; return; }
+      if(users.find(u=>u.email===email)) { showRegErr('This email is already registered.'); btn.disabled=false; btn.textContent='Create account'; return; }
       const hash = await hashPass(pass);
       const newUser = {id:uid(), name, email, passHash:hash, role:'user', created:new Date().toISOString()};
       saveUsers([...users, newUser]);
       await onLoginSuccess(newUser);
     }
   } catch(err) {
-    showRegErr('Verbindungsfehler: ' + err.message);
-    btn.disabled=false; btn.textContent='Account erstellen';
+    showRegErr('Connection error: ' + err.message);
+    btn.disabled=false; btn.textContent='Create account';
   }
 };
 
@@ -3544,7 +3282,7 @@ const createUser = async () => {
 
   if (AUTH_MODE === 'backend' && AUTH_API()) {
     const res = await authFetch('/api/users', { method: 'POST', body: JSON.stringify({ name, email, password: pass, role }) });
-    if (!res.ok) { const d = await res.json().catch(()=>({})); showAlert('team-alrt', d.error || 'Fehler', 'err'); return; }
+    if (!res.ok) { const d = await res.json().catch(()=>({})); showAlert('team-alrt', d.error || 'Error', 'err'); return; }
   } else {
     const users = getUsers();
     if(users.find(u=>u.email===email)) { showAlert('team-alrt',t('msg_email_taken'),'err'); return; }
@@ -3558,8 +3296,8 @@ const createUser = async () => {
   ['nu-name','nu-email','nu-pass'].forEach(id => { const el=$(id); if(el) el.value=''; });
   hideAddUser();
   renderTeam();
-  showAlert('team-alrt', `✓ Benutzer "${name}" (${email}) wurde angelegt.`,'ok');
-  addLog('Benutzer erstellt: '+name+' ('+email+') · Rolle: '+role,'ok');
+  showAlert('team-alrt', `✓ User "${name}" (${email}) was created.`,'ok');
+  addLog('User created: '+name+' ('+email+') · Role: '+role,'ok');
 };
 
 const toggleRole = async (userId) => {
@@ -3570,7 +3308,7 @@ const toggleRole = async (userId) => {
     const newRole = u.role === 'admin' ? 'user' : 'admin';
     await authFetch('/api/users/' + userId, { method: 'PUT', body: JSON.stringify({ role: newRole }) });
     renderTeam();
-    addLog('Rolle geändert: ' + u.name + ' → ' + newRole, 'warn');
+    addLog('Role changed: ' + u.name + ' → ' + newRole, 'warn');
     return;
   }
   const users = getUsers();
@@ -3579,17 +3317,17 @@ const toggleRole = async (userId) => {
   u.role = u.role==='admin' ? 'user' : 'admin';
   saveUsers(users);
   renderTeam();
-  addLog('Rolle geändert: '+u.name+' → '+u.role,'warn');
+  addLog('Role changed: '+u.name+' → '+u.role,'warn');
 };
 
 const resetPassword = async (userId) => {
-  const newPass = prompt('Neues Passwort für diesen Benutzer (min. 8 Zeichen):');
-  if(!newPass || newPass.length < 8) { alert('Passwort zu kurz.'); return; }
+  const newPass = prompt('New password for this user (min. 8 characters):');
+  if(!newPass || newPass.length < 8) { alert('Password too short.'); return; }
   if (AUTH_MODE === 'backend' && AUTH_API()) {
     const res = await authFetch('/api/users/' + userId + '/password', { method: 'PUT', body: JSON.stringify({ password: newPass }) });
-    if (!res.ok) { const d = await res.json().catch(()=>({})); showAlert('team-alrt', d.error || 'Fehler', 'err'); return; }
+    if (!res.ok) { const d = await res.json().catch(()=>({})); showAlert('team-alrt', d.error || 'Error', 'err'); return; }
     showAlert('team-alrt',t('msg_pass_reset'),'ok');
-    addLog('Passwort zurückgesetzt','warn');
+    addLog('Password reset','warn');
     return;
   }
   const users = getUsers();
@@ -3597,8 +3335,8 @@ const resetPassword = async (userId) => {
   if(!u) return;
   u.passHash = await hashPass(newPass);
   saveUsers(users);
-  showAlert('team-alrt','Passwort für '+u.name+' wurde zurückgesetzt.','ok');
-  addLog('Passwort zurückgesetzt: '+u.name,'warn');
+  showAlert('team-alrt','Password for '+u.name+' was reset.','ok');
+  addLog('Password reset: '+u.name,'warn');
 };
 
 const deleteUser = async (userId) => {
@@ -3606,21 +3344,21 @@ const deleteUser = async (userId) => {
     const users = await (await authFetch('/api/users')).json();
     const u = users.find(x=>x.id===userId);
     if(!u) return;
-    if(!confirm(`Benutzer "${u.name}" (${u.email}) wirklich löschen?`)) return;
+    if(!confirm(`Really delete user "${u.name}" (${u.email})?`)) return;
     await authFetch('/api/users/' + userId, { method: 'DELETE' });
     renderTeam();
     showAlert('team-alrt',t('msg_user_deleted'),'warn');
-    addLog('Benutzer gelöscht: '+u.name,'warn');
+    addLog('User deleted: '+u.name,'warn');
     return;
   }
   const users = getUsers();
   const u = users.find(x=>x.id===userId);
   if(!u) return;
-  if(!confirm(`Benutzer "${u.name}" (${u.email}) wirklich löschen?`)) return;
+  if(!confirm(`Really delete user "${u.name}" (${u.email})?`)) return;
   saveUsers(users.filter(x=>x.id!==userId));
   renderTeam();
   showAlert('team-alrt',t('msg_user_deleted'),'warn');
-  addLog('Benutzer gelöscht: '+u.name,'warn');
+  addLog('User deleted: '+u.name,'warn');
 };
 
 const changeOwnPassword = async () => {

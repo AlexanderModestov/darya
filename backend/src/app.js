@@ -68,7 +68,7 @@ app.post('/api/perplexity/search', authMiddleware, async (req, res) => {
       body: JSON.stringify({
         model: 'sonar',
         messages: [
-          { role: 'system', content: 'Du bist ein B2B-Lead-Recherche-Agent für den deutschen Markt. Antworte AUSSCHLIESSLICH mit einem JSON-Array, kein anderer Text.' },
+          { role: 'system', content: 'You are a B2B lead research agent for the German market. Respond ONLY with a JSON array, no other text.' },
           { role: 'user', content: prompt }
         ],
         max_tokens: 4000,
